@@ -1,0 +1,1258 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/ContentTypeService.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description"></p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"></div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">eZ\Publish\API\Repository
+         
+    </dd>
+</dl>
+<a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\ContentTypeService" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\API\Repository\ContentTypeService<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository</small><p class="short-description"></p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Example</dt>
+<dd>Examples/contenttype.php
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::addFieldDefinition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addFieldDefinition</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a> $contentTypeDraft, <a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct</a> $fieldDefinitionCreateStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Adds a new field definition to an existing content type.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The content type must be in state DRAFT.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeDraft</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$fieldDefinitionCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if the identifier in already exists in the content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to edit a content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::assignContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">assignContentTypeGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType, <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a> $contentTypeGroup
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">assign a content type to a content type group.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentTypeGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to unlink a content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the content type is already assigned the given group</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::copyContentType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copyContentType</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType, <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></code><div class="description"><p class="short_description">Copy Type incl fields and groupIds to a new Type object</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>New Type will have $userId as creator / modifier, created / modified should be updated with current time,
+updated remoteId and identifier should be appended with '_' + unique string.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em><p>if null the current user is used</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to copy a content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::createContentType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createContentType</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct</a> $contentTypeCreateStruct, array $contentTypeGroups
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></code><div class="description"><p class="short_description">Create a Content Type object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The content type is created in the state STATUS_DRAFT.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentTypeGroups</th>
+<td>array</td>
+<td><em><p>Required array of {@link ContentTypeGroup} to link type with (must contain one)</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the identifier or remoteId in the content type create struct already exists or there is a dublicate field identifier</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::createContentTypeDraft()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createContentTypeDraft</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></code><div class="description"><p class="short_description">Creates a draft from an existing content type.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This is a complete copy of the content
+type wiich has the state STATUS_DRAFT.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to edit a content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>If there is already a draft assigned to another user</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::createContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createContentTypeGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct</a> $contentTypeGroupCreateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></code><div class="description"><p class="short_description">Create a Content Type Group object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroupCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to create a content type group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If a group with the same identifier already exists</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::deleteContentType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteContentType</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType, boolean $deleteObjects
+              =
+              false
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete a Content Type object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If $deleteObjects is set to true all object instances of this content type are deleted.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$deleteObjects</th>
+<td>boolean</td>
+<td><em><p>indicates if content object should be deleted if exist</p></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>$deleteObjects is set to false and there exist content objects of this type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to delete a content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::deleteContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteContentTypeGroup</span><span class="nb-faded-text">(
+           $contentTypeGroup, boolean $deleteObjects
+              =
+              false
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete a Content Type Group.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If the paramter $deleteObjects is set to true
+this method deletes also all content types in this group which
+are not assigned to other groups including the content object instances.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroup</th>
+<td></td>
+<td><em><p>\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</p>
+</em></td>
+</tr>
+<tr>
+<th>$deleteObjects</th>
+<td>boolean</td>
+<td><em><p>indicates if content object should be deleted if exist</p></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to delete a content type group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the parameter $deleteObjects is set to false and a to be deleted content type has instances</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentType</span><span class="nb-faded-text">(
+          int $contentTypeId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></code><div class="description"><p class="short_description">Get a Content Type object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If a content type with the given id and status DEFINED can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeByIdentifier()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeByIdentifier</span><span class="nb-faded-text">(
+          string $identifier
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></code><div class="description"><p class="short_description">Get a Content Type object by identifier</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$identifier</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If content type with the given identifier and status DEFINED can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeByRemoteId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeByRemoteId</span><span class="nb-faded-text">(
+          string $remoteId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></code><div class="description"><p class="short_description">Get a Content Type object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$remoteId</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If content type with the given remote id and status DEFINED can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeDraft()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeDraft</span><span class="nb-faded-text">(
+          int $contentTypeId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></code><div class="description"><p class="short_description">Get a Content Type object draft by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If the content type draft owned by the current user can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeGroup</span><span class="nb-faded-text">(
+          int $contentTypeGroupId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></code><div class="description"><p class="short_description">Get a Content Type Group object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroupId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If group can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeGroupByIdentifier()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeGroupByIdentifier</span><span class="nb-faded-text">(
+          string $contentTypeGroupIdentifier
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></code><div class="description"><p class="short_description">Get a Content Type Group object by identifier</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroupIdentifier</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If group can not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypeGroups()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypeGroups</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \eZ\Publish\API\Repository\aray</code><div class="description"><p class="short_description">Get all Content Type Groups</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\aray</td>
+<td>an array of {@link ContentTypeGroup}</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::loadContentTypes()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentTypes</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a> $contentTypeGroup
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Get Content Type objects which belong to the given content type group</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>an array of {@link ContentType} which have status DEFINED</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newContentTypeCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentTypeCreateStruct</span><span class="nb-faded-text">(
+          string $identifier
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct</a></code><div class="description"><p class="short_description">instanciates a new content type create class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$identifier</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newContentTypeGroupCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentTypeGroupCreateStruct</span><span class="nb-faded-text">(
+          string $identifier
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct</a></code><div class="description"><p class="short_description">instanciates a new content type group create class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$identifier</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newContentTypeGroupUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentTypeGroupUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupUpdateStruct</a></code><div class="description"><p class="short_description">instanciates a new content type update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newContentTypeUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentTypeUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct</a></code><div class="description"><p class="short_description">instanciates a new content type update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newFieldDefinitionCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newFieldDefinitionCreateStruct</span><span class="nb-faded-text">(
+          string $identifier, string $fieldTypeIdentifier
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct</a></code><div class="description"><p class="short_description">instanciates a field definition create struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$identifier</th>
+<td>string</td>
+<td><em><p>the required identifier for the field definition</p></em></td>
+</tr>
+<tr>
+<th>$fieldTypeIdentifier</th>
+<td>string</td>
+<td><em><p>the required field type identifier</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::newFieldDefinitionUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newFieldDefinitionUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct</a></code><div class="description"><p class="short_description">instanciates a field definition update class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::publishContentTypeDraft()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">publishContentTypeDraft</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a> $contentTypeDraft
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Publish the content type and update content objects.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeDraft</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>If the content type has no draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to publish a content type This method updates content objects, depending on the changed field definitions.</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::removeFieldDefinition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeFieldDefinition</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a> $contentTypeDraft, <a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinition.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinition">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition</a> $fieldDefinition
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Remove a field definition from an existing Type.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeDraft</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$fieldDefinition</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinition.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinition">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the given field definition does not belong to the given type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to edit a content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::unassignContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unassignContentTypeGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType, <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a> $contentTypeGroup
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Unassign a content type from a group.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentTypeGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to link a content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the content type is not assigned this the given group.</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>If $contentTypeGroup is the last group assigned to the content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::updateContentTypeDraft()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateContentTypeDraft</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a> $contentTypeDraft, <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct</a> $contentTypeUpdateStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a Content Type object</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Does not update fields (fieldDefinitions), use {@link updateFieldDefinition()} to update them.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeDraft</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentTypeUpdateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to update a content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the given identifier or remoteId already exists or there is no draft assigned to the authenticated user</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::updateContentTypeGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateContentTypeGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a> $contentTypeGroup, <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupUpdateStruct</a> $contentTypeGroupUpdateStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a Content Type Group object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></td>
+<td><em><p>the content type group to be updated</p></em></td>
+</tr>
+<tr>
+<th>$contentTypeGroupUpdateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to create a content type group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the given identifier (if set) already exists</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentTypeService::updateFieldDefinition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateFieldDefinition</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a> $contentTypeDraft, <a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinition.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinition">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition</a> $fieldDefinition,  $fieldDefinitionUpdateStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a field definition</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentTypeDraft</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeDraft.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeDraft">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft</a></td>
+<td><em><p>the content type draft</p></em></td>
+</tr>
+<tr>
+<th>$fieldDefinition</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinition.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinition">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition</a></td>
+<td><em><p>the field definition which should be updated</p></em></td>
+</tr>
+<tr>
+<th>$fieldDefinitionUpdateStruct</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\InvalidArgumentException</td>
+<td><em>If the field id in the update struct is not found or does not belong to the content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to edit a content type</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>If the given identifier is used in an existing field of the given content type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

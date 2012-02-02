@@ -1,0 +1,477 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/FieldType/BinaryFile/Value.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CValue">\ezp\Content\FieldType\BinaryFile\Value</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\FieldType\BinaryFile\Value" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\FieldType\BinaryFile\Value<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Value for BinaryFile field type</p>
+<div class="long-description"><p>A field value object is to be understood with associated field type</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_ValueInterface.html#%5Cezp%5CContent%5CFieldType%5CValueInterface">\ezp\Content\FieldType\ValueInterface</a>
+            &lt;
+            <a href="db_ezp_Base_ModelState.html#%5Cezp%5CBase%5CModelState" style="color: gray; font-size: 0.8em
+                ">\ezp\Base\ModelState</a>
+</dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$downloadCount" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$downloadCount</span>= '0'
+                </code><div class="description">
+<p class="short-description">Number of times the file has been downloaded through content/download module</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>0</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$file" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Io\BinaryFile
+                 <span class="highlight">$file</span>= ''
+                </code><div class="description">
+<p class="short-description">BinaryFile object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$filename" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$filename</span>= ''
+                </code><div class="description">
+<p class="short-description">The internal name of the file (generated by the system)</p>The internal name of the file (generated by the system)</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The internal name of the file (generated by the system)
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$filepath" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$filepath</span>= ''
+                </code><div class="description">
+<p class="short-description">The path to the file (including the filename).</p>The path to the file (including the filename).</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The path to the file (including the filename).
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$filesize" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$filesize</span>= ''
+                </code><div class="description">
+<p class="short-description">The size of the file (number of bytes).</p>The size of the file (number of bytes).</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The size of the file (number of bytes).
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$handler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Content\FieldType\BinaryFile\Handler
+                 <span class="highlight">$handler</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_FieldType_BinaryFile_Handler.html#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CHandler">\ezp\Content\FieldType\BinaryFile\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$mimeType" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$mimeType</span>= ''
+                </code><div class="description">
+<p class="short-description">The MIME type of the file (for example "audio/wav").</p>The MIME type of the file (for example "audio/wav").</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The MIME type of the file (for example "audio/wav").
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$mimeTypeCategory" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$mimeTypeCategory</span>= ''
+                </code><div class="description">
+<p class="short-description">The MIME type category (for example "audio").</p>The MIME type category (for example "audio").</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The MIME type category (for example "audio").
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$mimeTypePart" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$mimeTypePart</span>= ''
+                </code><div class="description">
+<p class="short-description">The MIME type part (for example "wav").</p>The MIME type part (for example "wav").</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The MIME type part (for example "wav").
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::$originalFilename" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$originalFilename</span>= ''
+                </code><div class="description">
+<p class="short-description">Original file name</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+           $file
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Construct a new Value object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>To affect a BinaryFile object to the $file property, use the handler:</p>
+
+<pre><code>use \ezp\Content\FieldType\BinaryFile;
+$binaryValue = new BinaryFile\Value;
+$binaryValue->file = $binaryValue->getHandler()->createFromLocalPath( '/path/to/local/file.txt' );
+</code></pre></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$file</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::__get()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+           $name
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::__toString()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__toString</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_Value.html#%5Cezp%5CContent%5CFieldType%5CValue">\ezp\Content\FieldType\Value</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::fromString()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fromString</span><span class="nb-faded-text">(
+           $stringValue
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_FieldType_BinaryFile_Value.html#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CValue">\ezp\Content\FieldType\BinaryFile\Value</a></code><div class="description">
+<span class="attribute">static</span><p class="short_description"></p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$stringValue</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_FieldType_BinaryFile_Value.html#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CValue">\ezp\Content\FieldType\BinaryFile\Value</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_Value.html#%5Cezp%5CContent%5CFieldType%5CValue">\ezp\Content\FieldType\Value</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::getHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_FieldType_BinaryFile_Handler.html#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CHandler">\ezp\Content\FieldType\BinaryFile\Handler</a></code><div class="description"><p class="short_description">Returns handler object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Useful manipulate {@link self::$file}</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_FieldType_BinaryFile_Handler.html#%5Cezp%5CContent%5CFieldType%5CBinaryFile%5CHandler">\ezp\Content\FieldType\BinaryFile\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\BinaryFile\Value::getTitle()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTitle</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Returns the title of the current field value.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>It will be used to generate content name and url alias if current field is designated
+to be used in the content name/urlAlias pattern.</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_ValueInterface.html#%5Cezp%5CContent%5CFieldType%5CValueInterface::getTitle()">\ezp\Content\FieldType\ValueInterface::getTitle()</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

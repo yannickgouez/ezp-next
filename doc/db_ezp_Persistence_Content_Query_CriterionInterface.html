@@ -1,0 +1,214 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Content/Query/CriterionInterface.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Content\Query\CriterionInterface" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\ezp\Persistence\Content\Query\CriterionInterface<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Base interface for Criterion implementations</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_ContentTypeGroupId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CContentTypeGroupId">\ezp\Persistence\Content\Query\Criterion\ContentTypeGroupId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_FullText.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CFullText">\ezp\Persistence\Content\Query\Criterion\FullText</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_RemoteId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CRemoteId">\ezp\Persistence\Content\Query\Criterion\RemoteId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_UserMetadata.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CUserMetadata">\ezp\Persistence\Content\Query\Criterion\UserMetadata</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_DateMetadata.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CDateMetadata">\ezp\Persistence\Content\Query\Criterion\DateMetadata</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_ParentLocationId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CParentLocationId">\ezp\Persistence\Content\Query\Criterion\ParentLocationId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_ContentId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CContentId">\ezp\Persistence\Content\Query\Criterion\ContentId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_LocationId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLocationId">\ezp\Persistence\Content\Query\Criterion\LocationId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_Subtree.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CSubtree">\ezp\Persistence\Content\Query\Criterion\Subtree</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_ContentTypeId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CContentTypeId">\ezp\Persistence\Content\Query\Criterion\ContentTypeId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_SectionId.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CSectionId">\ezp\Persistence\Content\Query\Criterion\SectionId</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_UrlAlias.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CUrlAlias">\ezp\Persistence\Content\Query\Criterion\UrlAlias</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_Field.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CField">\ezp\Persistence\Content\Query\Criterion\Field</a></dd>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion_Status.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CStatus">\ezp\Persistence\Content\Query\Criterion\Status</a></dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Content\Query\CriterionInterface::createFromQueryBuilder()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createFromQueryBuilder</span><span class="nb-faded-text">(
+          string $target, string $operator, mixed $value
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_CriterionInterface.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterionInterface">\ezp\Persistence\Content\Query\CriterionInterface</a></code><div class="description">
+<span class="attribute">static</span><p class="short_description">Creates a new Criterion for $target with operator $operator on $value</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$target</th>
+<td>string</td>
+<td><em><p>The target (field identifier for a field, metadata identifier, etc)</p>
+</em></td>
+</tr>
+<tr>
+<th>$operator</th>
+<td>string</td>
+<td><em><p>The criterion operator, from Criterion\Operator</p>
+</em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>The Criterion value, either as an individual item or an array</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_CriterionInterface.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterionInterface">\ezp\Persistence\Content\Query\CriterionInterface</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Query\CriterionInterface::getSpecifications()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getSpecifications</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_Criterion_Operator_Specifications.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5COperator%5CSpecifications">\ezp\Persistence\Content\Query\Criterion\Operator\Specifications[]</a></code><div class="description"><p class="short_description">Criterion description function.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Returns the combination of the Criterion's supported operator/value,
+as an array of ezp\Persistence\Content\Query\Criterion\Operator\Specifications objects
+- Operator is one supported Operator, as an Operator::* constant
+- ValueType is the type of input value this operator requires, either array or single
+- SupportedTypes is an array of types the operator will accept
+- ValueCountLimitation is an integer saying how many values are expected.</p>
+
+<pre><code>// IN and EQ are supported
+return array(
+    // The EQ operator expects a single value, either as an integer or a string
+    new Specifications(
+        Operator::EQ,
+        Specifications::INPUT_TYPE_SINGLE,
+        array( Specifications::INPUT_VALUE_INTEGER, Specifications::INPUT_VALUE_STRING ),
+    ),
+    // The IN operator expects an array of values, of either integers or strings
+    new Specifications(
+        Operator::IN,
+        Specifications::INPUT_TYPE_ARRAY,
+        array( Specifications::INPUT_VALUE_INTEGER, Specifications::INPUT_VALUE_STRING )
+    )
+)*
+</code></pre></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion_Operator_Specifications.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5COperator%5CSpecifications">\ezp\Persistence\Content\Query\Criterion\Operator\Specifications[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

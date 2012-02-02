@@ -1,0 +1,859 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Storage/InMemory/UserHandler.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CUserHandler">\ezp\Persistence\Storage\InMemory\UserHandler</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Storage\InMemory\UserHandler" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Persistence\Storage\InMemory\UserHandler<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Storage Engine handler for user module</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Persistence_User_Handler.html#%5Cezp%5CPersistence%5CUser%5CHandler">\ezp\Persistence\User\Handler</a></dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::$backend" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\InMemory\Backend
+                 <span class="highlight">$backend</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_InMemory_Backend.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CBackend">\ezp\Persistence\Storage\InMemory\Backend</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::$handler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\InMemory\Handler
+                 <span class="highlight">$handler</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_InMemory_Handler.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CHandler">\ezp\Persistence\Storage\InMemory\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Storage_InMemory_Handler.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CHandler">\ezp\Persistence\Storage\InMemory\Handler</a> $handler, <a href="db_ezp_Persistence_Storage_InMemory_Backend.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CBackend">\ezp\Persistence\Storage\InMemory\Backend</a> $backend
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Setups current handler instance with reference to Handler object that created it.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$handler</th>
+<td><a href="db_ezp_Persistence_Storage_InMemory_Handler.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CHandler">\ezp\Persistence\Storage\InMemory\Handler</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$backend</th>
+<td><a href="db_ezp_Persistence_Storage_InMemory_Backend.html#%5Cezp%5CPersistence%5CStorage%5CInMemory%5CBackend">\ezp\Persistence\Storage\InMemory\Backend</a></td>
+<td><em><p>The storage engine backend</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::addPolicy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addPolicy</span><span class="nb-faded-text">(
+          mixed $roleId, <a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a> $policy
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a></code><div class="description"><p class="short_description">Adds a policy to a role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$policy</th>
+<td><a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If $policy->limitation is empty (null, empty string/array..)</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Throw on invalid Role Id?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::assignRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">assignRole</span><span class="nb-faded-text">(
+          mixed $groupId, mixed $roleId, array $limitation
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Assign role to user group with given limitation</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The limitation array may look like:</p>
+
+<pre><code> array(
+     'Subtree' => array(
+         '/1/2/',
+         '/1/4/',
+     ),
+     'Foo' => array( 'Bar' ),
+     …
+ )
+</code></pre>
+
+<p>Where the keys are the limitation identifiers, and the respective values
+are an array of limitation values. The limitation parameter is optional.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$groupId</th>
+<td>mixed</td>
+<td><em><p>The group Id to assign the role to. In Legacy storage engine this is the content object id of the group to assign to. Assigning to a user is not supported, only un-assigning is supported for bc.</p>
+</em></td>
+</tr>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$limitation</th>
+<td>array</td>
+<td><em><p>@todo Remove or implement</p>
+</em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If group or role is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If group is not of user_group Content Type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If group is already assigned role</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a> $user
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></code><div class="description"><p class="short_description">Create a user</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The User struct used to create the user will contain an ID which is used
+to reference the user.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If no id was provided or if it already exists</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::createRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a> $role
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></code><div class="description"><p class="short_description">Create new role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          mixed $userId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete user with the given ID.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Throw on missing user?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::deleteRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteRole</span><span class="nb-faded-text">(
+          mixed $roleId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete the specified role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::getPermissionsForObject()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getPermissionsForObject</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content.html#%5Cezp%5CPersistence%5CContent">\ezp\Persistence\Content</a> $content,  $typeId, array $policies
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Persistence_Content.html#%5Cezp%5CPersistence%5CContent">\ezp\Persistence\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$typeId</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$policies</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If $content is not of user_group Content Type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          mixed $userId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></code><div class="description"><p class="short_description">Load user with user ID.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::loadByLogin()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadByLogin</span><span class="nb-faded-text">(
+          string $login, boolean $alsoMatchEmail
+              =
+              false
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User[]</a></code><div class="description"><p class="short_description">Load user with user login / email.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$login</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$alsoMatchEmail</th>
+<td>boolean</td>
+<td><em><p>Also match user email, caller must verify that $login is a valid email address.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::loadPoliciesByUserId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadPoliciesByUserId</span><span class="nb-faded-text">(
+          mixed $userId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy[]</a></code><div class="description"><p class="short_description">Returns the user policies associated with the user (including inherited policies from user groups)</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy[]</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If user (it's content object atm) is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If user is not of user Content Type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::loadRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRole</span><span class="nb-faded-text">(
+          mixed $roleId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></code><div class="description"><p class="short_description">Load a specified role by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If role is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::loadRolesByGroupId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRolesByGroupId</span><span class="nb-faded-text">(
+          mixed $groupId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role[]</a></code><div class="description"><p class="short_description">Load roles assigned to a user/group</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$groupId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role[]</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If user (it's content object atm) is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If group is not of user_group Content Type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::removePolicy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removePolicy</span><span class="nb-faded-text">(
+          mixed $roleId, mixed $policyId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a policy from a role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$policyId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Throw exception on missing role / policy?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::unAssignRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unAssignRole</span><span class="nb-faded-text">(
+          mixed $groupId, mixed $roleId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Un-assign a role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$groupId</th>
+<td>mixed</td>
+<td><em><p>The group / user Id to un-assign a role from</p>
+</em></td>
+</tr>
+<tr>
+<th>$roleId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If group or role is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If group is not of user[_group] Content Type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If group does not contain role</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update the user information specified by the user struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::updatePolicy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updatePolicy</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a> $policy
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a policy</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Replaces limitations values with new values.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$policy</th>
+<td><a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If $policy->limitation is empty (null, empty string/array..)</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\InMemory\UserHandler::updateRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User_RoleUpdateStruct.html#%5Cezp%5CPersistence%5CUser%5CRoleUpdateStruct">\ezp\Persistence\User\RoleUpdateStruct</a> $role
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_Persistence_User_RoleUpdateStruct.html#%5Cezp%5CPersistence%5CUser%5CRoleUpdateStruct">\ezp\Persistence\User\RoleUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

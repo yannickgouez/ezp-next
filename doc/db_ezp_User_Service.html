@@ -1,0 +1,1207 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/User/Service.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CUser%5CService">\ezp\User\Service</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\User\Service" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\User\Service<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">User Service, extends repository with user specific operations</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\User\Service::$handler" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Handler
+                 <span class="highlight">$handler</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description"></p><small>Inherited from:
+                        <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24handler">\ezp\Base\Service::$$handler</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24handler">\ezp\Base\Service::$$handler</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::$repository" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Repository
+                 <span class="highlight">$repository</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description"></p><small>Inherited from:
+                        <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24repository">\ezp\Base\Service::$$repository</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24repository">\ezp\Base\Service::$$repository</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\User\Service::__construct()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a> $repository, <a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a> $handler
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Setups service with reference to repository object that created it & corresponding handler</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::__construct()">\ezp\Base\Service::__construct()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$repository</th>
+<td><a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$handler</th>
+<td><a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::addPolicy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addPolicy</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role, <a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a> $policy
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Add a policy to a persisted role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$policy</th>
+<td><a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::assignGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">assignGroup</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a> $group, <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Assign a Group to User</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$group</th>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If $object has not been persisted yet</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::assignRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">assignRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a> $group, <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$group</th>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If group is already contains role</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to assign provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::buildGroup()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildGroup</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::buildPolicy()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildPolicy</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a> $vo, <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$vo</th>
+<td><a href="db_ezp_Persistence_User_Policy.html#%5Cezp%5CPersistence%5CUser%5CPolicy">\ezp\Persistence\User\Policy</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::buildRole()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a> $vo
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$vo</th>
+<td><a href="db_ezp_Persistence_User_Role.html#%5Cezp%5CPersistence%5CUser%5CRole">\ezp\Persistence\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::buildUser()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildUser</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a> $vo, <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content
+          )
+        </span>
+        :
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$vo</th>
+<td><a href="db_ezp_Persistence_User.html#%5Cezp%5CPersistence%5CUser">\ezp\Persistence\User</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $user
+          )
+        </span>
+        :
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></code><div class="description"><p class="short_description">Crate a User object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing or has a value of null</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If attached content object with same id does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::createGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createGroup</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a> $parentGroup, string $name, string $description
+              =
+              ''
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></code><div class="description"><p class="short_description">Crate a Group object</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$parentGroup</th>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$description</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If name or description properties (fields) are not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::createHash()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">createHash</span><span class="nb-faded-text">(
+          string $login, string $password, int $type
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Create user password hash</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$login</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$type</th>
+<td>int</td>
+<td><em><p>One of User::PASSWORD_HASH_* constants</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::createRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></code><div class="description"><p class="short_description">Crate a Role object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing or has a value of null</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to create provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete a User object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::deleteRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Delete a Role object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to delete provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::fillStruct()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">fillStruct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> $do, array $optionalProperties
+              =
+              array()
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">General method to fill in property values in struct from model->property values</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::fillStruct()">\ezp\Base\Service::fillStruct()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$struct</th>
+<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$do</th>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$optionalProperties</th>
+<td>array</td>
+<td><em><p>List of properties that is optional</p></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing, has a value of null and {@link setPropertyByConvention()} returns false.</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\ezp\Base\setPropertyByConvention()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          mixed $id
+          )
+        </span>
+        :
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></code><div class="description"><p class="short_description">Load a User object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If user is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::loadByCredentials()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadByCredentials</span><span class="nb-faded-text">(
+          string $login, string $password
+          )
+        </span>
+        :
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></code><div class="description"><p class="short_description">Load a User object by login and password if user is enabled</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$login</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If user is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_User_Exception_FailedLogin.html#%5Cezp%5CUser%5CException%5CFailedLogin">\ezp\User\Exception\FailedLogin</a></td>
+<td><em>If password does not match</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::loadGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadGroup</span><span class="nb-faded-text">(
+          mixed $id
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></code><div class="description"><p class="short_description">Load a Group object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If group is not found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFoundWithType.html#%5Cezp%5CBase%5CException%5CNotFoundWithType">\ezp\Base\Exception\NotFoundWithType</a></td>
+<td><em>If content found with $id does not have correct typeId</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::loadRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRole</span><span class="nb-faded-text">(
+          mixed $id
+          )
+        </span>
+        :
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></code><div class="description"><p class="short_description">Load a Role object by id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If user is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::removePolicy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removePolicy</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role, <a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a> $policy
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Remove a policy from a persisted role</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$policy</th>
+<td><a href="db_ezp_User_Policy.html#%5Cezp%5CUser%5CPolicy">\ezp\User\Policy</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::setPropertyByConvention()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">setPropertyByConvention</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, string $property
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">General method to fill in property value by convention</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::setPropertyByConvention()">\ezp\Base\Service::setPropertyByConvention()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Properties filled by convention:
+    - remoteId
+    - created
+    - modified
+    - creatorId
+    - modifierId</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$struct</th>
+<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>False if no property was set by convention</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::unAssignGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unAssignGroup</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a> $group, <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Remove a Group assignment from a User</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$group</th>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If $object has not been persisted yet</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>: Either allow removing last group of a user or define which api should be used for deleting users + tree
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::unAssignRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unAssignRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a> $group, <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$group</th>
+<td><a href="db_ezp_User_Group.html#%5Cezp%5CUser%5CGroup">\ezp\User\Group</a></td>
+<td><em><p>Can also take instance of user atm</p></em></td>
+</tr>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If group does not contain role</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to (un)assign provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a User object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing or has a value of null</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\User\Service::updateRole()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateRole</span><span class="nb-faded-text">(
+          <a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a> $role
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Update a Role object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$role</th>
+<td><a href="db_ezp_User_Role.html#%5Cezp%5CUser%5CRole">\ezp\User\Role</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing or has a value of null</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

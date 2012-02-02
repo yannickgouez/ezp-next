@@ -1,0 +1,796 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/LocationService.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description"></p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"></div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">eZ\Publish\API\Repository
+         
+    </dd>
+</dl>
+<a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\LocationService" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\API\Repository\LocationService<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository</small><p class="short-description">Location service, used for complex subtree operations</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Example</dt>
+<dd>Examples/location.php
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\LocationService::copySubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copySubtree</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $subtree, <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $targetParentLocation
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Copies the subtree starting from $subtree as a new subtree of $targetLocation</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Only the items on which the user has read access are copied.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$subtree</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em><ul>
+<li>the subtree denoted by the location to copy</li>
+</ul>
+</em></td>
+</tr>
+<tr>
+<th>$targetParentLocation</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em><ul>
+<li>the target parent location for the copy operation</li>
+</ul>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>The newly created location of the copied subtree</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed copy the subtree to the given parent location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if the target location is a sub location of the given location</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>enhancement - this method should return a result structure containing the new location and a list
+of locations which are not copied due to permission denials.
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::createLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createLocation</span><span class="nb-faded-text">(
+           $content,  $locationCreateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Creates the new $location in the content repository for the given content</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationCreateStruct</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>the newly created Location</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to create this location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if the content is already below the specified parent or the parent is a sub location of the location the content or if set the remoteId existis already</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::deleteLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes $location and all its descendants.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user is not allowed to delete this location or a descendant</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::hideLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hideLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Hides the $location and marks invisible all descendants of $location.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>$location, with updated hidden value</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to hide this location</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::loadLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadLocation</span><span class="nb-faded-text">(
+          integer $locationId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Loads a location object from its $locationId</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to read this location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If the specified location is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::loadLocationByRemoteId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadLocationByRemoteId</span><span class="nb-faded-text">(
+          string $remoteId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Loads a location object from its $remoteId</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$remoteId</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to read this location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>If the specified location is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::loadLocationChildren()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadLocationChildren</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location, int $offset
+              =
+              0, int $limit
+              =
+              -1
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Load children which are readable by the current user of a location object sorted by sortField and sortOrder</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em><p>the start offset for paging</p></em></td>
+</tr>
+<tr>
+<th>$limit</th>
+<td>int</td>
+<td><em><p>the number of locations returned. If $limit = -1 all children starting at $offset are returned</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>of {@link Location}</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::loadLocations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadLocations</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $rootLocation
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Loads the locations for the given content object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If a $rootLocation is given, only locations that belong to this location are returned.
+The location list is also filtered by permissions on reading locations.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$rootLocation</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>an array of {@link Location}</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if there is no published version yet</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::loadMainLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadMainLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">loads the main loaction of a content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>(in 5.x the return value also can be null if the content has no location)</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to read this location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if there is no published version yet</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::moveSubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">moveSubtree</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location, <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $newParentLocation
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Moves the subtree to $newParentLocation</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If a user has the permission to move the location to a target location
+he can do it regardless of an existing descendant on which the user has no permission.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParentLocation</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to move this location to the target</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::newLocationCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newLocationCreateStruct</span><span class="nb-faded-text">(
+          int $parentLocationId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_LocationCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationCreateStruct">\eZ\Publish\API\Repository\Values\Content\LocationCreateStruct</a></code><div class="description"><p class="short_description">Instantiates a new location create class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$parentLocationId</th>
+<td>int</td>
+<td><em><p>the parent under which the new location should be created</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_LocationCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationCreateStruct">\eZ\Publish\API\Repository\Values\Content\LocationCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::newLocationUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newLocationUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_LocationUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationUpdateStruct">\eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct</a></code><div class="description"><p class="short_description">Instantiates a new location update class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_LocationUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationUpdateStruct">\eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::swapLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">swapLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location1, <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location2
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Swaps the contents hold by the $location1 and $location2</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location1</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$location2</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to swap content</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::unhideLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unhideLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Unhides the $location.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This method and marks visible all descendants of $locations
+until a hidden location is found.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>$location, with updated hidden value</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to unhide this location</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\LocationService::updateLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateLocation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a> $location, <a href="db_eZ_Publish_API_Repository_Values_Content_LocationUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationUpdateStruct">\eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct</a> $locationUpdateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></code><div class="description"><p class="short_description">Updates $location in the content repository</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationUpdateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_LocationUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationUpdateStruct">\eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></td>
+<td>the updated Location</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>If the current user user is not allowed to update this location</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if if set the remoteId existis already</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

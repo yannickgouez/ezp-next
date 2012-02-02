@@ -1,0 +1,1477 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/Proxy.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CProxy">\ezp\Content\Proxy</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\Proxy" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\Proxy<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">This class represents a Proxy Content item</p>
+<div class="long-description"><p>It is used for both input and output manipulation.</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a>
+            &lt;
+            <a href="db_ezp_Base_ModelDefinition.html#%5Cezp%5CBase%5CModelDefinition" style="color: gray; font-size: 0.8em
+                ">\ezp\Base\ModelDefinition</a>
+</dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\Proxy::$alwaysAvailable" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">bool
+                 <span class="highlight">$alwaysAvailable</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's always available flag</p>The Content's always available flag</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's always available flag
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$contentType" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Type
+                 <span class="highlight">$contentType</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's type</p>The Content's type</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Type.html#%5Cezp%5CContent%5CType">\ezp\Content\Type</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's type
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$creationDate" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\DateTime
+                 <span class="highlight">$creationDate</span>= ''
+                </code><div class="description">
+<p class="short-description">The date the object was created</p>The date the object was created</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Content\DateTime</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The date the object was created
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$currentVersion" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Version
+                 <span class="highlight">$currentVersion</span>= ''
+                </code><div class="description">
+<p class="short-description">Current version of content</p>Current version of content</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Current version of content
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$currentVersionNo" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$currentVersionNo</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's current version</p>The Content's current version</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's current version
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$fields" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Field[]
+                 <span class="highlight">$fields</span>= ''
+                </code><div class="description">
+<p class="short-description">Collection of content's fields in default (current) language. Shorthand property to directly access to the content's fields in current language &lt;code&gt; $myTitle = $content-&gt;fields-&gt;title; // Where "title" is the field identifier &lt;/code&gt;</p>Collection of content's fields in default (current) language. Shorthand property to directly access to the content's fields in current language &lt;code&gt; $myTitle = $content-&gt;fields-&gt;title; // Where "title" is the field identifier &lt;/code&gt;</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Field.html#%5Cezp%5CContent%5CField">\ezp\Content\Field[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Collection of content's fields in default (current) language. Shorthand property to directly access to the content's fields in current language <code> $myTitle = $content->fields->title; // Where "title" is the field identifier </code>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$id" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">mixed
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Id of the object</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24id">\ezp\Base\Proxy::$$id</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24id">\ezp\Base\Proxy::$$id</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$id
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$id" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's ID, automatically assigned by the persistence layer</p>The Content's ID, automatically assigned by the persistence layer</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's ID, automatically assigned by the persistence layer
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$initialLanguage" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Language
+                 <span class="highlight">$initialLanguage</span>= ''
+                </code><div class="description">
+<p class="short-description">The language the Content was initially created in</p>The language the Content was initially created in</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Language.html#%5Cezp%5CContent%5CLanguage">\ezp\Content\Language</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>The language the Content was initially created in
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$initialLanguageId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$initialLanguageId</span>= ''
+                </code><div class="description">
+<p class="short-description">The id of the language the Content was initially created in. Set using {@see setInitialLanguage()}</p>The id of the language the Content was initially created in. Set using {@see setInitialLanguage()}</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The id of the language the Content was initially created in. Set using {@see setInitialLanguage()}
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$locations" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Location[]
+                 <span class="highlight">$locations</span>= ''
+                </code><div class="description">
+<p class="short-description">Locations for content. Iterable, countable and Array-accessible (with numeric indexes) First location referenced in the collection represents the main location for content &lt;code&gt; $mainLocation = $content-&gt;locations[0]; $anotherLocation = $content-&gt;locations[2]; $locationById = $content-&gt;locations-&gt;byId( 60 ); &lt;/code&gt;</p>Locations for content. Iterable, countable and Array-accessible (with numeric indexes) First location referenced in the collection represents the main location for content &lt;code&gt; $mainLocation = $content-&gt;locations[0]; $anotherLocation = $content-&gt;locations[2]; $locationById = $content-&gt;locations-&gt;byId( 60 ); &lt;/code&gt;</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Locations for content. Iterable, countable and Array-accessible (with numeric indexes) First location referenced in the collection represents the main location for content <code> $mainLocation = $content->locations[0]; $anotherLocation = $content->locations[2]; $locationById = $content->locations->byId( 60 ); </code>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$mainLocation" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Location
+                 <span class="highlight">$mainLocation</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$observers" class="anchor"></a><div class="property private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\ezp\Base\Observer[]
+                 <span class="highlight">$observers</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">List of event listeners</p><small>Inherited from:
+                        </small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Base\Observer[]</dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$observers
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$owner" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\User
+                 <span class="highlight">$owner</span>= ''
+                </code><div class="description">
+<p class="short-description">Owner user object</p>Owner user object</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>Owner user object
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$ownerId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$ownerId</span>= ''
+                </code><div class="description">
+<p class="short-description">Id of the user object that owns the content</p>Id of the user object that owns the content</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Id of the user object that owns the content
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$ownerId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$ownerId</span>= ''
+                </code><div class="description">
+<p class="short-description">Owner identifier</p>Owner identifier</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Owner identifier
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$proxiedObject" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Model|object
+                 <span class="highlight">$proxiedObject</span>= 'null'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Concrete proxied object</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24proxiedObject">\ezp\Base\Proxy::$$proxiedObject</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>
+<a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> | object</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24proxiedObject">\ezp\Base\Proxy::$$proxiedObject</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$proxiedObject
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$relations" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Relation[]
+                 <span class="highlight">$relations</span>= ''
+                </code><div class="description">
+<p class="short-description">Collection of \ezp\Content\Relation objects, related to the current one</p>Collection of \ezp\Content\Relation objects, related to the current one</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Collection of \ezp\Content\Relation objects, related to the current one
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$remoteId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$remoteId</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's remote identifier (custom identifier for the object)</p>The Content's remote identifier (custom identifier for the object)</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's remote identifier (custom identifier for the object)
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$reverseRelations" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Relation[]
+                 <span class="highlight">$reverseRelations</span>= ''
+                </code><div class="description">
+<p class="short-description">Collection of \ezp\Content\Relation objects, reverse-related to the current one</p>Collection of \ezp\Content\Relation objects, reverse-related to the current one</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Collection of \ezp\Content\Relation objects, reverse-related to the current one
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$section" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Section
+                 <span class="highlight">$section</span>= ''
+                </code><div class="description">
+<p class="short-description">The Section the content belongs to</p>The Section the content belongs to</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Section the content belongs to
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$sectionId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$sectionId</span>= ''
+                </code><div class="description">
+<p class="short-description">Read property for section id, use with object $section to change</p>Read property for section id, use with object $section to change</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Read property for section id, use with object $section to change
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$service" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Service
+                 <span class="highlight">$service</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Service used to load the object the proxy represents.</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24service">\ezp\Base\Proxy::$$service</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24service">\ezp\Base\Proxy::$$service</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$service
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$status" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$status</span>= ''
+                </code><div class="description">
+<p class="short-description">The Content's status, as one of the \ezp\Content::STATUS_* constants</p>The Content's status, as one of the \ezp\Content::STATUS_* constants</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The Content's status, as one of the \ezp\Content::STATUS_* constants
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$translations" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Translation[]
+                 <span class="highlight">$translations</span>= ''
+                </code><div class="description">
+<p class="short-description">Collection of content's translations, indexed by locale (ie. eng-GB) &lt;code&gt; $myEnglishTranslation = $content-&gt;translations["eng-GB"]; $myEnglishTitle = $content-&gt;translations["eng-GB"]-&gt;fields-&gt;title; // Where "title" is the field identifier &lt;/code&gt;</p>Collection of content's translations, indexed by locale (ie. eng-GB) &lt;code&gt; $myEnglishTranslation = $content-&gt;translations["eng-GB"]; $myEnglishTitle = $content-&gt;translations["eng-GB"]-&gt;fields-&gt;title; // Where "title" is the field identifier &lt;/code&gt;</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Translation.html#%5Cezp%5CContent%5CTranslation">\ezp\Content\Translation[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Collection of content's translations, indexed by locale (ie. eng-GB) <code> $myEnglishTranslation = $content->translations["eng-GB"]; $myEnglishTitle = $content->translations["eng-GB"]->fields->title; // Where "title" is the field identifier </code>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$typeId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$typeId</span>= ''
+                </code><div class="description">
+<p class="short-description">Read property for type id</p>Read property for type id</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Read property for type id
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::$versions" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Version[]
+                 <span class="highlight">$versions</span>= ''
+                </code><div class="description">
+<p class="short-description">Iterable collection of versions for content. Array-accessible :; &lt;code&gt; $myFirstVersion = $content-&gt;versions[1]; $myThirdVersion = $content-&gt;versions[3]; &lt;/code&gt;</p>Iterable collection of versions for content. Array-accessible :; &lt;code&gt; $myFirstVersion = $content-&gt;versions[1]; $myThirdVersion = $content-&gt;versions[3]; &lt;/code&gt;</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version[]</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Iterable collection of versions for content. Array-accessible :; <code> $myFirstVersion = $content->versions[1]; $myThirdVersion = $content->versions[3]; </code>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\Proxy::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          mixed $id, <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a> $service
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Setup proxy object with enough info to be able to perform a load operation on the object it proxies.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em><p>Primary id</p></em></td>
+</tr>
+<tr>
+<th>$service</th>
+<td><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::__get()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Provides read access to a $property</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__get()">\ezp\Base\Proxy::__get()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::__isset()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__isset</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Checks if a public virtual property is set</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__isset()">\ezp\Base\Proxy::__isset()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Property name</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::__set()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $property, mixed $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Provides write access to a $property</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__set()">\ezp\Base\Proxy::__set()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::addParent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addParent</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a> $parentLocation
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a></code><div class="description"><p class="short_description">Adds a new location to content under an existing one.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$parentLocation</th>
+<td><a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::attach()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">attach</span><span class="nb-faded-text">(
+          \ezp\Base\Observer $observer, string $event
+              =
+              "update"
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Attaches $observer for $event to the Model</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::attach()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$observer</th>
+<td>\ezp\Base\Observer</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::definition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">definition</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Returns definition of the content object, atm: permissions</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::detach()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">detach</span><span class="nb-faded-text">(
+          \ezp\Base\Observer $observer, string $event
+              =
+              "update"
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Detaches $observer for $event from the Model</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::detach()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$observer</th>
+<td>\ezp\Base\Observer</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getContentType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getContentType</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Type.html#%5Cezp%5CContent%5CType">\ezp\Content\Type</a></code><div class="description"><p class="short_description">Return Type object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Type.html#%5Cezp%5CContent%5CType">\ezp\Content\Type</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getCurrentVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCurrentVersion</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> | null</code><div class="description"><p class="short_description">Find current version amongst version objects</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getFields()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFields</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Field.html#%5Cezp%5CContent%5CField">\ezp\Content\Field[]</a></code><div class="description"><p class="short_description">Get fields of current version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Field.html#%5Cezp%5CContent%5CField">\ezp\Content\Field[]</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Do we really want/need this shortcut?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getLocations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLocations</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location[]</a></code><div class="description"><p class="short_description">Gets locations</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getMainLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMainLocation</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a> | null</code><div class="description"><p class="short_description">Return Main location object on this Content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_ezp_Content_Location.html#%5Cezp%5CContent%5CLocation">\ezp\Content\Location</a> | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getOwner()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getOwner</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></code><div class="description"><p class="short_description">Returns the User the Content is owned by</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getRelations</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content[]</a></code><div class="description"><p class="short_description">Gets Content relations</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getReverseRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getReverseRelations</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content[]</a></code><div class="description"><p class="short_description">Gets Content reverse relations</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getSection()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getSection</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a></code><div class="description"><p class="short_description">Returns the Section the Content belongs to</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getState()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getState</span><span class="nb-faded-text">(
+          string | null $property
+              =
+              null
+          )
+        </span>
+        :
+          array | mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets internal variables on object as array</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::getState()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Key is property name and value is property value.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string | null</td>
+<td><em><p>Optional, lets you specify to only return one property by name</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array | mixed</td>
+<td>Array if $property is null, else value of property</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If $property is not found (when not null)</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::getVersions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getVersions</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version[]</a></code><div class="description"><p class="short_description">Return a collection containing all available versions of the Content</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::lazyLoad()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">lazyLoad</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Loads the proxied object and moves observers over to it</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::lazyLoad()</small>
+</div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::moveObservers()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">moveObservers</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Move observers from proxy to proxiedObject, must be done after load and
+proxiedObject must be a observable</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::moveObservers()</small>
+</div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::notify()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">notify</span><span class="nb-faded-text">(
+          string $event
+              =
+              "update", array | null $arguments
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Notifies registered observers about $event</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::notify()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$arguments</th>
+<td>array | null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::setOwner()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setOwner</span><span class="nb-faded-text">(
+          <a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a> $owner
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Sets the Owner the Content belongs to</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$owner</th>
+<td><a href="db_ezp_User.html#%5Cezp%5CUser">\ezp\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::setSection()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setSection</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a> $section
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Sets the Section the Content belongs to</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$section</th>
+<td><a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Proxy::setState()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setState</span><span class="nb-faded-text">(
+          array $state
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets internal variables on object from array</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::setState()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Key is property name and value is property value.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$state</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If one of the properties in $state is not found</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

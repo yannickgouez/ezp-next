@@ -1,0 +1,1153 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/Service.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CService">\ezp\Content\Service</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\Service" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\Service<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Content service, used for Content operations</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\Service::$handler" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Handler
+                 <span class="highlight">$handler</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description"></p><small>Inherited from:
+                        <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24handler">\ezp\Base\Service::$$handler</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24handler">\ezp\Base\Service::$$handler</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::$repository" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Repository
+                 <span class="highlight">$repository</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description"></p><small>Inherited from:
+                        <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24repository">\ezp\Base\Service::$$repository</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::%24%24repository">\ezp\Base\Service::$$repository</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\Service::__construct()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a> $repository, <a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a> $handler
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Setups service with reference to repository object that created it & corresponding handler</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::__construct()">\ezp\Base\Service::__construct()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$repository</th>
+<td><a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$handler</th>
+<td><a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::addRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addRelation</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $contentFrom, <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $contentTo, mixed | null $versionFromNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation</a></code><div class="description"><p class="short_description">Adds an object relation between $contentFrom and $contentTo.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The relation created will be of type Relation::COMMON,</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentFrom</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentTo</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionFromNo</th>
+<td>mixed | null</td>
+<td><em><p>Version number for use in relation, $contentFrom->currentVersionNo used if null</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::addUserPermissionsTo()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">addUserPermissionsTo</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a> $query
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Add Permissions criteria to Query if current user has read limitations</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>False if user does not have any read permissions at all</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If some read limitation is missing query function</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::buildDomainObject()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildDomainObject</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content.html#%5Cezp%5CPersistence%5CContent">\ezp\Persistence\Content</a> $vo, <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Build a content Domain Object from a content Value object returned by Persistence</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$vo</th>
+<td><a href="db_ezp_Persistence_Content.html#%5Cezp%5CPersistence%5CContent">\ezp\Persistence\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em><p>Will be set to version object during execution</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::buildVersionDomainObject()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">buildVersionDomainObject</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content, <a href="db_ezp_Persistence_Content_Version.html#%5Cezp%5CPersistence%5CContent%5CVersion">\ezp\Persistence\Content\Version</a> | <a href="db_ezp_Persistence_Content_RestrictedVersion.html#%5Cezp%5CPersistence%5CContent%5CRestrictedVersion">\ezp\Persistence\Content\RestrictedVersion</a> $versionVo
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></code><div class="description"><p class="short_description">Builds a version Domain Object from its value object returned by persistence</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionVo</th>
+<td>
+<a href="db_ezp_Persistence_Content_Version.html#%5Cezp%5CPersistence%5CContent%5CVersion">\ezp\Persistence\Content\Version</a> | <a href="db_ezp_Persistence_Content_RestrictedVersion.html#%5Cezp%5CPersistence%5CContent%5CRestrictedVersion">\ezp\Persistence\Content\RestrictedVersion</a>
+</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::copy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copy</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content, <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Copies $content in $version and returns the new copy.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version is provided, all versions will be copied</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to create provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Creates the new $content in the content repository</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td>The newly created content</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentType.html#%5Cezp%5CBase%5CException%5CInvalidArgumentType">\ezp\Base\Exception\InvalidArgumentType</a></td>
+<td><em>If $content already has an id</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to create provided object</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>If/when we have some sort of object storage, use that to check if object is persisted instead of just id
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::createDraftFromVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createDraftFromVersion</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content, <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $srcVersion
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></code><div class="description"><p class="short_description">Creates a new draft version from $content in $srcVersion.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Copies all fields from $content in $srcVersion and creates a new
+version of the referred Content from it.
+If $srcVersion (default value) is null, currentVersion from $content will be taken</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$srcVersion</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em><p>The source version to use. currentVersion is used if not specificed</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Language support
+         
+    </dd>
+<dt>Todo</dt>
+<dd>User support
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes a content from the repository</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>if content could not be found</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to remove provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::deleteVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteVersion</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes $version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to version-remove provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::fillStruct()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">fillStruct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> $do, array $optionalProperties
+              =
+              array()
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">General method to fill in property values in struct from model->property values</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::fillStruct()">\ezp\Base\Service::fillStruct()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$struct</th>
+<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$do</th>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$optionalProperties</th>
+<td>array</td>
+<td><em><p>List of properties that is optional</p></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If property is missing, has a value of null and {@link setPropertyByConvention()} returns false.</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\ezp\Base\setPropertyByConvention()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::find()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">find</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a> $query, bool $filterOnUserPermissions
+              =
+              true
+          )
+        </span>
+        :
+          \ezp\Content\Result</code><div class="description"><p class="short_description">Triggers a content search against $query.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>$query should have been built using {@link \ezp\Content\Query\Builder} interface:</p>
+
+<pre><code>$qb = new ezp\Content\Query\Builder();
+$qb->addCriteria(
+    $qb->fullText->like( 'eZ Publish' ),
+    $qb->urlAlias->like( '/cms/amazing/*' ),
+    $qb->contentTypeId->eq( 'folder' ),
+    $qb->field->eq( 'author', 'community@ez.no' )
+)->addSortClause(
+    $qb->sort->field( 'folder', 'name', Query::SORT_ASC ),
+    $qb->sort->dateCreated( Query::SORT_DESC )
+)->setOffset( 5 )->setLimit( 15 );
+$contentList = $contentService->find( $qb->getQuery() );
+</code></pre></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$filterOnUserPermissions</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\ezp\Content\Result</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Translation filter
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::findSingle()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">findSingle</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a> $query, bool $filterOnUserPermissions
+              =
+              true
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Triggers a content search against $query and returns only one content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$filterOnUserPermissions</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to content read</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Translation filter
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::generateContentName()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">generateContentName</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Generates content name for $content in $version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Implement translations
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          mixed $contentId
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Loads a content from its id ($contentId)</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>if content could not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::loadRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRelations</span><span class="nb-faded-text">(
+          int $contentId, int | null $version
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Loads content relations from its id ($contentId)</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td>int | null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Implement it (should be similar to listVersions())
+and use it for $content->relations lazy collection
+So should likewise be marked as private and take Version is argument?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::loadVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadVersion</span><span class="nb-faded-text">(
+          mixed $contentId, int | null $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></code><div class="description"><p class="short_description">Loads a version from its id and versionNo</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int | null</td>
+<td><em><p>If null (default), then current version is returned</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If content/version could not be found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::publish()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">publish</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></code><div class="description"><p class="short_description">Publishes $version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td>The updated, published Version</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>if $version doesn't have the DRAFT status</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::removeRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeRelation</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation</a> $relation
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes content object relation represented by $relation.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$relation</th>
+<td><a href="db_ezp_Content_Relation.html#%5Cezp%5CContent%5CRelation">\ezp\Content\Relation</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If the relation to be removed is not found.</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Add permission checks when contentFrom object is available
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::setPropertyByConvention()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">setPropertyByConvention</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, string $property
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Defines specific conventions for filling content/update structs.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This method is here mainly to provide fallbacks if a struct property cannot be set in another way (aka not implemented yet)</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$struct</th>
+<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td>False if no property was set by convention</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService::setPropertyByConvention()">\ezp\Base\Service::setPropertyByConvention()</a>
+         
+    </dd>
+<dt>Todo</dt>
+<dd>initialLanguageId should be processed via translation management, not hardcoded
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Service::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a> $content, <a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a> $version
+          )
+        </span>
+        :
+          <a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></code><div class="description"><p class="short_description">Updates $content in the content repository</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td><a href="db_ezp_Content_Version.html#%5Cezp%5CContent%5CVersion">\ezp\Content\Version</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_Forbidden.html#%5Cezp%5CBase%5CException%5CForbidden">\ezp\Base\Exception\Forbidden</a></td>
+<td><em>If user does not have access to edit provided object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

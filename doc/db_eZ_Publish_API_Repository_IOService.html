@@ -1,0 +1,365 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/IOService.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\IOService" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\API\Repository\IOService<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository</small><p class="short-description">The io service for managing binary files</p>
+<div class="long-description"></div>
+<dl class="class-info"></dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\IOService::createBinaryFile()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createBinaryFile</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a> $binaryFileCreateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></code><div class="description"><p class="short_description">Creates a  binary file in the the repository</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$binaryFileCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></td>
+<td>The created BinaryFile object</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::deleteBinaryFile()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteBinaryFile</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a> $binaryFile
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes the BinaryFile with $path</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$binaryFile</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::getFileContents()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFileContents</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a> $binaryFile
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Returns the content of the binary file</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$binaryFile</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::getFileInputStream()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFileInputStream</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a> $binaryFile
+          )
+        </span>
+        :
+          resource</code><div class="description"><p class="short_description">Returns a read (mode: rb) file resource to the binary file identified by $path</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$binaryFile</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>resource</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::loadBinaryFile()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadBinaryFile</span><span class="nb-faded-text">(
+          string $binaryFileid
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></code><div class="description"><p class="short_description">Loads the binary file with $id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$binaryFileid</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFile.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFile">\eZ\Publish\API\Repository\Values\IO\BinaryFile</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExcption</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::newBinaryCreateStructFromLocalFile()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newBinaryCreateStructFromLocalFile</span><span class="nb-faded-text">(
+          string $localFile
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a></code><div class="description"><p class="short_description">Creates a BinaryFileCreateStruct object from $localFile</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$localFile</th>
+<td>string</td>
+<td><em><p>Path to local file</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\InvalidArgumentException</td>
+<td><em>When given a non existing / unreadable file</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\IOService::newBinaryCreateStructFromUploadedFile()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newBinaryCreateStructFromUploadedFile</span><span class="nb-faded-text">(
+          array $uploadedFile
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a></code><div class="description"><p class="short_description">Creates a BinaryFileCreateStruct object from the uploaded file $uploadedFile</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$uploadedFile</th>
+<td>array</td>
+<td><em><p>The $_POST hash of an uploaded file</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_IO_BinaryFileCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CIO%5CBinaryFileCreateStruct">\eZ\Publish\API\Repository\Values\IO\BinaryFileCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\InvalidArgumentException</td>
+<td><em>When given an invalid uploaded file</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

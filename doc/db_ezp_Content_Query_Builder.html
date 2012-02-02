@@ -1,0 +1,1010 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/Query/Builder.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\Query\Builder" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\Query\Builder<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">This class provides a fluent interface to create a content query</p>
+<div class="long-description"><p>Every Criterion is accessible using a getter on the Builder object.
+For instance, calling $queryBuilder->field will return a CriterionFactory object for a Field Criterion.
+This CriterionFactory will then give access to the operators the contained Criterion supports, as methods.
+These methods can then be used to construct a new Criterion for the given target &amp; value:</p>
+
+<pre><code>$queryBuilder = new ezp\Content\Query\Builder();
+$queryBuilder->addCriteria( $queryBuilder->contentType->eq( null, 'article' ) );
+</code></pre></div>
+<dl class="class-info"></dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\Query\Builder::$and" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$and</span>= ''
+                </code><div class="description">
+<p class="short-description">New logical AND criterion (alias for {@see $lAnd})</p>New logical AND criterion (alias for {@see $lAnd})</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>New logical AND criterion (alias for {@see $lAnd})
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$contentId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$contentId</span>= ''
+                </code><div class="description">
+<p class="short-description">A new ContentId CriterionFactory</p>A new ContentId CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new ContentId CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$contentType" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$contentType</span>= ''
+                </code><div class="description">
+<p class="short-description">A new ContentType CriterionFactory</p>A new ContentType CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new ContentType CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$contentTypeGroup" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$contentTypeGroup</span>= ''
+                </code><div class="description">
+<p class="short-description">A new ContentTypeGroup CriterionFactory</p>A new ContentTypeGroup CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new ContentTypeGroup CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$criteria" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\ezp\Persistence\Content\Query\Criterion[]
+                 <span class="highlight">$criteria</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">The internal criteria array</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion[]</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$dateMetadata" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$dateMetadata</span>= ''
+                </code><div class="description">
+<p class="short-description">A new DateMetadata CriterionFactory</p>A new DateMetadata CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new DateMetadata CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$field" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$field</span>= ''
+                </code><div class="description">
+<p class="short-description">A new Field CriterionFactory</p>A new Field CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new Field CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$field" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$field</span>= ''
+                </code><div class="description">
+<p class="short-description">A new field CriterionFactory</p>A new field CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new field CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$fullText" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$fullText</span>= ''
+                </code><div class="description">
+<p class="short-description">A new FullText CriterionFactory</p>A new FullText CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new FullText CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$lAnd" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$lAnd</span>= ''
+                </code><div class="description">
+<p class="short-description">New logical AND criterion</p>New logical AND criterion</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>New logical AND criterion
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$lNot" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$lNot</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$lOr" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$lOr</span>= ''
+                </code><div class="description">
+<p class="short-description">New logical OR criterion</p>New logical OR criterion</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>New logical OR criterion
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$limit" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int|null
+                 <span class="highlight">$limit</span>= ''
+                </code><div class="description">
+<p class="short-description">Query limit, as a number of items</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int | null</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$locationId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$locationId</span>= ''
+                </code><div class="description">
+<p class="short-description">A new LocationId CriterionFactory</p>A new LocationId CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new LocationId CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$metaData" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$metaData</span>= ''
+                </code><div class="description">
+<p class="short-description">A new MetaData CriterionFactory</p>A new MetaData CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new MetaData CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$not" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$not</span>= ''
+                </code><div class="description">
+<p class="short-description">New logical NOT criterion (alias for {@see $lNot})</p>New logical NOT criterion (alias for {@see $lNot})</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>New logical NOT criterion (alias for {@see $lNot})
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$offset" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$offset</span>= '0'
+                </code><div class="description">
+<p class="short-description">Query offset, starting from 0</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>0</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$or" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$or</span>= ''
+                </code><div class="description">
+<p class="short-description">New logical OR criterion (alias for {@see $lOr})</p>New logical OR criterion (alias for {@see $lOr})</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>New logical OR criterion (alias for {@see $lOr})
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$parentLocationId" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$parentLocationId</span>= ''
+                </code><div class="description">
+<p class="short-description">A new ParentLocationId CriterionFactory</p>A new ParentLocationId CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new ParentLocationId CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$permission" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$permission</span>= ''
+                </code><div class="description">
+<p class="short-description">A new Permission CriterionFactory</p>A new Permission CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new Permission CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$section" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$section</span>= ''
+                </code><div class="description">
+<p class="short-description">A new Section CriterionFactory</p>A new Section CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new Section CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$sort" class="anchor"></a><div class="property public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\Query\SortClauseBuilder
+                 <span class="highlight">$sort</span>= ''
+                </code><div class="description">
+<p class="short-description">Sort clause builder</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_Query_SortClauseBuilder.html#%5Cezp%5CContent%5CQuery%5CSortClauseBuilder">\ezp\Content\Query\SortClauseBuilder</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$sortClauses" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\ezp\Persistence\Content\Query\SortClause[]
+                 <span class="highlight">$sortClauses</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">SortClause objects array</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Content_Query_SortClause.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CSortClause">\ezp\Persistence\Content\Query\SortClause[]</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$subtree" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$subtree</span>= ''
+                </code><div class="description">
+<p class="short-description">A new Subtree CriterionFactory</p>A new Subtree CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>A new Subtree CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::$urlAlias" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\ezp\Content\CriterionFactory
+                 <span class="highlight">$urlAlias</span>= ''
+                </code><div class="description">
+<p class="short-description">An new UrlAlias CriterionFactory</p>An new UrlAlias CriterionFactory</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_CriterionFactory.html#%5Cezp%5CContent%5CCriterionFactory">\ezp\Content\CriterionFactory</a></dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>An new UrlAlias CriterionFactory
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\Query\Builder::__call()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__call</span><span class="nb-faded-text">(
+          string $method, array $arguments
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a></code><div class="description"><p class="short_description">Magic call method, used to provide or/and methods as an alternative to lOr/lAnd</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$method</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$arguments</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::__get()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+           $property
+          )
+        </span>
+        :
+          \ezp\Persistence\Content\Query\CriterionFactory</code><div class="description"><p class="short_description">Magic getter.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Gives access to criteria classes by means of their class name:
+MetaData -> metadata
+Field -> Field
+A criterion factory</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\ezp\Persistence\Content\Query\CriterionFactory</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::addCriteria()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addCriteria</span><span class="nb-faded-text">(
+          \ezp\Persistence\Content\Query\Criterion..$ $c
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></code><div class="description"><p class="short_description">Adds new criteria to the list. As many parameters as possible can be provided.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The given criteria will be added with a logical AND, meaning that they must all match.
+To handle OR criteria, the {@see or}/{@see lOr} methods must be used.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$c</th>
+<td>\ezp\Persistence\Content\Query\Criterion..$</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::addSortClause()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addSortClause</span><span class="nb-faded-text">(
+          \ezp\Persistence\Content\SortClause..$ $sortClause
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></code><div class="description"><p class="short_description">Adds new sorting clause objects to the query. One to many objects can be provided.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sortClause</th>
+<td>\ezp\Persistence\Content\SortClause..$</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></td>
+<td>Self</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::getQuery()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getQuery</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a></code><div class="description"><p class="short_description">Returns the query</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Query.html#%5Cezp%5CContent%5CQuery">\ezp\Content\Query</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::lAnd()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">lAnd</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a> $elementOne,  $elementTwo
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_Criterion_LogicalAnd.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalAnd">\ezp\Persistence\Content\Query\Criterion\LogicalAnd</a></code><div class="description"><p class="short_description">Logical and
+Criterion: Criterion\LogicalAnd</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$elementOne</th>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$elementTwo</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion_LogicalAnd.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalAnd">\ezp\Persistence\Content\Query\Criterion\LogicalAnd</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::lOr()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">lOr</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a> $elementOne,  $elementTwo
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_Criterion_LogicalOr.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalOr">\ezp\Persistence\Content\Query\Criterion\LogicalOr</a></code><div class="description"><p class="short_description">Logical or
+Criterion: Criterion\LogicalAnd</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$elementOne</th>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$elementTwo</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion_LogicalOr.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalOr">\ezp\Persistence\Content\Query\Criterion\LogicalOr</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::not()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">not</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a> $criterion
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Query_Criterion_LogicalNot.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalNot">\ezp\Persistence\Content\Query\Criterion\LogicalNot</a></code><div class="description"><p class="short_description">Logical not
+Criterion: Criterion\LogicalNot</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$criterion</th>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion">\ezp\Persistence\Content\Query\Criterion</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Query_Criterion_LogicalNot.html#%5Cezp%5CPersistence%5CContent%5CQuery%5CCriterion%5CLogicalNot">\ezp\Persistence\Content\Query\Criterion\LogicalNot</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::setLimit()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setLimit</span><span class="nb-faded-text">(
+           $limit
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></code><div class="description"><p class="short_description">Sets the query offset to $limit.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>A limit of 0 means no limit.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$limit</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></td>
+<td>Self</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>if $limit isn't an integer >= 0</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Query\Builder::setOffset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setOffset</span><span class="nb-faded-text">(
+          int $offset
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></code><div class="description"><p class="short_description">Sets the query offset to $offset</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$offset</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Query_Builder.html#%5Cezp%5CContent%5CQuery%5CBuilder">\ezp\Content\Query\Builder</a></td>
+<td>Self</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>if $limit isn't an integer >= 0</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

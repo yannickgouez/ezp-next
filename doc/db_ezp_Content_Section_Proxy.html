@@ -1,0 +1,729 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/Section/Proxy.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CSection%5CProxy">\ezp\Content\Section\Proxy</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\Section\Proxy" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\Section\Proxy<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">This class represents a Proxy Section object</p>
+<div class="long-description"><p>Because of lack of traits in PHP &lt; 5.4 we introduce an intermediate class
+for Proxy objects that need to implement Observable and ModelState.
+This might change in the future, so never check if a class implemented this abstract, only it's interfaces!</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_ezp_Content_Section.html#%5Cezp%5CContent%5CSection">\ezp\Content\Section</a>
+            &lt;
+            <a href="db_ezp_Base_ModelDefinition.html#%5Cezp%5CBase%5CModelDefinition" style="color: gray; font-size: 0.8em
+                ">\ezp\Base\ModelDefinition</a>
+</dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\Section\Proxy::$id" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">mixed
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Id of the object</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24id">\ezp\Base\Proxy::$$id</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24id">\ezp\Base\Proxy::$$id</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$id
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$id" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">integer
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<p class="short-description">The ID, automatically assigned by the persistence layer</p>The ID, automatically assigned by the persistence layer</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>integer</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>The ID, automatically assigned by the persistence layer
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$identifier" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$identifier</span>= ''
+                </code><div class="description">
+<p class="short-description">Unique identifier for the section.</p>Unique identifier for the section.</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>Unique identifier for the section.
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$name" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$name</span>= ''
+                </code><div class="description">
+<p class="short-description">Human readable name of the section (preferably short for gui's)</p>Human readable name of the section (preferably short for gui's)</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>Human readable name of the section (preferably short for gui's)
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$observers" class="anchor"></a><div class="property private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\ezp\Base\Observer[]
+                 <span class="highlight">$observers</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">List of event listeners</p><small>Inherited from:
+                        </small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Base\Observer[]</dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$observers
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$proxiedObject" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Model|object
+                 <span class="highlight">$proxiedObject</span>= 'null'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Concrete proxied object</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24proxiedObject">\ezp\Base\Proxy::$$proxiedObject</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>
+<a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> | object</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24proxiedObject">\ezp\Base\Proxy::$$proxiedObject</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$proxiedObject
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::$service" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\Service
+                 <span class="highlight">$service</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Service used to load the object the proxy represents.</p><small>Inherited from:
+                        <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24service">\ezp\Base\Proxy::$$service</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::%24%24service">\ezp\Base\Proxy::$$service</a>
+         
+    </dd>
+<dt>Inherited_from</dt>
+<dd>\ezp\Base\Proxy\Model::$$service
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\Section\Proxy::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          mixed $id, <a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a> $service
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Setup proxy object with enough info to be able to perform a load operation on the object it proxies.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em><p>Primary id</p></em></td>
+</tr>
+<tr>
+<th>$service</th>
+<td><a href="db_ezp_Base_Service.html#%5Cezp%5CBase%5CService">\ezp\Base\Service</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::__get()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Provides read access to a $property</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__get()">\ezp\Base\Proxy::__get()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::__isset()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__isset</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Checks if a public virtual property is set</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__isset()">\ezp\Base\Proxy::__isset()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Property name</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::__set()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $property, mixed $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Provides write access to a $property</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Proxy.html#%5Cezp%5CBase%5CProxy::__set()">\ezp\Base\Proxy::__set()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::attach()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">attach</span><span class="nb-faded-text">(
+          \ezp\Base\Observer $observer, string $event
+              =
+              "update"
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Attaches $observer for $event to the Model</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::attach()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$observer</th>
+<td>\ezp\Base\Observer</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::definition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">definition</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Returns definition of the section object, atm: permissions</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::detach()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">detach</span><span class="nb-faded-text">(
+          \ezp\Base\Observer $observer, string $event
+              =
+              "update"
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Detaches $observer for $event from the Model</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::detach()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$observer</th>
+<td>\ezp\Base\Observer</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::getState()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getState</span><span class="nb-faded-text">(
+          string | null $property
+              =
+              null
+          )
+        </span>
+        :
+          array | mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets internal variables on object as array</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::getState()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Key is property name and value is property value.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string | null</td>
+<td><em><p>Optional, lets you specify to only return one property by name</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array | mixed</td>
+<td>Array if $property is null, else value of property</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If $property is not found (when not null)</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::lazyLoad()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">lazyLoad</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Loads the proxied object and moves observers over to it</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::lazyLoad()</small>
+</div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::moveObservers()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">moveObservers</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Move observers from proxy to proxiedObject, must be done after load and
+proxiedObject must be a observable</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::moveObservers()</small>
+</div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::notify()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">notify</span><span class="nb-faded-text">(
+          string $event
+              =
+              "update", array | null $arguments
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Notifies registered observers about $event</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::notify()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$event</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$arguments</th>
+<td>array | null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Section\Proxy::setState()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setState</span><span class="nb-faded-text">(
+          array $state
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets internal variables on object from array</p>
+<small>Inherited from:
+                    \ezp\Base\Proxy\Model::setState()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Key is property name and value is property value.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$state</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>If one of the properties in $state is not found</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

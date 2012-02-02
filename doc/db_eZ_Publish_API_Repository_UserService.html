@@ -1,0 +1,881 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/UserService.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description"></p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"></div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">eZ\Publish\API\Repository
+         
+    </dd>
+</dl>
+<a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\UserService" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\API\Repository\UserService<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository</small><p class="short-description">This service provides methods for managing users and user groups</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Example</dt>
+<dd>Examples/user.php
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\UserService::assignUserToUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">assignUserToUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user, <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Assigns a new user group to the user</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If the user is already in the given user group this method does nothing.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to assign the user group to the user</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::createUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createUser</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserCreateStruct">\eZ\Publish\API\Repository\Values\User\UserCreateStruct</a> $userCreateStruct, array $parentGroups
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></code><div class="description"><p class="short_description">Create a new user. The created user is published by this method</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserCreateStruct">\eZ\Publish\API\Repository\Values\User\UserCreateStruct</a></td>
+<td><em><p>the data used for creating the user</p></em></td>
+</tr>
+<tr>
+<th>$parentGroups</th>
+<td>array</td>
+<td><em><p>the groups of type {@link \eZ\Publish\API\Repository\Values\User\UserGroup} which are assigned to the user after creation</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to move the user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if a user group was not found</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $userCreateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is missing</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::createUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupCreateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct</a> $userGroupCreateStruct, <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $parentGroup
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></code><div class="description"><p class="short_description">Creates a new user group using the data provided in the ContentCreateStruct parameter</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>In 4.x in the content type parameter in the profile is ignored
+- the content type is determined via configuration and can be set to null.
+The returned version is published.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userGroupCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupCreateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct</a></td>
+<td><em><p>a structure for setting all necessary data to create this user group</p></em></td>
+</tr>
+<tr>
+<th>$parentGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to create a user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if the input structure has invalid data</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $userGroupCreateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is missing</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::deleteUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteUser</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">This method deletes a user</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to delete the user</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::deleteUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a user group</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>the users which are not assigned to other groups will be deleted.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to create a user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if the user group with the given id was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::loadSubUserGroups()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadSubUserGroups</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Loads the sub groups of a user group</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>an array of {@link \eZ\Publish\API\Repository\Values\User\UserGroup}</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to read the user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if the user group with the given id was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::loadUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadUser</span><span class="nb-faded-text">(
+          integer $userId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></code><div class="description"><p class="short_description">Loads a user</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userId</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if a user with the given id was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::loadUserByCredentials()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadUserByCredentials</span><span class="nb-faded-text">(
+          string $login, string $password
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></code><div class="description"><p class="short_description">Loads a user for the given login and password</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$login</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em><p>the plain password</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if a user with the given credentials was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::loadUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadUserGroup</span><span class="nb-faded-text">(
+          int $id
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></code><div class="description"><p class="short_description">Loads a user group for the given id</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to create a user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if the user group with the given id was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::moveUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">moveUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup, <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $newParent
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Moves the user group to another parent</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to move the user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>if the user group with the given id was not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::newUserCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newUserCreateStruct</span><span class="nb-faded-text">(
+          string $login, string $email, string $password, string $mainLanguageCode, \eZ\Publish\API\Repository\ContentType $contentType
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserCreateStruct">\eZ\Publish\API\Repository\Values\User\UserCreateStruct</a></code><div class="description"><p class="short_description">Instantiate a user create class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$login</th>
+<td>string</td>
+<td><em><p>the login of the new user</p></em></td>
+</tr>
+<tr>
+<th>$email</th>
+<td>string</td>
+<td><em><p>the email of the new user</p></em></td>
+</tr>
+<tr>
+<th>$password</th>
+<td>string</td>
+<td><em><p>the plain password of the new user</p></em></td>
+</tr>
+<tr>
+<th>$mainLanguageCode</th>
+<td>string</td>
+<td><em><p>the main language for the underlying content object</p></em></td>
+</tr>
+<tr>
+<th>$contentType</th>
+<td>\eZ\Publish\API\Repository\ContentType</td>
+<td><em><p>5.x the content type for the underlying content object. In 4.x it is ignored and taken from the configuration</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserCreateStruct">\eZ\Publish\API\Repository\Values\User\UserCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::newUserGroupCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newUserGroupCreateStruct</span><span class="nb-faded-text">(
+          string $mainLanguageCode, null | <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupCreateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct</a></code><div class="description"><p class="short_description">Instantiate a user group create class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$mainLanguageCode</th>
+<td>string</td>
+<td><em><p>The main language for the underlying content object</p></em></td>
+</tr>
+<tr>
+<th>$contentType</th>
+<td>null | <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a>
+</td>
+<td><em><p>5.x the content type for the underlying content object. In 4.x it is ignored and taken from the configuration</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupCreateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::newUserGroupUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newUserGroupUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct</a></code><div class="description"><p class="short_description">Instantiate a new user group update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::newUserUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newUserUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserUpdateStruct</a></code><div class="description"><p class="short_description">Instantiate a new user update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::unAssignUssrFromUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unAssignUssrFromUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user, <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a user group from the user</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to remove the user group from the user</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if the user is not in the given user group</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::updateUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateUser</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user,  $userUpdateStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Updates a user</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>4.x: If the versionUpdateStruct is set in the user update structure, this method internally creates a content draft, updates ts with the provided data
+and publishes the draft. If a draft is explititely required, the user group can be updated via the content service methods.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$userUpdateStruct</th>
+<td></td>
+<td><em><p>\eZ\Publish\API\Repository\Values\User\UserUpdateStruct</p>
+</em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to update the user</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $userUpdateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is set empty</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\UserService::updateUserGroup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateUserGroup</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a> $userGroup, <a href="db_eZ_Publish_API_Repository_Values_User_UserGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct</a> $userGroupUpdateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></code><div class="description"><p class="short_description">Updates the group profile with fields and meta data</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>4.x: If the versionUpdateStruct is set in $userGroupUpdateStruct, this method internally creates a content draft, updates ts with the provided data
+and publishes the draft. If a draft is explititely required, the user group can be updated via the content service methods.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$userGroup</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$userGroupUpdateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_UserGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroup">\eZ\Publish\API\Repository\Values\User\UserGroup</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the authenticated user is not allowed to move the user group</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $userGroupUpdateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is set empty</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

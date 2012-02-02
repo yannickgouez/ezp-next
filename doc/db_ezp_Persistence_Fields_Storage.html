@@ -1,0 +1,344 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Fields/Storage.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Fields\Storage" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\ezp\Persistence\Fields\Storage<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Interface for setting field type data.</p>
+<div class="long-description"><p>Methods in this interface are called by storage engine.</p>
+
+<p>$context array passed to most methods provides some context for the field handler about the
+currently used storage engine.
+The array should at least define 2 keys :
+  - identifier (connection identifier)
+  - connection (the connection handler)
+For example, using Legacy storage engine, $context will be:
+  - identifier = 'LegacyStorage'
+  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+                 to be used accordingly to
+                 {@link http://incubator.apache.org/zetacomponents/documentation/trunk/Database/tutorial.html ezcDatabase} usage</p></div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_KeywordStorage.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CKeywordStorage">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\KeywordStorage</a></dd>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_BinaryFileStorage.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CBinaryFileStorage">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\BinaryFileStorage</a></dd>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_UrlStorage.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CUrlStorage">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\UrlStorage</a></dd>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_MediaStorage.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CMediaStorage">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\MediaStorage</a></dd>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_NullStorage.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CNullStorage">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\NullStorage</a></dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Fields\Storage::copyFieldData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copyFieldData</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$field</th>
+<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Fields\Storage::deleteFieldData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteFieldData</span><span class="nb-faded-text">(
+          array $fieldId, array $context
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$fieldId</th>
+<td>array</td>
+<td><em><p>Array of field Ids</p></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Fields\Storage::getFieldData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFieldData</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Populates $field value property based on the external data.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>$field->value is a {@link ezp\Persistence\Content\FieldValue} object.
+This value holds the data as a {@link ezp\Content\FieldType\Value} based object,
+according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$field</th>
+<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Fields\Storage::getIndexData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getIndexData</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$field</th>
+<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Fields\Storage::hasFieldData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasFieldData</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if field type has external data to deal with</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Fields\Storage::storeFieldData()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">storeFieldData</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          )
+        </span>
+        :
+          null | true</code><div class="description"><p class="short_description">Allows custom field types to store data in an external source (e.g. another DB table).</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Stores value for $field in an external data source.
+The whole {@link ezp\Persistence\Content\Field} object is passed and its value
+is accessible through the {@link ezp\Persistence\Content\FieldValue} 'value' property.
+This value holds the data filled by the user as a {@link ezp\Content\FieldType\Value} based object,
+according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).</p>
+
+<p>$field->id = unique ID from the attribute tables (needs to be generated by
+database back end on create, before the external data source may be
+called from storing).</p>
+
+<p>The context array provides some context for the field handler about the
+currently used storage engine.
+The array should at least define 2 keys :
+  - identifier (connection identifier)
+  - connection (the connection handler)
+For example, using Legacy storage engine, $context will be:
+  - identifier = 'LegacyStorage'
+  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+                 to be used accordingly to
+The context array provides some context for the field handler about the
+currently used storage engine.
+The array should at least define 2 keys :
+  - identifier (connection identifier)
+  - connection (the connection handler)
+For example, using Legacy storage engine, $context will be:
+  - identifier = 'LegacyStorage'
+  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+                 to be used accordingly to
+                 {@link http://incubator.apache.org/zetacomponents/documentation/trunk/Database/tutorial.html ezcDatabase} usage</p>
+
+<p>This method might return true if $field needs to be updated after storage done here (to store a PK for instance).
+In any other case, this method must not return anything (null).</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$field</th>
+<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$context</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null | true</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

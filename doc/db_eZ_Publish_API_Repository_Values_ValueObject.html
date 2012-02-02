@@ -1,0 +1,278 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/Values/ValueObject.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject">\eZ\Publish\API\Repository\Values\ValueObject</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description"></p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"></div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">eZ\Publish\API\Repository\Values
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\Values\ValueObject" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\eZ\Publish\API\Repository\Values\ValueObject<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository\Values</small><p class="short-description">The base class for all value objects and structs</p>
+<div class="long-description"><p>Supports readonly properties by marking them as protected.
+In this case they will only be writable using constructor, and need to be documented
+using @property-read <type> <$var> in class doc in addition to inline property doc.
+Writable properties must be public and must be documented inline.</p></div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_LanguageCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLanguageCreateStruct">\eZ\Publish\API\Repository\Values\Content\LanguageCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Query.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CQuery">\eZ\Publish\API\Repository\Values\Content\Query</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_ContentCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentCreateStruct">\eZ\Publish\API\Repository\Values\Content\ContentCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_LocationCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationCreateStruct">\eZ\Publish\API\Repository\Values\Content\LocationCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_LocationUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationUpdateStruct">\eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Location.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocation">\eZ\Publish\API\Repository\Values\Content\Location</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Language.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLanguage">\eZ\Publish\API\Repository\Values\Content\Language</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_ContentMetadataUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentMetaDataUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentMetaDataUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_SectionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSectionCreateStruct">\eZ\Publish\API\Repository\Values\Content\SectionCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Section.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSection">\eZ\Publish\API\Repository\Values\Content\Section</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_SectionUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSectionUpdateStruct">\eZ\Publish\API\Repository\Values\Content\SectionUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_ContentUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_Content_Field.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CField">\eZ\Publish\API\Repository\Values\Content\Field</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_Policy.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CPolicy">\eZ\Publish\API\Repository\Values\User\Policy</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_UserUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_Role.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CRole">\eZ\Publish\API\Repository\Values\User\Role</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_UserGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUserGroupUpdateStruct">\eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_PolicyUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CPolicyUpdateStruct">\eZ\Publish\API\Repository\Values\User\PolicyUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_RoleUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CRoleUpdateStruct">\eZ\Publish\API\Repository\Values\User\RoleUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_RoleAssignment.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CRoleAssignment">\eZ\Publish\API\Repository\Values\User\RoleAssignment</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_RoleCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CRoleCreateStruct">\eZ\Publish\API\Repository\Values\User\RoleCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation">\eZ\Publish\API\Repository\Values\User\Limitation</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_PolicyCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CPolicyCreateStruct">\eZ\Publish\API\Repository\Values\User\PolicyCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroup.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroup">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_Validator.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CValidator">\eZ\Publish\API\Repository\Values\ContentType\Validator</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeGroupUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeGroupUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_FieldDefinitionUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinitionUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeUpdateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct</a></dd>
+<dd><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentTypeCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentTypeCreateStruct">\eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct</a></dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\ValueObject::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $properties
+              =
+              array()
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Construct object optionally with a set of properties</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Readonly properties values must be set using $properties as they are not writable anymore
+after object has been created.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$properties</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ValueObject::__get()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Magic get function handling read to non public properties</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Returns value for all readonly (protected) properties.
+Throws PropertyNotFound exception on all reads to undefined properties so typos are not silently accepted.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Name of the property</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>When property does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ValueObject::__set()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $property, string $value
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Magic set function handling writes to non public properties</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Throws PropertyNotFound exception on all writes to undefined properties so typos are not silently accepted and
+throws PropertyPermission exception on readonly (protected) properties.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Name of the property</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>When property does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyPermission.html#%5Cezp%5CBase%5CException%5CPropertyPermission">\ezp\Base\Exception\PropertyPermission</a></td>
+<td><em>When property is readonly (protected)</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

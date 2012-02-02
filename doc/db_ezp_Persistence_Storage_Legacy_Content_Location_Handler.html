@@ -1,0 +1,711 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Storage/Legacy/Content/Location/Handler.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Location\Handler</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Persistence\Storage\Legacy\Content\Location\Handler<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">The Location Handler interface defines operations on Location elements in the storage engine.</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Persistence_Content_Location_Handler.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CHandler">\ezp\Persistence\Content\Location\Handler</a></dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::$contentHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Handler
+                 <span class="highlight">$contentHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Content handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::$contentMapper" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Mapper
+                 <span class="highlight">$contentMapper</span>= ''
+                </code><div class="description">
+<p class="short-description">Content locationMapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Mapper</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::$locationGateway" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway
+                 <span class="highlight">$locationGateway</span>= ''
+                </code><div class="description">
+<p class="short-description">Gaateway for handling location data</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::$locationMapper" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper
+                 <span class="highlight">$locationMapper</span>= ''
+                </code><div class="description">
+<p class="short-description">Location locationMapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway</a> $locationGateway,  $locationMapper,  $contentHandler,  $contentMapper
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Construct from userGateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationGateway</th>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationMapper</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentHandler</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentMapper</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::copySubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copySubtree</span><span class="nb-faded-text">(
+          mixed $sourceId, mixed $destinationParentId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></code><div class="description"><p class="short_description">Copy location object identified by $sourceId, into destination identified by $destinationParentId.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Performs a deep copy of the location identified by $sourceId and all of
+its child locations, copying the most recent published content object
+for each location to a new content object without any additional version
+information. Relations are not copied. URLs are not touched at all.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sourceId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$destinationParentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></td>
+<td>the newly created Location.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Location_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CCreateStruct">\ezp\Persistence\Content\Location\CreateStruct</a> $locationStruct
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></code><div class="description"><p class="short_description">Creates a new location rooted at $location->parentId.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationStruct</th>
+<td><a href="db_ezp_Persistence_Content_Location_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CCreateStruct">\ezp\Persistence\Content\Location\CreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::getParentPathString()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getParentPathString</span><span class="nb-faded-text">(
+          string $pathString
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Return parent path string for a path string</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$pathString</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::hide()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hide</span><span class="nb-faded-text">(
+          mixed $id
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Sets a location to be hidden, and it self + all children to invisible.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em><p>Location ID</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          int $locationId
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></code><div class="description"><p class="short_description">Loads the data for the location identified by $locationId.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::markSubtreeModified()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">markSubtreeModified</span><span class="nb-faded-text">(
+          int | string $locationId, int $timeStamp
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Marks the given nodes and all ancestors as modified</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Optionally a time stamp with the modification date may be specified,
+otherwise the current time is used.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$timeStamp</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::move()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">move</span><span class="nb-faded-text">(
+          mixed $sourceId, mixed $destinationParentId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Moves location identified by $sourceId into new parent identified by $destinationParentId.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Performs a full move of the location identified by $sourceId to a new
+destination, identified by $destinationParentId. Relations do not need
+to be updated, since they refer to Content. URLs are not touched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sourceId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$destinationParentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::removeSubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeSubtree</span><span class="nb-faded-text">(
+          mixed $locationId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Removes all Locations under and includin $locationId.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Performs a recursive delete on the location identified by $locationId,
+including all of its child locations. Content which is not referred to
+by any other location is automatically removed. Content which looses its
+main Location will get the first of its other Locations assigned as the
+new main Location.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::setSectionForSubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setSectionForSubtree</span><span class="nb-faded-text">(
+          mixed $locationId, mixed $sectionId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Set section on all content objects in the subtree</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$sectionId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::swap()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">swap</span><span class="nb-faded-text">(
+          mixed $locationId1, mixed $locationId2
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Swaps the content object being pointed to by a location object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Make the location identified by $locationId1 refer to the Content
+referred to by $locationId2 and vice versa.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId1</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationId2</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::trashSubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">trashSubtree</span><span class="nb-faded-text">(
+          mixed $locationId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Sends a subtree to the trash</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Moves all locations in the subtree to the Trash. The associated content
+objects are left untouched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::unHide()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">unHide</span><span class="nb-faded-text">(
+          mixed $id
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Sets a location to be unhidden, and self + children to visible unless a parent is hidding the tree.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If not make sure only children down to first hidden node is marked visible.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::untrashLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">untrashLocation</span><span class="nb-faded-text">(
+          mixed $locationId, mixed $newParentId
+              =
+              null
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Returns a trashed location to normal state.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Recreates the originally trashed location in the new position. If no new
+position has been specified, it will be tried to re-create the location
+at the old position. If this is not possible ( because the old location
+does not exist any more) and exception is thrown.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Location\Handler::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Location_UpdateStruct.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CUpdateStruct">\ezp\Persistence\Content\Location\UpdateStruct</a> $location, int $locationId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Updates an existing location.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$location</th>
+<td><a href="db_ezp_Persistence_Content_Location_UpdateStruct.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CUpdateStruct">\ezp\Persistence\Content\Location\UpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

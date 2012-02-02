@@ -1,0 +1,487 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Base/Exception/Unauthorized.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CBase%5CException%5CUnauthorized">\ezp\Base\Exception\Unauthorized</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Base\Exception\Unauthorized" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Base\Exception\Unauthorized<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Unauthorized Exception implementation</p>
+<div class="long-description"><p>10.4.2 401 Unauthorized</p>
+
+<p>The request requires user authentication. The response MUST include a WWW-Authenticate header field (section 14.47)
+containing a challenge applicable to the requested resource. The client MAY repeat the request with a suitable
+Authorization header field (section 14.8). If the request already included Authorization credentials, then the 401
+response indicates that authorization has been refused for those credentials. If the 401 response contains the same
+challenge as the prior response, and the user agent has already attempted authentication at least once, then the user
+SHOULD be presented the entity that was given in the response, since that entity might include relevant diagnostic
+information. HTTP access authentication is explained in "HTTP Authentication: Basic and Digest Access
+Authentication".</p>
+
+<p>Use:
+  throw new Unauthorized( 'Content' );</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp">\ezp\Base\Exception\Http</a>
+            &lt;
+            <a href="db_ezp_Base_Exception.html#%5Cezp%5CBase%5CException" style="color: gray; font-size: 0.8em
+                ">\ezp\Base\Exception</a>
+</dd>
+<dt>Children</dt>
+<dd><a href="db_ezp_User_Exception_FailedLogin.html#%5Cezp%5CUser%5CException%5CFailedLogin">\ezp\User\Exception\FailedLogin</a></dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\ezp\Base\Exception\Unauthorized::BAD_REQUEST" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">BAD_REQUEST</span>
+                = 400</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::BAD_REQUEST">\ezp\Base\Exception\Http::BAD_REQUEST</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::BAD_REQUEST">\ezp\Base\Exception\Http::BAD_REQUEST</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::UNAUTHORIZED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">UNAUTHORIZED</span>
+                = 401</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::UNAUTHORIZED">\ezp\Base\Exception\Http::UNAUTHORIZED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::UNAUTHORIZED">\ezp\Base\Exception\Http::UNAUTHORIZED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::PAYMENT_REQUIRED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">PAYMENT_REQUIRED</span>
+                = 402</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::PAYMENT_REQUIRED">\ezp\Base\Exception\Http::PAYMENT_REQUIRED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::PAYMENT_REQUIRED">\ezp\Base\Exception\Http::PAYMENT_REQUIRED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::FORBIDDEN" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">FORBIDDEN</span>
+                = 403</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::FORBIDDEN">\ezp\Base\Exception\Http::FORBIDDEN</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::FORBIDDEN">\ezp\Base\Exception\Http::FORBIDDEN</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::NOT_FOUND" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">NOT_FOUND</span>
+                = 404</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_FOUND">\ezp\Base\Exception\Http::NOT_FOUND</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_FOUND">\ezp\Base\Exception\Http::NOT_FOUND</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::METHOD_NOT_ALLOWED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">METHOD_NOT_ALLOWED</span>
+                = 405</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::METHOD_NOT_ALLOWED">\ezp\Base\Exception\Http::METHOD_NOT_ALLOWED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::METHOD_NOT_ALLOWED">\ezp\Base\Exception\Http::METHOD_NOT_ALLOWED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::NOT_ACCEPTABLE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">NOT_ACCEPTABLE</span>
+                = 406</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_ACCEPTABLE">\ezp\Base\Exception\Http::NOT_ACCEPTABLE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_ACCEPTABLE">\ezp\Base\Exception\Http::NOT_ACCEPTABLE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::CONFLICT" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">CONFLICT</span>
+                = 409</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::CONFLICT">\ezp\Base\Exception\Http::CONFLICT</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::CONFLICT">\ezp\Base\Exception\Http::CONFLICT</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::GONE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">GONE</span>
+                = 410</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::GONE">\ezp\Base\Exception\Http::GONE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::GONE">\ezp\Base\Exception\Http::GONE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::UNSUPPORTED_MEDIA_TYPE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">UNSUPPORTED_MEDIA_TYPE</span>
+                = 415</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::UNSUPPORTED_MEDIA_TYPE">\ezp\Base\Exception\Http::UNSUPPORTED_MEDIA_TYPE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::UNSUPPORTED_MEDIA_TYPE">\ezp\Base\Exception\Http::UNSUPPORTED_MEDIA_TYPE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::INTERNAL_ERROR" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">INTERNAL_ERROR</span>
+                = 500</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::INTERNAL_ERROR">\ezp\Base\Exception\Http::INTERNAL_ERROR</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::INTERNAL_ERROR">\ezp\Base\Exception\Http::INTERNAL_ERROR</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::NOT_IMPLEMENTED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">NOT_IMPLEMENTED</span>
+                = 501</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_IMPLEMENTED">\ezp\Base\Exception\Http::NOT_IMPLEMENTED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::NOT_IMPLEMENTED">\ezp\Base\Exception\Http::NOT_IMPLEMENTED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::SERVICE_UNAVAILABLE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SERVICE_UNAVAILABLE</span>
+                = 503</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::SERVICE_UNAVAILABLE">\ezp\Base\Exception\Http::SERVICE_UNAVAILABLE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::SERVICE_UNAVAILABLE">\ezp\Base\Exception\Http::SERVICE_UNAVAILABLE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Base\Exception\Unauthorized::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          string $what, <a href="http://php.net/manual/en/class.exception.php">\Exception</a> | null $previous
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Generates: Login required to get access to '{$what}'</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$what</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$previous</th>
+<td>
+<a href="http://php.net/manual/en/class.exception.php">\Exception</a> | null</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::__toString()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__toString</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::__toString()">\ezp\Base\Exception\Http::__toString()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getCode()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCode</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getCode()">\ezp\Base\Exception\Http::getCode()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getFile()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFile</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getFile()">\ezp\Base\Exception\Http::getFile()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getLine()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLine</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getLine()">\ezp\Base\Exception\Http::getLine()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getMessage()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMessage</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getMessage()">\ezp\Base\Exception\Http::getMessage()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getPrevious()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getPrevious</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getPrevious()">\ezp\Base\Exception\Http::getPrevious()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getTrace()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTrace</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getTrace()">\ezp\Base\Exception\Http::getTrace()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Base\Exception\Unauthorized::getTraceAsString()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTraceAsString</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">final</span><span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_Exception_Http.html#%5Cezp%5CBase%5CException%5CHttp::getTraceAsString()">\ezp\Base\Exception\Http::getTraceAsString()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

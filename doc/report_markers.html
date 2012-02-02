@@ -1,0 +1,1346 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><script xmlns="" type="text/javascript">
+        $(document).ready(function() {
+            $("#marker-accordion").accordion({
+                collapsible: true,
+                autoHeight:  false
+            });
+        });
+    </script><div xmlns="" id="content">
+<h1>Markers (TODO / FIXME)</h1>
+<div id="marker-accordion">
+<h3><a href="#">eZ/Publish/Core/Base/ServiceContainer.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>17</td>
+<td>Update service.ini reference bellow
+# @see \eZ\Publish\Core\Base\settings\service.ini For more options and examples.
+"arguments" values in service.ini can start with either @ in case of other services being dependency, $ if a
+predefined global variable is to be used ( currently: $_SERVER, $_REQUEST, $_COOKIE, $_FILES and $serviceContainer )
+or plain scalar if that is to be given directly as argument value.</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/Core/Base/Configuration/Parser.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>25</td>
+<td>Define exceptions</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>64</td>
+<td>Define exceptions</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/Core/Base/Configuration/Parser/Ini.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>82</td>
+<td>Change impl to use exceptions instead of trigger_error in most cases</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>157</td>
+<td>Change impl to use exceptions instead of trigger_error</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>397</td>
+<td>Test..</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/LocationService.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>21</td>
+<td>enhancement - this method should return a result structure containing the new location and a list
+of locations which are not copied due to permission denials.</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/ContentService.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>408</td>
+<td>TBD - filter by sourceversion destination version and languages</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/Values/Content/Query/Criterion.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>35</td>
+<td>Add a dedicated exception</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/Values/Content/Field.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>16</td>
+<td>may be not needed</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/Values/User/User.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>65</td>
+<td>: Not used in kernel, should probably be a number of login allowed before changing password.
+But new users gets 0 before they activate, admin has 10, and anonymous has 1000 in clean data.</td>
+</tr>
+</table></div>
+<h3><a href="#">eZ/Publish/API/Repository/RoleService.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>13</td>
+<td>add get roles for user including limitations</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>147</td>
+<td>add limitations</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Base/Configuration/Parser/Ini.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>388</td>
+<td>Test..</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Base/Exception/Expired.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>13</td>
+<td>Use something else then http BAD_REQUEST.
+Use:
+throw new Expired( 'Oauth Token' );</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Base/Repository.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>92</td>
+<td>throw something if $user is not persisted to backend (not stored)</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Base/Model.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>59</td>
+<td>should mention that no type checking is done internal props.?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>109</td>
+<td>Do we really want/need this shortcut?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>24</td>
+<td>Merge and optimize concepts for settings, validator data and field type properties.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Field/StaticCollection.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>54</td>
+<td>Direct string assignation ? If we decide to implement this, magic should be done here</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Field/LazyCollection.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>36</td>
+<td>Direct string assignation ? If we decide to implement this, magic should be done here</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Utils/NamePatternResolver.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>90</td>
+<td>Take translation into account</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Location.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>36</td>
+<td>const from eZ Publish 4.5</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Section/Service.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>24</td>
+<td>Should api be adjusted to take name and identifier like handler instead of object?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Image/AliasCollection.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>137</td>
+<td>Implement this method</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>149</td>
+<td>Implement for already published content</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Country/Type.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>26</td>
+<td>Is a default value really possible with this type?
+Shouldn't an exception be used?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Keyword/Type.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>36</td>
+<td>Implement it</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>51</td>
+<td>Review this, created from copy/paste to unblock failing tests!</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Url/Type.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>29</td>
+<td>Is a default value really possible with this type?
+Shouldn't an exception be used?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>60</td>
+<td>Sort seems to not be supported by this FieldType, is this handled correctly?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Float/Type.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>58</td>
+<td>Sort seems to not be supported by this FieldType, is this handled correctly?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/TextLine/Type.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>58</td>
+<td>String normalization should occur here.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/XmlText/Input/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>150</td>
+<td>Implement & Document</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/XmlText/Input/Parser/Base.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>1061</td>
+<td>break processing of any node that doesn't have parent</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>1100</td>
+<td>break processing of any node that doesn't have parent</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/DateAndTime/Value.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>94</td>
+<td>Return format taken from locale configuration</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/BinaryFile/Handler.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>16</td>
+<td>Handle creation from HTTP</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>33</td>
+<td>See todo in {@link __construct()}</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/FieldType/Selection/Type.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>54</td>
+<td>String normalization should occur here.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Proxy.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>133</td>
+<td>Do we really want/need this shortcut?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Concrete.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>621</td>
+<td>Do we really want/need this shortcut?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Version.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>47</td>
+<td>taken from eZContentObjectVersion, to be redefined</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Language/Service.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>105</td>
+<td>Add exception if still assigned to some content (needs handler support)</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Service.php<small>9</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>51</td>
+<td>If/when we have some sort of object storage, use that to check if object is persisted instead of just id</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>329</td>
+<td>Add permission checks when contentFrom object is available</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>342</td>
+<td>Implement it (should be similar to listVersions())
+and use it for $content->relations lazy collection
+So should likewise be marked as private and take Version is argument?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>384</td>
+<td>Language support</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>384</td>
+<td>User support</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>411</td>
+<td>Translation filter</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>460</td>
+<td>Translation filter</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>631</td>
+<td>Implement translations</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>756</td>
+<td>initialLanguageId should be processed via translation management, not hardcoded</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Location/Trash/Service.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>50</td>
+<td>Refresh $location (with an Identity map ?)</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Location/Concrete.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>124</td>
+<td>Should be removed or documented as internal as you will have to use move api if you want to change
+parent after creation.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Location/Service.php<small>6</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>36</td>
+<td>Permission checking, is it possible w/o loading all content in the subtree?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>248</td>
+<td>Make children visibility update more dynamic with some kind of LazyLoadedCollection</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>278</td>
+<td>Make children visibility update more dynamic with some kind of LazyLoadedCollection</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>309</td>
+<td>Figure out a way to do permissions w/o loading whole tree</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>324</td>
+<td>Do we need to check permissions for delete on children? Or should we document that
+giving access to deleting implicit gives a user access to remove all childes no matter what?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>343</td>
+<td>Figure out how to do permission checks w/o loading whole tree</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Field.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>142</td>
+<td>Make validate optional.</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>154</td>
+<td>Change so validate does not throw exceptions for logical validation errors.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Content/Type/Service.php<small>5</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>36</td>
+<td>Figure out which methods should manipulate object provided or add doc on having to re fetch object.</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>43</td>
+<td>Validate that identifier is not already in use</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>92</td>
+<td>Validate that identifier is not already in use (if it has been changed?)</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>294</td>
+<td>Consider adding fieldDefinitions on update struct when we have dirty state and knowledge about which
+one has been updated (not added / removed, there are separate api's for that). But remember to validate
+fieldDefinition->identifier when this is added.</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>337</td>
+<td>Change to take objects in input? ( more consistent with rest and removes needs for lots of NotFound possibilities )</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Io/ContentType.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>47</td>
+<td>Remove hardcoded dependency on fileinfo, use injection</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Io/Service.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>47</td>
+<td>Create file in backend like done in createFromLocalFile()</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/User/Exception/FailedLogin.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>23</td>
+<td>Find a more suitable message</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/User/Group/Concrete.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>32</td>
+<td>Deal with translation when Content has it</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/User/Service.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>286</td>
+<td>: Either allow removing last group of a user or define which api should be used for deleting users + tree</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/UpdateStruct.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>62</td>
+<td>: Document</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Type.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>14</td>
+<td>What about sort_field and sort_order?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>183</td>
+<td>: Document.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Query/Criterion.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>38</td>
+<td>Add a dedicated exception</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Search/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>37</td>
+<td>Define exceptions (InMemory uses NotFound while Legazy uses InvalidObjectCount)</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Section/Handler.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>16</td>
+<td>Should validate that $identifier is unique??</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>16</td>
+<td>What about translatable $name?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Handler.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>72</td>
+<td>Is this supposed to be constants from Content or Version? They differ..</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>151</td>
+<td>Should the existence verifications happen here or is this supposed to be handled at a higher level?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>162</td>
+<td>Should the existence verifications happen here or is this supposed to be handled at a higher level?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Version.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>87</td>
+<td>: Document</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Language/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>52</td>
+<td>Might throw an exception if the language is still associated with some content / types / (...) ?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/RestrictedVersion.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>77</td>
+<td>: Document</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Location/CreateStruct.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>56</td>
+<td>Rename to $contentVersionNo?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Location/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>128</td>
+<td>This can be confusing (regarding permissions and main/multi location).
+So method is for the time being not in PublicAPI so people can instead
+write scripts using their own logic against the assignSectionToContent() api.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Field.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>46</td>
+<td>What is supposed to be stored here? Object or languageCode?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>51</td>
+<td>Normally we would use a create struct here</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Type/UpdateStruct.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>117</td>
+<td>: Document.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Type/CreateStruct.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>153</td>
+<td>: Document.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Type/FieldDefinition.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>15</td>
+<td>Do we need a FieldDefitinitionCreateStruct?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>15</td>
+<td>What about the "serialized_data_text" field in legacy storage?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>108</td>
+<td>: Document</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Content/Type/Handler.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>34</td>
+<td>Throw exception if group is not found, also if group contains types</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>144</td>
+<td>Add FieldDefintion\CreateStruct?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>175</td>
+<td>Add FieldDefintion\UpdateStruct?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/User.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>60</td>
+<td>: Not used in kernel, should probably be a number of login allowed before changing password.
+But new users gets 0 before they activate, admin has 10, and anonymous has 1000 in clean data.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/User/Handler.php<small>4</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>59</td>
+<td>Throw on missing user?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>108</td>
+<td>Throw on invalid Role Id?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>129</td>
+<td>Throw exception on missing role / policy?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>148</td>
+<td>It has been discussed to not support assigning roles with limitations, as it is kind of flawed in eZ Publish
+Hence you would simplify the design and reduce future bugs by forcing use of policy limitations instead.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Handler.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>243</td>
+<td>Is this supposed to be constants from Content or Version? They differ..</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>388</td>
+<td>Should the existence verifications happen here or is this supposed to be handled at a higher level?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>402</td>
+<td>Should the existence verifications happen here or is this supposed to be handled at a higher level?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Mapper.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>92</td>
+<td>: created, modified, initial_language_id, status, user_id?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Language/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>102</td>
+<td>Might throw an exception if the language is still associated with
+some content / types / (...) ?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/FieldValue/Converter/BinaryFileStorage.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>19</td>
+<td>Check if it's insert or update query</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Type/ContentUpdater/Action/RemoveField.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>41</td>
+<td>Handle external field data.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Type/ContentUpdater/Action/AddField.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>53</td>
+<td>Handle external field data</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Type/Gateway/EzcDatabase.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>fixme</td>
+<td>708</td>
+<td>Actually not needed</td>
+</tr>
+<tr>
+<td>fixme</td>
+<td>748</td>
+<td>Actually not needed</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>720</td>
+<td>Handle StorageFieldDefinition</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Type/Handler.php<small>6</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>fixme</td>
+<td>263</td>
+<td>Return true only if deletion happened</td>
+</tr>
+<tr>
+<td>fixme</td>
+<td>329</td>
+<td>What is to be returned?</td>
+</tr>
+<tr>
+<td>fixme</td>
+<td>344</td>
+<td>What is to be returned?</td>
+</tr>
+<tr>
+<td>fixme</td>
+<td>386</td>
+<td>Return true only if deletion happened</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>222</td>
+<td>Maintain contentclass_name</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>239</td>
+<td>Maintain contentclass_name</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Content/Type/Mapper.php<small>2</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>44</td>
+<td>$description is not supported by database, yet</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>167</td>
+<td>Handle field definition conversion.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/Legacy/Handler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>37</td>
+<td>If possible, the handler should not receive the DSN but the database
+connection instead, so that the implementation becomes fully testable.</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/InMemory/LanguageHandler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>95</td>
+<td>Might throw an exception if the language is still associated with some content / types / (...) ?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/InMemory/UserHandler.php<small>3</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>115</td>
+<td>Throw on missing user?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>220</td>
+<td>Throw on invalid Role Id?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>255</td>
+<td>Throw exception on missing role / policy?</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/InMemory/LocationHandler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>400</td>
+<td>Requires approbation</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/InMemory/ContentHandler.php<small>1</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>163</td>
+<td>Language support</td>
+</tr>
+</table></div>
+<h3><a href="#">ezp/Persistence/Storage/InMemory/ContentTypeHandler.php<small>4</small></a></h3>
+<div><table>
+<tr>
+<th>Type</th>
+<th>Line</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>todo</td>
+<td>26</td>
+<td>Validate $status arguments</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>74</td>
+<td>Throw exception if group is not found, also if group contains types</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>371</td>
+<td>Add FieldDefintion\CreateStruct?</td>
+</tr>
+<tr>
+<td>todo</td>
+<td>398</td>
+<td>Add FieldDefintion\UpdateStruct?</td>
+</tr>
+</table></div>
+</div>
+</div></body></html>

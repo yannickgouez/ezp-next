@@ -1,0 +1,552 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/FieldType/Image/Manager.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CFieldType%5CImage%5CManager">\ezp\Content\FieldType\Image\Manager</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\FieldType\Image\Manager" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\FieldType\Image\Manager<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Wraps eZImageManager class from old eZ Publish</p>
+<div class="long-description"><p>Use this class to abstract a class/object coming from legacy codebase (aka "old" eZ Publish)</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>\ezp\Base\Legacy\Carpet</dd>
+<dt>Note</dt>
+<dd>This implementation is to be changed not to be dependent on the old eZImageManager
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\FieldType\Image\Manager::$aliasCollection" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Content\FieldType\Image\AliasCollection
+                 <span class="highlight">$aliasCollection</span>= ''
+                </code><div class="description">
+<p class="short-description">Image alias collection object for which this manager is used</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_FieldType_Image_AliasCollection.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAliasCollection">\ezp\Content\FieldType\Image\AliasCollection</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::$binaryRepository" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Base\BinaryRepository
+                 <span class="highlight">$binaryRepository</span>= ''
+                </code><div class="description">
+<p class="short-description">The binary repository.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Can be used to store image aliases once generation is done</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Base_BinaryRepository.html#%5Cezp%5CBase%5CBinaryRepository">\ezp\Base\BinaryRepository</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::$className" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$className</span>= ''eZImageManager''
+                </code><div class="description">
+<span class="attribute">static</span><p class="short-description">Class name for the abstracted legacy object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>'eZImageManager'</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::$object" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\eZImageManager
+                 <span class="highlight">$object</span>= ''
+                </code><div class="description">
+<p class="short-description">Legacy image manager class</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZImageManager</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\FieldType\Image\Manager::__call()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__call</span><span class="nb-faded-text">(
+          string $method, array $arguments
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Calls $method with $arguments on abstracted object</p>
+<small>Inherited from:
+                    \ezp\Base\Legacy\Carpet::__call()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$method</th>
+<td>string</td>
+<td><em><p>Method name</p></em></td>
+</tr>
+<tr>
+<th>$arguments</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_MethodNotFound.html#%5Cezp%5CBase%5CException%5CMethodNotFound">\ezp\Base\Exception\MethodNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::__callStatic()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__callStatic</span><span class="nb-faded-text">(
+          string $method, array $arguments
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">static</span><span class="attribute">inherited</span><p class="short_description">Calls static $method with $arguments on abstracted object class</p>
+<small>Inherited from:
+                    \ezp\Base\Legacy\Carpet::__callStatic()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$method</th>
+<td>string</td>
+<td><em><p>Method name</p></em></td>
+</tr>
+<tr>
+<th>$arguments</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_MethodNotFound.html#%5Cezp%5CBase%5CException%5CMethodNotFound">\ezp\Base\Exception\MethodNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_FieldType_Image_AliasCollection.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAliasCollection">\ezp\Content\FieldType\Image\AliasCollection</a> $aliasCollection, <a href="db_ezp_Base_BinaryRepository.html#%5Cezp%5CBase%5CBinaryRepository">\ezp\Base\BinaryRepository</a> $binaryRepository
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Constructor</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$aliasCollection</th>
+<td><a href="db_ezp_Content_FieldType_Image_AliasCollection.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAliasCollection">\ezp\Content\FieldType\Image\AliasCollection</a></td>
+<td><em><p>The image alias collection calling this manager</p></em></td>
+</tr>
+<tr>
+<th>$binaryRepository</th>
+<td><a href="db_ezp_Base_BinaryRepository.html#%5Cezp%5CBase%5CBinaryRepository">\ezp\Base\BinaryRepository</a></td>
+<td><em><p>The binary repository</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::__get()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Access to abstracted object's property, identified by $name.</p>
+<small>Inherited from:
+                    \ezp\Base\Legacy\Carpet::__get()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>Property name</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::__set()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $name, mixed $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets $value to abstracted object's property, identified by $name</p>
+<small>Inherited from:
+                    \ezp\Base\Legacy\Carpet::__set()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em><p>Property name</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>Value to set</p></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::buildImageData()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">buildImageData</span><span class="nb-faded-text">(
+          array $imageInfo
+          )
+        </span>
+        :
+          <a href="db_ezp_Base_Image_Data.html#%5Cezp%5CBase%5CImage%5CData">\ezp\Base\Image\Data</a></code><div class="description"><p class="short_description">Builds an {@link \ezp\Base\Image\Data} object from $imageInfo and maps properties</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$imageInfo</th>
+<td>array</td>
+<td><em><p>Image info array returned by legacy image analyzer</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Image_Data.html#%5Cezp%5CBase%5CImage%5CData">\ezp\Base\Image\Data</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\eZImageManager::analyzeImage()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::createImageAlias()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createImageAlias</span><span class="nb-faded-text">(
+          string $aliasName
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_FieldType_Image_Alias.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAlias">\ezp\Content\FieldType\Image\Alias</a></code><div class="description"><p class="short_description">Creates the image alias $aliasName if it's not already part of the
+existing aliases</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$aliasName</th>
+<td>string</td>
+<td><em><p>Name of the alias to create</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_FieldType_Image_Alias.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAlias">\ezp\Content\FieldType\Image\Alias</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::createOriginalAlias()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createOriginalAlias</span><span class="nb-faded-text">(
+          <a href="db_ezp_Io_FileInfo.html#%5Cezp%5CIo%5CFileInfo">\ezp\Io\FileInfo</a> $imageInfo, string $originalFilename
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_FieldType_Image_Alias.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAlias">\ezp\Content\FieldType\Image\Alias</a></code><div class="description"><p class="short_description">Creates original alias from $imageInfo.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>$originalFilename will be stored in the alias object</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$imageInfo</th>
+<td><a href="db_ezp_Io_FileInfo.html#%5Cezp%5CIo%5CFileInfo">\ezp\Io\FileInfo</a></td>
+<td><em><p>Object containing all information regarding physical image file</p></em></td>
+</tr>
+<tr>
+<th>$originalFilename</th>
+<td>string</td>
+<td><em><p>The original file name to store in the alias ($imageInfo filename is a temporary unique hash)</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_FieldType_Image_Alias.html#%5Cezp%5CContent%5CFieldType%5CImage%5CAlias">\ezp\Content\FieldType\Image\Alias</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\Image\Manager::lift()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">lift</span><span class="nb-faded-text">(
+          array | null $constructorArgs
+              =
+              null
+          )
+        </span>
+        :
+          \ezp\Base\Legacy\Carpet</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">"Lifts the carpet and sweeps the dust under it"
+In other more pragmatic words, Instantiates the object to be abstracted.</p>
+<small>Inherited from:
+                    \ezp\Base\Legacy\Carpet::lift()</small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Note: This method makes use of Reflection if $constructorArgs contains more than 1 element.
+Therefore, to avoid too much performance cost, please consider extending this class
+and reimplement this method in order to pass the exact number of arguments
+to the abstracted class's constructor</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$constructorArgs</th>
+<td>array | null</td>
+<td><em><p>Arguments to pass to the constructor. Set to null (default) if no argument is required</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\ezp\Base\Legacy\Carpet</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

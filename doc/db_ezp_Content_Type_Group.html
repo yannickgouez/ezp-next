@@ -1,0 +1,236 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/Type/Group.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\Type\Group" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\ezp\Content\Type\Group<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Group class ( Content Class Group )</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Base_ModelDefinition.html#%5Cezp%5CBase%5CModelDefinition">\ezp\Base\ModelDefinition</a></dd>
+<dt>Children</dt>
+<dd><a href="db_ezp_Content_Type_Group_Proxy.html#%5Cezp%5CContent%5CType%5CGroup%5CProxy">\ezp\Content\Type\Group\Proxy</a></dd>
+<dd><a href="db_ezp_Content_Type_Group_Concrete.html#%5Cezp%5CContent%5CType%5CGroup%5CConcrete">\ezp\Content\Type\Group\Concrete</a></dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>Appended items will not be stored, use TypeService->link()
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\Type\Group::definition()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">definition</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">static</span><span class="attribute">inherited</span><p class="short_description">Returns definition of the model object, eg: permissions(, properties)...</p>
+<small>Inherited from:
+                    <a href="db_ezp_Base_ModelDefinition.html#%5Cezp%5CBase%5CModelDefinition::definition()">\ezp\Base\ModelDefinition::definition()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Return value example:
+array(
+    'module' => 'content',
+    'functions' => array(
+        'read' => array(
+            'Class' => array(
+                'options' => function( Repository $repository )
+                {
+                    return $repository->getContentTypeService()->loadAll( $idNamePair = true );
+                },
+                'compare' => function( Model $content, array $limitationsValues[, Repository $repository[, Model $assignment = null]] )
+                {
+                    return in_array( $content->typeId, $limitationsValues );
+                },
+                'query' => function( array $limitationsValues[, Repository $repository] )
+                {
+                    if ( !isset( $limitationsValues[1] ) )
+                        return new Criterion\ContentTypeId( $limitationsValues[0] );</p>
+
+<pre><code>                return new Criterion\ContentTypeId( $limitationsValues );
+            },
+        )
+    )
+)
+</code></pre>
+
+<p>);</p>
+
+<p>Where 'read' is function and 'Class' is limitation identifier.</p>
+
+<p>Bellow that are three possible keys: 'options', a callback returning a list of options,
+where key is scalar value identifying limitation and value is human readable name.
+The second key is 'compare', a callback comparing instance of an object against limitation values.
+The third possible key is 'query', a callback that modifies criterion object to include filtering rules
+for the limitation.</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Access</dt>
+<dd>private
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\Type\Group::getTypes()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTypes</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Content_Type.html#%5Cezp%5CContent%5CType">\ezp\Content\Type[]</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Type.html#%5Cezp%5CContent%5CType">\ezp\Content\Type[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

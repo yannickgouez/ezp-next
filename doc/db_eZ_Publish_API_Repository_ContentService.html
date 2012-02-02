@@ -1,0 +1,1702 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/ContentService.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description"></p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"></div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">eZ\Publish\API\Repository
+         
+    </dd>
+</dl>
+<a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\ContentService" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\API\Repository\ContentService<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>eZ\Publish\API\Repository</small><p class="short-description">This class provides service methods for managing content</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Example</dt>
+<dd>Examples/content.php
+         
+    </dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\ContentService::addRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addRelation</span><span class="nb-faded-text">(
+           $sourceVersion,  $destinationContent
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation</a></code><div class="description"><p class="short_description">Adds a relation of type common.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sourceVersion</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$destinationContent</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation</a></td>
+<td>the newly created relation</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to edit this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is not a draft The source of the relation is the content and version referenced by $versionInfo.</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::addTranslationInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addTranslationInfo</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a> $translationInfo
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">add translation information to the content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$translationInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed add a translation info</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Example</dt>
+<dd>Examples/translation_5x.php
+         
+    </dd>
+<dt>Since</dt>
+<dd>5.0
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::copyContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copyContent</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, <a href="db_eZ_Publish_API_Repository_Values_Content_LocationCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationCreateStruct">\eZ\Publish\API\Repository\Values\Content\LocationCreateStruct</a> $destinationLocationCreateStruct, <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">copies the content to a new location. If no version is given,
+all versions are copied, otherwise only the given version.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$destinationLocationCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_LocationCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CLocationCreateStruct">\eZ\Publish\API\Repository\Values\Content\LocationCreateStruct</a></td>
+<td><em><p>the target location where the content is copied to</p></em></td>
+</tr>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to copy the content to the given location</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::createContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createContent</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentCreateStruct">\eZ\Publish\API\Repository\Values\Content\ContentCreateStruct</a> $contentCreateStruct, array $locationCreateStructs
+              =
+              array()
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">Creates a new content draft assigned to the authenticated user.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If a different userId is given in $contentCreateStruct it is assigned to the given user
+but this required special rights for the authenticated user
+(this is useful for content staging where the transfer process does not
+have to authenticate with the user which created the content object in the source server).
+The user has to publish the draft if it should be visible.
+In 4.x at least one location has to be provided in the location creation array.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentCreateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentCreateStruct">\eZ\Publish\API\Repository\Values\Content\ContentCreateStruct</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$locationCreateStructs</th>
+<td>array</td>
+<td><em><p>an array of {@link \eZ\Publish\API\Repository\Values\Content\LocationCreateStruct} for each location parent under which a location should be created for the content</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td>- the newly created content draft</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to create the content in the given location</em></td>
+</tr>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\InvalidArgumentException</td>
+<td><em>if there is a provided remoteId which exists in the system or (4.x) there is no location provided</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $contentCreateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is missing</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::createContentDraft()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createContentDraft</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">creates a draft from a publshed or archived version.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version is given, the current published version is used.
+4.x: The draft is created with the initialLanguge code of the source version or if not present with the main language.
+It can be changed on updating the version.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td>- the newly created content draft</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to create the draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if there is no published version or the version info points to a draft</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::deleteContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteContent</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">deletes a content object including all its versions and locations including their subtrees.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowd to delete the content (in one of the locations of the given content object)</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::deleteRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteRelation</span><span class="nb-faded-text">(
+           $sourceVersion,  $destinationContent
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a relation of type COMMON from a draft.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sourceVersion</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$destinationContent</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed edit this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is not a draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_IllegalArgumentException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CIllegalArgumentException">\eZ\Publish\API\Repository\Exceptions\IllegalArgumentException</a></td>
+<td><em>if there is no relation of type COMMON for the given destination</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::deleteVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteVersion</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">removes the given version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is in state published</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to remove this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::findContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">findContent</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Query.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CQuery">\eZ\Publish\API\Repository\Values\Content\Query</a> $query, array $fieldFilters, boolean $filterOnUserPermissions
+              =
+              true
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_SearchResult.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSearchResult">\eZ\Publish\API\Repository\Values\Content\SearchResult</a></code><div class="description"><p class="short_description">finds content objects for the given query.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Query.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CQuery">\eZ\Publish\API\Repository\Values\Content\Query</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$fieldFilters</th>
+<td>array</td>
+<td><em><ul>
+<li>a map of filters for the returned fields. Currently supported: <code>array("languages" => array(<language1>,..))</code>.</li>
+</ul>
+</em></td>
+</tr>
+<tr>
+<th>$filterOnUserPermissions</th>
+<td>boolean</td>
+<td><em><p>if true only the objects which is the user allowed to read are returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_SearchResult.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSearchResult">\eZ\Publish\API\Repository\Values\Content\SearchResult</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>TODO</dt>
+<dd>define structs for the field filters
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::findSingle()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">findSingle</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Query.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CQuery">\eZ\Publish\API\Repository\Values\Content\Query</a> $query, array $fieldFilters, boolean $filterOnUserPermissions
+              =
+              true
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_SearchResult.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSearchResult">\eZ\Publish\API\Repository\Values\Content\SearchResult</a></code><div class="description"><p class="short_description">Performs a query for a single content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$query</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Query.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CQuery">\eZ\Publish\API\Repository\Values\Content\Query</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$fieldFilters</th>
+<td>array</td>
+<td><em><ul>
+<li>a map of filters for the returned fields. Currently supported: <code>array("languages" => array(<language1>,..))</code>.</li>
+</ul>
+</em></td>
+</tr>
+<tr>
+<th>$filterOnUserPermissions</th>
+<td>boolean</td>
+<td><em><p>if true only the objects which is the user allowed to read are returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_SearchResult.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CSearchResult">\eZ\Publish\API\Repository\Values\Content\SearchResult</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to read the found content object</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>TODO</dt>
+<dd>throw an exception if the found object count is > 1
+         
+    </dd>
+<dt>TODO</dt>
+<dd>define structs for the field filters
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContenInfotByRemoteId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContenInfotByRemoteId</span><span class="nb-faded-text">(
+          string $remoteId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></code><div class="description"><p class="short_description">Loads a content info object for the given remoteId.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>To load fields use loadContent</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$remoteId</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowd to create the content in the given location</em></td>
+</tr>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the content with the given remote id does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContent</span><span class="nb-faded-text">(
+          int $contentId, array $languages
+              =
+              null, int $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">loads content in a version of the given content object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version number is given, the method returns the current version</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$languages</th>
+<td>array</td>
+<td><em><p>A language filter for fields. If not given all languages are returned</p></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int</td>
+<td><em><p>the version number. If not given the current version is returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the content or version with the given id does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContentByContentInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentByContentInfo</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, array $languages
+              =
+              null, int $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">loads content in a version for the given content info object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version number is given, the method returns the current version</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$languages</th>
+<td>array</td>
+<td><em><p>A language filter for fields. If not given all languages are returned</p></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int</td>
+<td><em><p>the version number. If not given the current version is returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_NotFoundException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CNotFoundException">\eZ\Publish\API\Repository\Exceptions\NotFoundException</a></td>
+<td><em>- if version with the given number does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContentByVersionInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentByVersionInfo</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo, array $languages
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">loads content in the version given by version info.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$languages</th>
+<td>array</td>
+<td><em><p>A language filter for fields. If not given all languages are returned</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContentDrafts()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentDrafts</span><span class="nb-faded-text">(
+          \eZ\Publish\API\Repository\User $user
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></code><div class="description"><p class="short_description">Load drafts for a user.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no user is given the drafts for the authenticated user a returned</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td>\eZ\Publish\API\Repository\User</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td>the drafts ({@link VersionInfo}) owned by the given user</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load the draft list</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadContentInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadContentInfo</span><span class="nb-faded-text">(
+          int $contentId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></code><div class="description"><p class="short_description">Loads a content info object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>To load fields use loadContent</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to read the content</em></td>
+</tr>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the content with the given id does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRelations</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation[]</a></code><div class="description"><p class="short_description">load all outgoing relations for the given version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation[]</a></td>
+<td>an array of {@link Relation}</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to read this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadReverseRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadReverseRelations</span><span class="nb-faded-text">(
+           $content
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation[]</a></code><div class="description"><p class="short_description">Loads all incoming relations for a content object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The relations come only
+from published versions of the source content objects</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Relation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CRelation">\eZ\Publish\API\Repository\Values\Content\Relation[]</a></td>
+<td>an array of {@link Relation}</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to read this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadTranslationInfos()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadTranslationInfos</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, array $filter
+              =
+              array()
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo[]</a></code><div class="description"><p class="short_description">lists the translations done on this content object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$filter</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo[]</a></td>
+<td>an array of {@link TranslationInfo}</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed read trnaslation infos</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Since</dt>
+<dd>5.0
+         
+    </dd>
+<dt>Todo</dt>
+<dd>TBD - filter by sourceversion destination version and languages
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadVersionByRemoteId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadVersionByRemoteId</span><span class="nb-faded-text">(
+          string $remoteId, array $languages
+              =
+              null, int $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">loads content in a version for the content object reference by the given remote id.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version is given, the method returns the current version</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$remoteId</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$languages</th>
+<td>array</td>
+<td><em><p>A language filter for fields. If not given all languages are returned</p></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int</td>
+<td><em><p>the version number. If not given the current version is returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the content or version with the given remote id does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadVersionInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadVersionInfo</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, int $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></code><div class="description"><p class="short_description">loads a version info of the given content object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version number is given, the method returns the current version</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int</td>
+<td><em><p>the version number. If not given the current version is returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the version with the given number does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadVersionInfoById()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadVersionInfoById</span><span class="nb-faded-text">(
+          int $contentId, int $versionNo
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></code><div class="description"><p class="short_description">loads a version info of the given content object id.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no version number is given, the method returns the current version</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$versionNo</th>
+<td>int</td>
+<td><em><p>the version number. If not given the current version is returned.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\NotFoundExceptoin</td>
+<td><em>- if the version with the given number does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to load this version</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::loadVersions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadVersions</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo[]</a></code><div class="description"><p class="short_description">Loads all versions for the given content</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo[]</a></td>
+<td>an array of {@link \eZ\Publish\API\Repository\Values\Content\VersionInfo} sorted by creation date</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to list versions</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::newContentCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentCreateStruct</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a> $contentType, string $mainLanguageCode
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentCreateStruct">\eZ\Publish\API\Repository\Values\Content\ContentCreateStruct</a></code><div class="description"><p class="short_description">Instantiates a new content create struct object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentType</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ContentType_ContentType.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CContentType">\eZ\Publish\API\Repository\Values\ContentType\ContentType</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$mainLanguageCode</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentCreateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentCreateStruct">\eZ\Publish\API\Repository\Values\Content\ContentCreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::newContentMetadataUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentMetadataUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct</code><div class="description"><p class="short_description">Instantiates a new content meta data update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::newContentUpdateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newContentUpdateStruct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct</a></code><div class="description"><p class="short_description">Instantiates a new content update struct</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::newTranslationInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newTranslationInfo</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a></code><div class="description"><p class="short_description">Instantiates a new TranslationInfo object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::newTranslationValues()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">newTranslationValues</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationValues.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationValues">\eZ\Publish\API\Repository\Values\Content\TranslationValues</a></code><div class="description"><p class="short_description">Instantiates a Translation object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationValues.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationValues">\eZ\Publish\API\Repository\Values\Content\TranslationValues</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::publishVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">publishVersion</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">Publishes a content version</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to publish this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is not a draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to publish this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is not a draft</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::translateVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">translateVersion</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a> $translationInfo, <a href="db_eZ_Publish_API_Repository_Values_Content_TranslationValues.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationValues">\eZ\Publish\API\Repository\Values\Content\TranslationValues</a> $translationValues, <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">Translate a version</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>updates the destination version given in $translationInfo with the provided translated fields in $translationValues</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$translationInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationInfo">\eZ\Publish\API\Repository\Values\Content\TranslationInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$translationValues</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_TranslationValues.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CTranslationValues">\eZ\Publish\API\Repository\Values\Content\TranslationValues</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em><p>If set, this user is taken as modifier of the version</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td>the content draft with the translated fields</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to update this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the given destiantioon version is not a draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is set to an empty value</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $translationValues is not valid</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Example</dt>
+<dd>Examples/translation_5x.php
+         
+    </dd>
+<dt>Since</dt>
+<dd>5.0
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::updateContent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateContent</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a> $versionInfo, <a href="db_eZ_Publish_API_Repository_Values_Content_ContentUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct</a> $contentUpdateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">Updates the fields of a draft.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$versionInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_VersionInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CVersionInfo">\eZ\Publish\API\Repository\Values\Content\VersionInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentUpdateStruct</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentUpdateStruct.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentUpdateStruct">\eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td>the content draft with the updated fields</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowed to update this version</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_BadStateException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CBadStateException">\eZ\Publish\API\Repository\Exceptions\BadStateException</a></td>
+<td><em>if the version is not a draft</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentFieldValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentFieldValidationException">\eZ\Publish\API\Repository\Exceptions\ContentFieldValidationException</a></td>
+<td><em>if a field in the $contentUpdateStruct is not valid</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_ContentValidationException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CContentValidationException">\eZ\Publish\API\Repository\Exceptions\ContentValidationException</a></td>
+<td><em>if a required field is set to an empty value</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\ContentService::updateContentMetadata()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateContentMetadata</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a> $contentInfo, \eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct $contentMetadataUpdateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></code><div class="description"><p class="short_description">Updates the metadata.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>(see {@link ContentMetadataUpdateStruct}) of a content object - to update fields use updateContent</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentInfo</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_ContentInfo.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContentInfo">\eZ\Publish\API\Repository\Values\Content\ContentInfo</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$contentMetadataUpdateStruct</th>
+<td>\eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_Content_Content.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContent%5CContent">\eZ\Publish\API\Repository\Values\Content\Content</a></td>
+<td>the content with the updated attributes</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Exceptions_UnauthorizedException.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CExceptions%5CUnauthorizedException">\eZ\Publish\API\Repository\Exceptions\UnauthorizedException</a></td>
+<td><em>if the user is not allowd to update the content meta data</em></td>
+</tr>
+<tr>
+<td>\eZ\Publish\API\Repository\Exceptions\InvalidArgumentException</td>
+<td><em>if the remoteId in $contentMetadataUpdateStruct is set but already existis</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

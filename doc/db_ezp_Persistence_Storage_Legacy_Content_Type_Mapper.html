@@ -1,0 +1,483 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Storage/Legacy/Content/Type/Mapper.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Type\Mapper</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Persistence\Storage\Legacy\Content\Type\Mapper<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Mapper for Content Type Handler.</p>
+<div class="long-description"><p>Performs mapping of Type objects.</p></div>
+<dl class="class-info"></dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::$converterRegistry" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Legacy\Content\FieldValue\Converter\Registry
+                 <span class="highlight">$converterRegistry</span>= ''
+                </code><div class="description">
+<p class="short-description">Converter registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Persistence\Legacy\Content\FieldValue\Converter\Registry</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_Registry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CRegistry">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry</a> $converterRegistry
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Creates a new content type mapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$converterRegistry</th>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_Registry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CRegistry">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::createCreateStructFromType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createCreateStructFromType</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Type.html#%5Cezp%5CPersistence%5CContent%5CType">\ezp\Persistence\Content\Type</a> $type
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CType%5CCreateStruct">\ezp\Persistence\Content\Type\CreateStruct</a></code><div class="description"><p class="short_description">Creates a create struct from an existing $type.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td><a href="db_ezp_Persistence_Content_Type.html#%5Cezp%5CPersistence%5CContent%5CType">\ezp\Persistence\Content\Type</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CType%5CCreateStruct">\ezp\Persistence\Content\Type\CreateStruct</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::createGroupFromCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createGroupFromCreateStruct</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Type_Group_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup%5CCreateStruct">\ezp\Persistence\Content\Type\Group\CreateStruct</a> $struct
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type_Group.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup">\ezp\Persistence\Content\Type\Group</a></code><div class="description"><p class="short_description">Creates a Group from its create struct.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$struct</th>
+<td><a href="db_ezp_Persistence_Content_Type_Group_CreateStruct.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup%5CCreateStruct">\ezp\Persistence\Content\Type\Group\CreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type_Group.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup">\ezp\Persistence\Content\Type\Group</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>$description is not supported by database, yet
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::createTypeFromCreateStruct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createTypeFromCreateStruct</span><span class="nb-faded-text">(
+           $createStruct
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Maps properties from $struct to $type.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$createStruct</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::extractFieldFromRow()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">extractFieldFromRow</span><span class="nb-faded-text">(
+          array $row
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a></code><div class="description"><p class="short_description">Creates a FieldDefinition from the data in $row.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$row</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Handle field definition conversion.
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::extractGroupsFromRows()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">extractGroupsFromRows</span><span class="nb-faded-text">(
+          array $rows
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type_Group.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup">\ezp\Persistence\Content\Type\Group[]</a></code><div class="description"><p class="short_description">Extracts Group objects from theb given $rows.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$rows</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type_Group.html#%5Cezp%5CPersistence%5CContent%5CType%5CGroup">\ezp\Persistence\Content\Type\Group[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::extractStorageFieldFromRow()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">extractStorageFieldFromRow</span><span class="nb-faded-text">(
+          array $row
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a></code><div class="description"><p class="short_description">Extracts a StorageFieldDefinition from $row</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$row</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::extractTypeFromRow()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">extractTypeFromRow</span><span class="nb-faded-text">(
+          array $row
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type.html#%5Cezp%5CPersistence%5CContent%5CType">\ezp\Persistence\Content\Type</a></code><div class="description"><p class="short_description">Creates a Type from the data in $row.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$row</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type.html#%5Cezp%5CPersistence%5CContent%5CType">\ezp\Persistence\Content\Type</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::extractTypesFromRows()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">extractTypesFromRows</span><span class="nb-faded-text">(
+          array $rows
+          )
+        </span>
+        :
+          \ezp\Persistence\Storage\Legacy\Content\Type\array(Type)</code><div class="description"><p class="short_description">Extracts types and related data from the given $rows.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$rows</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\ezp\Persistence\Storage\Legacy\Content\Type\array(Type)</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::toFieldDefinition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">toFieldDefinition</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a> $storageFieldDef, <a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a> $fieldDef
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Maps a FieldDefinition from the given $storageFieldDef</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$storageFieldDef</th>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$fieldDef</th>
+<td><a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Content\Type\Mapper::toStorageFieldDefinition()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">toStorageFieldDefinition</span><span class="nb-faded-text">(
+          <a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a> $fieldDef, <a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a> $storageFieldDef
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Maps $fieldDef to the legacy storage specific StorageFieldDefinition</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$fieldDef</th>
+<td><a href="db_ezp_Persistence_Content_Type_FieldDefinition.html#%5Cezp%5CPersistence%5CContent%5CType%5CFieldDefinition">\ezp\Persistence\Content\Type\FieldDefinition</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$storageFieldDef</th>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageFieldDefinition.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageFieldDefinition">\ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

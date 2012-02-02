@@ -1,0 +1,756 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Content/Location/Trashed.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CPersistence%5CContent%5CLocation%5CTrashed">\ezp\Persistence\Content\Location\Trashed</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Content\Location\Trashed" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Persistence\Content\Location\Trashed<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Struct containing accessible properties on TrashedLocation entities.</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation">\ezp\Persistence\Content\Location</a>
+            &lt;
+            <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject" style="color: gray; font-size: 0.8em
+                ">\ezp\Persistence\ValueObject</a>
+</dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_PATH" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_PATH</span>
+                = 1</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PATH">\ezp\Persistence\Content\Location::SORT_FIELD_PATH</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PATH">\ezp\Persistence\Content\Location::SORT_FIELD_PATH</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_PUBLISHED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_PUBLISHED</span>
+                = 2</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PUBLISHED">\ezp\Persistence\Content\Location::SORT_FIELD_PUBLISHED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PUBLISHED">\ezp\Persistence\Content\Location::SORT_FIELD_PUBLISHED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_MODIFIED" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_MODIFIED</span>
+                = 3</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_MODIFIED">\ezp\Persistence\Content\Location::SORT_FIELD_MODIFIED</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_MODIFIED">\ezp\Persistence\Content\Location::SORT_FIELD_MODIFIED</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_SECTION" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_SECTION</span>
+                = 4</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_SECTION">\ezp\Persistence\Content\Location::SORT_FIELD_SECTION</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_SECTION">\ezp\Persistence\Content\Location::SORT_FIELD_SECTION</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_DEPTH" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_DEPTH</span>
+                = 5</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_DEPTH">\ezp\Persistence\Content\Location::SORT_FIELD_DEPTH</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_DEPTH">\ezp\Persistence\Content\Location::SORT_FIELD_DEPTH</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_CLASS_IDENTIFIER" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_CLASS_IDENTIFIER</span>
+                = 6</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CLASS_IDENTIFIER">\ezp\Persistence\Content\Location::SORT_FIELD_CLASS_IDENTIFIER</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CLASS_IDENTIFIER">\ezp\Persistence\Content\Location::SORT_FIELD_CLASS_IDENTIFIER</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_CLASS_NAME" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_CLASS_NAME</span>
+                = 7</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CLASS_NAME">\ezp\Persistence\Content\Location::SORT_FIELD_CLASS_NAME</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CLASS_NAME">\ezp\Persistence\Content\Location::SORT_FIELD_CLASS_NAME</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_PRIORITY" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_PRIORITY</span>
+                = 8</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PRIORITY">\ezp\Persistence\Content\Location::SORT_FIELD_PRIORITY</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_PRIORITY">\ezp\Persistence\Content\Location::SORT_FIELD_PRIORITY</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_NAME" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_NAME</span>
+                = 9</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_NAME">\ezp\Persistence\Content\Location::SORT_FIELD_NAME</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_NAME">\ezp\Persistence\Content\Location::SORT_FIELD_NAME</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_MODIFIED_SUBNODE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_MODIFIED_SUBNODE</span>
+                = 10</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_MODIFIED_SUBNODE">\ezp\Persistence\Content\Location::SORT_FIELD_MODIFIED_SUBNODE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_MODIFIED_SUBNODE">\ezp\Persistence\Content\Location::SORT_FIELD_MODIFIED_SUBNODE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_NODE_ID" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_NODE_ID</span>
+                = 11</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_NODE_ID">\ezp\Persistence\Content\Location::SORT_FIELD_NODE_ID</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_NODE_ID">\ezp\Persistence\Content\Location::SORT_FIELD_NODE_ID</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_FIELD_CONTENTOBJECT_ID" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_FIELD_CONTENTOBJECT_ID</span>
+                = 12</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CONTENTOBJECT_ID">\ezp\Persistence\Content\Location::SORT_FIELD_CONTENTOBJECT_ID</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_FIELD_CONTENTOBJECT_ID">\ezp\Persistence\Content\Location::SORT_FIELD_CONTENTOBJECT_ID</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_ORDER_DESC" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_ORDER_DESC</span>
+                = 0</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_ORDER_DESC">\ezp\Persistence\Content\Location::SORT_ORDER_DESC</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_ORDER_DESC">\ezp\Persistence\Content\Location::SORT_ORDER_DESC</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::SORT_ORDER_ASC" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SORT_ORDER_ASC</span>
+                = 1</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_ORDER_ASC">\ezp\Persistence\Content\Location::SORT_ORDER_ASC</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::SORT_ORDER_ASC">\ezp\Persistence\Content\Location::SORT_ORDER_ASC</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$contentId" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$contentId</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">ID of the corresponding {@link \ezp\Persistence\Content}.</p>Content ID.<small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24contentId">\ezp\Persistence\Content\Location::$$contentId</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24contentId">\ezp\Persistence\Content\Location::$$contentId</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$depth" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$depth</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Depth location has in the location tree.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24depth">\ezp\Persistence\Content\Location::$$depth</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24depth">\ezp\Persistence\Content\Location::$$depth</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$hidden" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">bool
+                 <span class="highlight">$hidden</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Indicates that the Location entity has been explicitly marked as hidden.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24hidden">\ezp\Persistence\Content\Location::$$hidden</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24hidden">\ezp\Persistence\Content\Location::$$hidden</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$id" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Location ID.</p>Location ID.<small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24id">\ezp\Persistence\Content\Location::$$id</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24id">\ezp\Persistence\Content\Location::$$id</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$invisible" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">bool
+                 <span class="highlight">$invisible</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Indicates that the Location is implicitly marked as hidden by a parent
+location.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24invisible">\ezp\Persistence\Content\Location::$$invisible</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24invisible">\ezp\Persistence\Content\Location::$$invisible</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$mainLocationId" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$mainLocationId</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Identifier of the main location.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24mainLocationId">\ezp\Persistence\Content\Location::$$mainLocationId</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>If the content object in this location has multiple locations,
+$mainLocationId will point to the main one.</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24mainLocationId">\ezp\Persistence\Content\Location::$$mainLocationId</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$modifiedSubLocation" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$modifiedSubLocation</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Timestamp of the latest update of a content object in a sub location.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24modifiedSubLocation">\ezp\Persistence\Content\Location::$$modifiedSubLocation</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24modifiedSubLocation">\ezp\Persistence\Content\Location::$$modifiedSubLocation</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$parentId" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$parentId</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Parent ID.</p>Location ID.<small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24parentId">\ezp\Persistence\Content\Location::$$parentId</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24parentId">\ezp\Persistence\Content\Location::$$parentId</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$pathIdentificationString" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$pathIdentificationString</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Legacy format of the url alias.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24pathIdentificationString">\ezp\Persistence\Content\Location::$$pathIdentificationString</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>This field might be removed in a later version.</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24pathIdentificationString">\ezp\Persistence\Content\Location::$$pathIdentificationString</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$pathString" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$pathString</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">The materialized path of the location entry, eg: /1/2/</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24pathString">\ezp\Persistence\Content\Location::$$pathString</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24pathString">\ezp\Persistence\Content\Location::$$pathString</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$priority" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$priority</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Location priority</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24priority">\ezp\Persistence\Content\Location::$$priority</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Position of the Location among its siblings when sorted using priority
+sort order.</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24priority">\ezp\Persistence\Content\Location::$$priority</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$remoteId" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$remoteId</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Remote ID.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24remoteId">\ezp\Persistence\Content\Location::$$remoteId</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>A universally unique identifier.</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24remoteId">\ezp\Persistence\Content\Location::$$remoteId</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$sortField" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$sortField</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Specifies which property the child locations should be sorted on.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24sortField">\ezp\Persistence\Content\Location::$$sortField</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Valid values are found at {@link Location::SORT_FIELD_*}</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24sortField">\ezp\Persistence\Content\Location::$$sortField</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::$sortOrder" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">mixed
+                 <span class="highlight">$sortOrder</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Specifies whether the sort order should be ascending or descending.</p><small>Inherited from:
+                        <a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24sortOrder">\ezp\Persistence\Content\Location::$$sortOrder</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Valid values are {@link Location::SORT_ORDER_*}</p></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::%24%24sortOrder">\ezp\Persistence\Content\Location::$$sortOrder</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Content\Location\Trashed::__construct()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $properties
+              =
+              array()
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Construct object optionally with set of properties</p>
+<small>Inherited from:
+                    <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject::__construct()">\ezp\Persistence\ValueObject::__construct()</a><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::__construct()">\ezp\Persistence\Content\Location::__construct()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$properties</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::__get()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Throws exception on all reads to undefined properties so typos are not silently accepted.</p>
+<small>Inherited from:
+                    <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject::__get()">\ezp\Persistence\ValueObject::__get()</a><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::__get()">\ezp\Persistence\Content\Location::__get()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Content\Location\Trashed::__set()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $name, string $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Throws exception on all writes to undefined properties so typos are not silently accepted.</p>
+<small>Inherited from:
+                    <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject::__set()">\ezp\Persistence\ValueObject::__set()</a><a href="db_ezp_Persistence_Content_Location.html#%5Cezp%5CPersistence%5CContent%5CLocation::__set()">\ezp\Persistence\Content\Location::__set()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

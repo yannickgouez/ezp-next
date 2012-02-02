@@ -1,0 +1,3059 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Content/FieldType/XmlText/Input/Parser/OnlineEditor.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5COnlineEditor">\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">OnlineEditor XmlText input parser.</p>
+<div class="long-description"><p>Parses X(HT)ML produced by the OnlineEditor.</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Content_FieldType_XmlText_Input_Parser.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser">\ezp\Content\FieldType\XmlText\Input\Parser</a></dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::HTML_CLASS_REGEX" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">HTML_CLASS_REGEX</span>
+                = "/(webkit-[\w\-]+|Apple-[\w\-]+|mceItem\w+|ezoeItem\w+|mceVisualAid)/i"</code><div class="description"><p class="short-description">Used to strip out ezoe, tinymce &amp; browser specific classes</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<dl class="constant-info"></dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::ERROR_NONE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ERROR_NONE</span>
+                = 0</code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Error types constants</p>
+<small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_NONE">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_NONE</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_NONE">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_NONE</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::ERROR_SYNTAX" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ERROR_SYNTAX</span>
+                = 4</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_SYNTAX">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_SYNTAX</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_SYNTAX">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_SYNTAX</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::ERROR_SCHEMA" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ERROR_SCHEMA</span>
+                = 8</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_SCHEMA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_SCHEMA</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_SCHEMA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_SCHEMA</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::ERROR_DATA" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ERROR_DATA</span>
+                = 16</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_DATA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_DATA</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_DATA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_DATA</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::ERROR_ALL" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">ERROR_ALL</span>
+                = 28</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_ALL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_ALL</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::ERROR_ALL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::ERROR_ALL</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_VALIDATE_ERROR_LEVEL" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant">string 
+                <span class="highlight">OPT_VALIDATE_ERROR_LEVEL</span>
+                = 'ValidateErrorLevel'</code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Parser options constants, to be used with setOption</p>
+<small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_VALIDATE_ERROR_LEVEL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_VALIDATE_ERROR_LEVEL</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_VALIDATE_ERROR_LEVEL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_VALIDATE_ERROR_LEVEL</a>
+         
+    </dd>
+<dt>See</dt>
+<dd>\ezp\Content\FieldType\XmlText\Input\Parser\setOption()
+         
+    </dd>
+<dt></dt>
+<dd>string<br><em></em>
+</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_DETECT_ERROR_LEVEL" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_DETECT_ERROR_LEVEL</span>
+                = 'DetectErrorLevel'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_DETECT_ERROR_LEVEL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_DETECT_ERROR_LEVEL</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_DETECT_ERROR_LEVEL">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_DETECT_ERROR_LEVEL</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_REMOVE_DEFAULT_ATTRS" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_REMOVE_DEFAULT_ATTRS</span>
+                = 'RemoveDefaultAttrs'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_REMOVE_DEFAULT_ATTRS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_REMOVE_DEFAULT_ATTRS</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_REMOVE_DEFAULT_ATTRS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_REMOVE_DEFAULT_ATTRS</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_PARSE_LINE_BREAKS" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_PARSE_LINE_BREAKS</span>
+                = 'ParseLineBreaks'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_PARSE_LINE_BREAKS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_PARSE_LINE_BREAKS</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_PARSE_LINE_BREAKS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_PARSE_LINE_BREAKS</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_EZ_PUBLISH_VERSION" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_EZ_PUBLISH_VERSION</span>
+                = 'eZPublishVersion'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_EZ_PUBLISH_VERSION">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_EZ_PUBLISH_VERSION</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_EZ_PUBLISH_VERSION">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_EZ_PUBLISH_VERSION</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_TRIM_SPACES" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_TRIM_SPACES</span>
+                = 'TrimSpaces'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_TRIM_SPACES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_TRIM_SPACES</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_TRIM_SPACES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_TRIM_SPACES</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_ALLOW_MULTIPLE_SPACES" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_ALLOW_MULTIPLE_SPACES</span>
+                = 'AllowMultipleSpaces'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_ALLOW_MULTIPLE_SPACES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_ALLOW_MULTIPLE_SPACES</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_ALLOW_MULTIPLE_SPACES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_ALLOW_MULTIPLE_SPACES</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_ALLOW_NUMERIC_ENTITIES" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_ALLOW_NUMERIC_ENTITIES</span>
+                = 'AllowNumericEntities'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_ALLOW_NUMERIC_ENTITIES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_ALLOW_NUMERIC_ENTITIES</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_ALLOW_NUMERIC_ENTITIES">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_ALLOW_NUMERIC_ENTITIES</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_STRICT_HEADERS" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_STRICT_HEADERS</span>
+                = 'StrictHeaders'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_STRICT_HEADERS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_STRICT_HEADERS</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_STRICT_HEADERS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_STRICT_HEADERS</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_DOM_DOCUMENT_CLASS" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_DOM_DOCUMENT_CLASS</span>
+                = 'DOMDocumentClass'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_DOM_DOCUMENT_CLASS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_DOM_DOCUMENT_CLASS</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_DOM_DOCUMENT_CLASS">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_DOM_DOCUMENT_CLASS</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::OPT_CHECK_EXTERNAL_DATA" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OPT_CHECK_EXTERNAL_DATA</span>
+                = 'checkExternalData'</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_CHECK_EXTERNAL_DATA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_CHECK_EXTERNAL_DATA</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::OPT_CHECK_EXTERNAL_DATA">\ezp\Content\FieldType\XmlText\Input\Parser\Base::OPT_CHECK_EXTERNAL_DATA</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$Document" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\DOMDocument
+                 <span class="highlight">$Document</span>= 'null'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">DOM document object</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Document">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Document</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="http://php.net/manual/en/class.domdocument.php">\DOMDocument</a></dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Document">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Document</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$InputTags" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$InputTags</span>= 'array(
+        'section' =&gt; array( 'name' =&gt; 'section' ),
+        'b'       =&gt; array( 'name' =&gt; 'strong' ),
+        'bold'    =&gt; array( 'name' =&gt; 'strong' ),
+        'strong'  =&gt; array( 'name' =&gt; 'strong' ),
+        'i'       =&gt; array( 'name' =&gt; 'emphasize' ),
+        'em'      =&gt; array( 'name' =&gt; 'emphasize' ),
+        'pre'     =&gt; array( 'name' =&gt; 'literal' ),
+        'div'     =&gt; array( 'nameHandler' =&gt; 'tagNameDivnImg' ),
+        'u'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'sub'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'sup'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'img'     =&gt; array( 'nameHandler' =&gt; 'tagNameDivnImg',
+                            'noChildren' =&gt; true ),
+        'h1'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h2'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h3'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h4'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h5'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h6'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'p'       =&gt; array( 'name' =&gt; 'paragraph' ),
+        'br'      =&gt; array( 'name' =&gt; 'br',
+                            'noChildren' =&gt; true ),
+        'span'    =&gt; array( 'nameHandler' =&gt; 'tagNameSpan' ),
+        'table'   =&gt; array( 'nameHandler' =&gt; 'tagNameTable' ),
+        'td'      =&gt; array( 'name' =&gt; 'td' ),
+        'tr'      =&gt; array( 'name' =&gt; 'tr' ),
+        'th'      =&gt; array( 'name' =&gt; 'th' ),
+        'ol'      =&gt; array( 'name' =&gt; 'ol' ),
+        'ul'      =&gt; array( 'name' =&gt; 'ul' ),
+        'li'      =&gt; array( 'name' =&gt; 'li' ),
+        'a'       =&gt; array( 'nameHandler' =&gt; 'tagNameLink' ),
+        'link'    =&gt; array( 'nameHandler' =&gt; 'tagNameLink' ),
+       // Stubs for not supported tags.
+        'tbody'   =&gt; array( 'name' =&gt; '' ),
+        'thead'   =&gt; array( 'name' =&gt; '' ),
+        'tfoot'   =&gt; array( 'name' =&gt; '' )
+    )'
+                </code><div class="description">
+<p class="short-description">Maps input tags (html) to a output tag or a hander to
+decide what kind of ezxml tag to use.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Each array element describes a tag that comes from the input. Arrays index is
+a tag's name. Each element is an array that may contain the following members:
+- name: a string representing a new name of the tag
+- nameHandler: a name of the function that returns new tag name.
+               Function format: function tagNameHandler( $tagName, &amp;$attributes )
+               If none of those elements are defined the original tag's name is used.
+- noChildren: boolean value that determines if this tag could have child tags. Default value is false.</p>
+
+<pre><code>$InputTags = array(
+    'original-name' => array( 'name' => 'new-name' ),
+    'original-name2' => array( 'nameHandler' => 'tagNameHandler',
+                               'noChildren' => true ),
+);
+</code></pre></div>
+<strong>Default value</strong><code>array(
+        'section' =&gt; array( 'name' =&gt; 'section' ),
+        'b'       =&gt; array( 'name' =&gt; 'strong' ),
+        'bold'    =&gt; array( 'name' =&gt; 'strong' ),
+        'strong'  =&gt; array( 'name' =&gt; 'strong' ),
+        'i'       =&gt; array( 'name' =&gt; 'emphasize' ),
+        'em'      =&gt; array( 'name' =&gt; 'emphasize' ),
+        'pre'     =&gt; array( 'name' =&gt; 'literal' ),
+        'div'     =&gt; array( 'nameHandler' =&gt; 'tagNameDivnImg' ),
+        'u'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'sub'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'sup'       =&gt; array( 'nameHandler' =&gt; 'tagNameCustomHelper' ),
+        'img'     =&gt; array( 'nameHandler' =&gt; 'tagNameDivnImg',
+                            'noChildren' =&gt; true ),
+        'h1'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h2'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h3'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h4'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h5'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'h6'      =&gt; array( 'nameHandler' =&gt; 'tagNameHeader' ),
+        'p'       =&gt; array( 'name' =&gt; 'paragraph' ),
+        'br'      =&gt; array( 'name' =&gt; 'br',
+                            'noChildren' =&gt; true ),
+        'span'    =&gt; array( 'nameHandler' =&gt; 'tagNameSpan' ),
+        'table'   =&gt; array( 'nameHandler' =&gt; 'tagNameTable' ),
+        'td'      =&gt; array( 'name' =&gt; 'td' ),
+        'tr'      =&gt; array( 'name' =&gt; 'tr' ),
+        'th'      =&gt; array( 'name' =&gt; 'th' ),
+        'ol'      =&gt; array( 'name' =&gt; 'ol' ),
+        'ul'      =&gt; array( 'name' =&gt; 'ul' ),
+        'li'      =&gt; array( 'name' =&gt; 'li' ),
+        'a'       =&gt; array( 'nameHandler' =&gt; 'tagNameLink' ),
+        'link'    =&gt; array( 'nameHandler' =&gt; 'tagNameLink' ),
+       // Stubs for not supported tags.
+        'tbody'   =&gt; array( 'name' =&gt; '' ),
+        'thead'   =&gt; array( 'name' =&gt; '' ),
+        'tfoot'   =&gt; array( 'name' =&gt; '' )
+    )</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$Messages" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\string[]
+                 <span class="highlight">$Messages</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Processing messages</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Messages">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Messages</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\string[]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Messages">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Messages</a>
+         
+    </dd>
+<dt>See</dt>
+<dd>\ezp\Content\FieldType\XmlText\Input\Parser\getMessages()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$Namespaces" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$Namespaces</span>= 'array( 'image' =&gt; 'http://ez.no/namespaces/ezpublish3/image/',
+                                   'xhtml' =&gt; 'http://ez.no/namespaces/ezpublish3/xhtml/',
+                                   'custom' =&gt; 'http://ez.no/namespaces/ezpublish3/custom/',
+                                   'tmp' =&gt; 'http://ez.no/namespaces/ezpublish3/temporary/' )'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">List of XmlText namespaces</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Namespaces">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Namespaces</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array( 'image' =&gt; 'http://ez.no/namespaces/ezpublish3/image/',
+                                   'xhtml' =&gt; 'http://ez.no/namespaces/ezpublish3/xhtml/',
+                                   'custom' =&gt; 'http://ez.no/namespaces/ezpublish3/custom/',
+                                   'tmp' =&gt; 'http://ez.no/namespaces/ezpublish3/temporary/' )</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24Namespaces">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$Namespaces</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$OutputTags" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$OutputTags</span>= 'array(
+        'section'   =&gt; array(),
+
+        'embed'     =&gt; array( 'initHandler'    =&gt; 'transformStyles',
+                              'structHandler'  =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerEmbed',
+                              'attributes'     =&gt; array( 'alt' =&gt; 'size',
+                                                         'html_id' =&gt; 'xhtml:id' ) ),
+
+        'embed-inline' =&gt; array( 'initHandler'    =&gt; 'transformStyles',
+                                 'structHandler'  =&gt; 'appendLineParagraph',
+                                 'publishHandler' =&gt; 'publishHandlerEmbed',
+                                 'attributes'     =&gt; array( 'alt' =&gt; 'size',
+                                                            'html_id' =&gt; 'xhtml:id' ) ),
+
+        'table'     =&gt; array( 'initHandler'   =&gt; 'transformStyles',
+                              'structHandler' =&gt; 'appendParagraph',
+                              'attributes'    =&gt; array( 'border' =&gt; false,
+                                                        'ezborder' =&gt; 'border' ) ),
+
+        'tr'        =&gt; array(),
+
+        'td'        =&gt; array( 'initHandler' =&gt; 'transformStyles',
+                              'attributes'  =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                      'colspan' =&gt; 'xhtml:colspan',
+                                                      'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'th'        =&gt; array( 'initHandler' =&gt; 'transformStyles',
+                              'attributes'  =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                      'colspan' =&gt; 'xhtml:colspan',
+                                                      'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'ol'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'ul'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'li'        =&gt; array( 'autoCloseOn' =&gt; array( 'li' ) ),
+
+        'header'    =&gt; array( 'initHandler'   =&gt; 'initHandlerHeader',
+                              'autoCloseOn'   =&gt; array( 'paragraph' ),
+                              'structHandler' =&gt; 'structHandlerHeader' ),
+
+        'paragraph' =&gt; array( 'parsingHandler' =&gt; 'parsingHandlerParagraph',
+                              'autoCloseOn'    =&gt; array( 'paragraph' ),
+                              'initHandler'    =&gt; 'transformStyles',
+                              'structHandler'  =&gt; 'structHandlerParagraph' ),
+
+        'line'      =&gt; array(),
+
+        'br'        =&gt; array( 'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler'  =&gt; 'structHandlerBr',
+                              'attributes'     =&gt; false ),
+
+        'literal'   =&gt; array( 'parsingHandler' =&gt; 'parsingHandlerLiteral',
+                              'structHandler'  =&gt; 'appendParagraph',
+                              'attributes'     =&gt; array( 'class' =&gt; 'class' ) ),
+
+        'strong'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'emphasize' =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'link'      =&gt; array( 'structHandler'  =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerLink',
+                              'attributes'     =&gt; array( 'title' =&gt; 'xhtml:title',
+                                                         'id' =&gt; 'xhtml:id' ) ),
+
+        'anchor'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'custom'    =&gt; array( 'initHandler'   =&gt; 'initHandlerCustom',
+                              'structHandler' =&gt; 'structHandlerCustom' ),
+
+        '#text'     =&gt; array( 'structHandler' =&gt; 'structHandlerText' )
+    )'
+                </code><div class="description">
+<p class="short-description">Maps output tags (ezxml) to varius handlers at different stages
+decide what kind of ezxml tag to use.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Each array element describes a tag presented in the output. Arrays index is
+a tag's name. Each element is an array that may contain the following members:
+- parsingHandler: "Parsing handler" called at parse pass 1 before processing tag's children.
+- initHandler: "Init handler" called at pass 2 before proccessing tag's children.
+- structHandler: "Structure handler" called at pass 2 after proccessing tag's children,
+                 but before schema validity check. It can be used to implement structure
+                 transformations.
+- publishHandler: "Publish handler" called at pass 2 after schema validity check, so it is called
+                 in case the element has it's guaranteed place in the DOM tree.
+- attributes: an array that describes attributes transformations. Array's index is the
+             original name of an attribute, and the value is the new name.
+- requiredInputAttributes: attributes that are required in the input tag. If they are not presented
+                           it raises invalid input flag.</p>
+
+<p>&lt;</p>
+
+<p>pre><code>public $OutputTags = array(
+   'custom'    => array( 'parsingHandler' => 'parsingHandlerCustom',
+                         'initHandler' => 'initHandlerCustom',
+                         'structHandler' => 'structHandlerCustom',
+                         'publishHandler' => 'publishHandlerCustom',
+                         'attributes' => array( 'title' => 'name' ) ),
+);</p></div>
+<strong>Default value</strong><code>array(
+        'section'   =&gt; array(),
+
+        'embed'     =&gt; array( 'initHandler'    =&gt; 'transformStyles',
+                              'structHandler'  =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerEmbed',
+                              'attributes'     =&gt; array( 'alt' =&gt; 'size',
+                                                         'html_id' =&gt; 'xhtml:id' ) ),
+
+        'embed-inline' =&gt; array( 'initHandler'    =&gt; 'transformStyles',
+                                 'structHandler'  =&gt; 'appendLineParagraph',
+                                 'publishHandler' =&gt; 'publishHandlerEmbed',
+                                 'attributes'     =&gt; array( 'alt' =&gt; 'size',
+                                                            'html_id' =&gt; 'xhtml:id' ) ),
+
+        'table'     =&gt; array( 'initHandler'   =&gt; 'transformStyles',
+                              'structHandler' =&gt; 'appendParagraph',
+                              'attributes'    =&gt; array( 'border' =&gt; false,
+                                                        'ezborder' =&gt; 'border' ) ),
+
+        'tr'        =&gt; array(),
+
+        'td'        =&gt; array( 'initHandler' =&gt; 'transformStyles',
+                              'attributes'  =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                      'colspan' =&gt; 'xhtml:colspan',
+                                                      'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'th'        =&gt; array( 'initHandler' =&gt; 'transformStyles',
+                              'attributes'  =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                      'colspan' =&gt; 'xhtml:colspan',
+                                                      'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'ol'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'ul'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'li'        =&gt; array( 'autoCloseOn' =&gt; array( 'li' ) ),
+
+        'header'    =&gt; array( 'initHandler'   =&gt; 'initHandlerHeader',
+                              'autoCloseOn'   =&gt; array( 'paragraph' ),
+                              'structHandler' =&gt; 'structHandlerHeader' ),
+
+        'paragraph' =&gt; array( 'parsingHandler' =&gt; 'parsingHandlerParagraph',
+                              'autoCloseOn'    =&gt; array( 'paragraph' ),
+                              'initHandler'    =&gt; 'transformStyles',
+                              'structHandler'  =&gt; 'structHandlerParagraph' ),
+
+        'line'      =&gt; array(),
+
+        'br'        =&gt; array( 'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler'  =&gt; 'structHandlerBr',
+                              'attributes'     =&gt; false ),
+
+        'literal'   =&gt; array( 'parsingHandler' =&gt; 'parsingHandlerLiteral',
+                              'structHandler'  =&gt; 'appendParagraph',
+                              'attributes'     =&gt; array( 'class' =&gt; 'class' ) ),
+
+        'strong'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'emphasize' =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'link'      =&gt; array( 'structHandler'  =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerLink',
+                              'attributes'     =&gt; array( 'title' =&gt; 'xhtml:title',
+                                                         'id' =&gt; 'xhtml:id' ) ),
+
+        'anchor'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'custom'    =&gt; array( 'initHandler'   =&gt; 'initHandlerCustom',
+                              'structHandler' =&gt; 'structHandlerCustom' ),
+
+        '#text'     =&gt; array( 'structHandler' =&gt; 'structHandlerText' )
+    )</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$ParentStack" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\string[]
+                 <span class="highlight">$ParentStack</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Parent nodes stack</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24ParentStack">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$ParentStack</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\string[]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24ParentStack">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$ParentStack</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$QuitProcess" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$QuitProcess</span>= 'false'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Boolean used to interrupt the process between steps</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24QuitProcess">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$QuitProcess</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24QuitProcess">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$QuitProcess</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$XMLSchema" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Content\FieldType\XmlText\Schema
+                 <span class="highlight">$XMLSchema</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">XmlSchema object</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24XMLSchema">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$XMLSchema</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Content\FieldType\XmlText\Schema</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24XMLSchema">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$XMLSchema</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$anchorAsAttribute" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$anchorAsAttribute</span>= 'false'
+                </code><div class="description"></div>
+<div class="code-tabs">
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>n/a</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$contentObjectID" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$contentObjectID</span>= '0'
+                </code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24contentObjectID">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$contentObjectID</a></small>
+</div>
+<div class="code-tabs">
+<strong>Default value</strong><code>0</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>n/a</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24contentObjectID">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$contentObjectID</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$customTagList" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$customTagList</span>= 'null'
+                </code><div class="description">
+<span class="attribute">static</span><p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$deletedEmbeddedNodeIDArray" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$deletedEmbeddedNodeIDArray</span>= 'array()'
+                </code><div class="description"></div>
+<div class="code-tabs">
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>n/a</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$deletedEmbeddedObjectIDArray" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$deletedEmbeddedObjectIDArray</span>= 'array()'
+                </code><div class="description"></div>
+<div class="code-tabs">
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>n/a</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$embeddedObjectIDArray" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\integer[]
+                 <span class="highlight">$embeddedObjectIDArray</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Lists of external ids found during parsing</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\integer[]</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$handler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Content\FieldType\XmlText\Input\Handler
+                 <span class="highlight">$handler</span>= ''
+                </code><div class="description">
+<p class="short-description">Input handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Content_FieldType_XmlText_Input_Handler.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CHandler">\ezp\Content\FieldType\XmlText\Input\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$isInputValid" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$isInputValid</span>= 'true'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Boolean holding the validity status of the input string</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24isInputValid">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$isInputValid</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>true</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24isInputValid">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$isInputValid</a>
+         
+    </dd>
+<dt>See</dt>
+<dd>\ezp\Content\FieldType\XmlText\Input\Parser\isInputValid()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$linkedObjectIDArray" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\integer[]
+                 <span class="highlight">$linkedObjectIDArray</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Array of linked Content objects id</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24linkedObjectIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$linkedObjectIDArray</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\integer[]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24linkedObjectIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$linkedObjectIDArray</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$options" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Content\FieldType\XmlText\Input\Parser\mixed[string]
+                 <span class="highlight">$options</span>= 'array(
+        'ValidateErrorLevel' =&gt; self::ERROR_NONE,
+        'DetectErrorLevel' =&gt; self::ERROR_NONE,
+        'RemoveDefaultAttrs' =&gt; false,
+        'ParseLineBreaks' =&gt; false,
+        'eZPublishVersion' =&gt; 4.6,
+        'TrimSpaces' =&gt; false,
+        'AllowMultipleSpaces' =&gt; false,
+        'AllowNumericEntities' =&gt; false,
+        'StrictHeaders' =&gt; false,
+        'DOMDocumentClass' =&gt; 'DOMDocument',
+        'checkExternalData' =&gt; true,
+    )'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Parser options list</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24options">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$options</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array(
+        'ValidateErrorLevel' =&gt; self::ERROR_NONE,
+        'DetectErrorLevel' =&gt; self::ERROR_NONE,
+        'RemoveDefaultAttrs' =&gt; false,
+        'ParseLineBreaks' =&gt; false,
+        'eZPublishVersion' =&gt; 4.6,
+        'TrimSpaces' =&gt; false,
+        'AllowMultipleSpaces' =&gt; false,
+        'AllowNumericEntities' =&gt; false,
+        'StrictHeaders' =&gt; false,
+        'DOMDocumentClass' =&gt; 'DOMDocument',
+        'checkExternalData' =&gt; true,
+    )</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ezp\Content\FieldType\XmlText\Input\Parser\mixed[string]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24options">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$options</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$relatedObjectIDArray" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\integer[]
+                 <span class="highlight">$relatedObjectIDArray</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Array of related Content objects id</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24relatedObjectIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$relatedObjectIDArray</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\integer[]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24relatedObjectIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$relatedObjectIDArray</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$thrashedEmbeddedObjectIDArray" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$thrashedEmbeddedObjectIDArray</span>= 'array()'
+                </code><div class="description"></div>
+<div class="code-tabs">
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>n/a</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::$urlIDArray" class="anchor"></a><div class="property protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\integer[]
+                 <span class="highlight">$urlIDArray</span>= 'array()'
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">Array of Url objects ids</p><small>Inherited from:
+                        <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24urlIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$urlIDArray</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\integer[]</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::%24%24urlIDArray">\ezp\Content\FieldType\XmlText\Input\Parser\Base::$$urlIDArray</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Constructor
+For more info see {@link eZXMLInputParser::eZXMLInputParser()}</p></div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::appendLineParagraph()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">appendLineParagraph</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">appendLineParagraph (Structure handler, pass 2 after childre tags)
+Structure handler for inline nodes.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::appendParagraph()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">appendParagraph</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">appendParagraph (Structure handler, pass 2 after childre tags)
+Structure handler for in-paragraph nodes.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::breakInlineFlow()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">breakInlineFlow</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, array $param
+          )
+        </span>
+        :
+          bool | null</code><div class="description"><p class="short_description">breakInlineFlow (parsing handler, pass 1)
+handle flow around <br> tags, legazy from oe 4.x</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$param</th>
+<td>array</td>
+<td><em><p>parameters for xml element</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::callInputHandler()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">callInputHandler</span><span class="nb-faded-text">(
+           $handlerName,  $tagName,  $attributes
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::callInputHandler()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::callInputHandler()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$handlerName</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$tagName</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::callOutputHandler()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">callOutputHandler</span><span class="nb-faded-text">(
+           $handlerName,  $element,  $params
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::callOutputHandler()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::callOutputHandler()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$handlerName</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$element</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::convertNumericEntities()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">convertNumericEntities</span><span class="nb-faded-text">(
+           $text
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::convertNumericEntities()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::convertNumericEntities()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$text</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::createAndPublishElement()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">createAndPublishElement</span><span class="nb-faded-text">(
+           $elementName,  $ret
+          )
+        </span>
+        :
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Creates new element from $elementName and adds it to array for further post-processing.</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::createAndPublishElement()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::createAndPublishElement()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Use this function if you need to process newly created element (check it by schema
+and call 'structure' and 'publish' handlers)</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$elementName</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$ret</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td>the created element</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::createDomDocument()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">createDomDocument</span><span class="nb-faded-text">(
+          bool $createRootNode
+              =
+              true
+          )
+        </span>
+        :
+          <a href="http://php.net/manual/en/class.domdocument.php">\DOMDocument</a></code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Creates the DOMDocument object holding the XML text</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::createDomDocument()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::createDomDocument()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$createRootNode</th>
+<td>bool</td>
+<td><em><p>wether or not to create the root <section> node</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="http://php.net/manual/en/class.domdocument.php">\DOMDocument</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::customTagIsEnabled()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">customTagIsEnabled</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Check if a custom tag is enabled</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::elementStylesToAttribute()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">elementStylesToAttribute</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Trying to convert CSS rules to XML attributes
+(for the case of pasting from external source)</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::entitiesDecode()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">entitiesDecode</span><span class="nb-faded-text">(
+           $text
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::entitiesDecode()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::entitiesDecode()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$text</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::fixSubtree()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">fixSubtree</span><span class="nb-faded-text">(
+           $element,  $mainChild
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Removes nodes that don't match schema (recursively)</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::fixSubtree()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::fixSubtree()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$mainChild</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getDeletedEmbedIDArray()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDeletedEmbedIDArray</span><span class="nb-faded-text">(
+          bool $includeTrash
+              =
+              false
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Get list over currently deleted embeded objects, nodes and (optionally) objects in trash</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$includeTrash</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getEmbeddedObjectIDArray()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getEmbeddedObjectIDArray</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getLinkedContentIdArray()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLinkedContentIdArray</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::getLinkedContentIdArray()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::getLinkedContentIdArray()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getMessages()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMessages</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Returns the XML processing messages</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::getMessages()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::getMessages()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getOption()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getOption</span><span class="nb-faded-text">(
+          string $option
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Gets the parser option $option</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::getOption()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::getOption()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$option</th>
+<td>string</td>
+<td><em><p>One of self::OPT_*</p>
+</em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_BadConfiguration.html#%5Cezp%5CBase%5CException%5CBadConfiguration">\ezp\Base\Exception\BadConfiguration</a></td>
+<td><em>If the option is unknown or the value incorrect</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getRelatedContentIdArray()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getRelatedContentIdArray</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::getRelatedContentIdArray()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::getRelatedContentIdArray()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::getUrlIdArray()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getUrlIdArray</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::getUrlIdArray()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::getUrlIdArray()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::handleError()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">handleError</span><span class="nb-faded-text">(
+           $type,  $message
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::handleError()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::handleError()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$message</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::initHandlerCustom()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">initHandlerCustom</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element,  $params
+          )
+        </span>
+        :
+          bool | null</code><div class="description"><p class="short_description">initHandlerCustom (init handler, pass 2 before childre tags)
+seesm to be doing nothing</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::initHandlerHeader()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">initHandlerHeader</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element,  $params
+          )
+        </span>
+        :
+          bool | null</code><div class="description"><p class="short_description">initHandlerHeader (init handler, pass 2 before childre tags)
+sets anchor as attribute if setting is enabled</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::isValid()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isValid</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Returns the validity status of the processed XML String</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::isValid()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::isValid()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::optionExists()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">optionExists</span><span class="nb-faded-text">(
+          string $option
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Check if $option exists</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::optionExists()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::optionExists()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$option</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::parseAttributes()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">parseAttributes</span><span class="nb-faded-text">(
+           $attributeString
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Helper functions for pass 1</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::parseAttributes()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::parseAttributes()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$attributeString</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::parseTag()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">parseTag</span><span class="nb-faded-text">(
+           $data,  $pos,  $parent
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::parseTag()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::parseTag()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$data</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$pos</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$parent</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::parsingHandlerLiteral()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">parsingHandlerLiteral</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, array $param
+          )
+        </span>
+        :
+          bool | null</code><div class="description"><p class="short_description">parsingHandlerLiteral (parsing handler, pass 1)
+parse content of literal tag so tags are threated like text.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$param</th>
+<td>array</td>
+<td><em><p>parameters for xml element</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::parsingHandlerParagraph()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">parsingHandlerParagraph</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, array $param
+          )
+        </span>
+        :
+          bool | null</code><div class="description"><p class="short_description">parsingHandlerParagraph (parsing handler, pass 1)
+parse content of paragraph tag to fix empty paragraphs issues.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$param</th>
+<td>array</td>
+<td><em><p>parameters for xml element</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool | null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::performPass1()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">performPass1</span><span class="nb-faded-text">(
+           $data
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::performPass1()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::performPass1()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$data</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::performPass2()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">performPass2</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::performPass2()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::performPass2()</a></small>
+</div>
+<div class="code-tabs"></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::process()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">process</span><span class="nb-faded-text">(
+          string $text, bool $createRootNode
+              =
+              true
+          )
+        </span>
+        :
+          false | \ezp\Content\FieldType\XmlText\Input\Parser\DOMDocument</code><div class="description"><p class="short_description">Process html text and transform it to xml.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$text</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$createRootNode</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>false | \ezp\Content\FieldType\XmlText\Input\Parser\DOMDocument</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::processAttributesBySchema()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">processAttributesBySchema</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">processAttributesBySchema
+Parses customattributes attribute and splits it into actual
+custom: xml attributes, passes processing of normal attributes
+to parent class.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::processBySchemaPresence()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">processBySchemaPresence</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Check if the element is allowed to exist in this document and remove it if not.</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::processBySchemaPresence()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::processBySchemaPresence()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::processBySchemaTree()" class="anchor"></a><div class="method protected inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">processBySchemaTree</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Check that $element has a correct position in the tree and fix it if not.</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::processBySchemaTree()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::processBySchemaTree()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::processNewElements()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">processNewElements</span><span class="nb-faded-text">(
+           $createdElements
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::processNewElements()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::processNewElements()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$createdElements</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::processSubtree()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">processSubtree</span><span class="nb-faded-text">(
+           $element,  $lastHandlerResult
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::processSubtree()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::processSubtree()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$lastHandlerResult</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::publishHandlerEmbed()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">publishHandlerEmbed</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element,  $params
+          )
+        </span>
+        :
+          null | array</code><div class="description"><p class="short_description">publishHandlerEmbed (Publish handler, pass 2 after schema validation)
+Publish handler for embed element, convert id to [object|node]_id parameter,
+fixes align=middle value (if embed was image) and tries to map css to attributes</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null | array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::publishHandlerLink()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">publishHandlerLink</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element,  $params
+          )
+        </span>
+        :
+          null | array</code><div class="description"><p class="short_description">publishHandlerLink (Publish handler, pass 2 after schema validation)
+Publish handler for link element, converts href to [object|node|link]_id.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null | array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::removeAllAttributes()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">removeAllAttributes</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Removes all attributes from $element</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::removeAllAttributes()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::removeAllAttributes()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::setAttributes()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">setAttributes</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, array $attributes
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets attributes from $attributes on $element</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::setAttributes()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::setAttributes()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::setHandler()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setHandler</span><span class="nb-faded-text">(
+          <a href="db_ezp_Content_FieldType_XmlText_Input_Handler.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CHandler">\ezp\Content\FieldType\XmlText\Input\Handler</a> $handler
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets the input handler for the parser to $handler</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::setHandler()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::setHandler()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$handler</th>
+<td><a href="db_ezp_Content_FieldType_XmlText_Input_Handler.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CHandler">\ezp\Content\FieldType\XmlText\Input\Handler</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::setOption()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setOption</span><span class="nb-faded-text">(
+          string $option, mixed $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Sets the parser option $option to $value</p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::setOption()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::setOption()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$option</th>
+<td>string</td>
+<td><em><p>One of self::OPT_*</p>
+</em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_BadConfiguration.html#%5Cezp%5CBase%5CException%5CBadConfiguration">\ezp\Base\Exception\BadConfiguration</a></td>
+<td><em>If the option is unknown or the value incorrect</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerBr()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerBr</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerBr (Structure handler, pass 2 after childre tags)
+Structure handler for temporary <br> elements</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerCustom()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerCustom</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerCustom (Structure handler, pass 2 after childre tags)
+Structure handler for custom tag.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerHeader()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerHeader</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerHeader (Structure handler, pass 2 after childre tags)
+Structure handler for header tag.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerLists()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerLists</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerLists (Structure handler, pass 2 after childre tags)
+Structure handler for ul|ol tags.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerParagraph()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerParagraph</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerParagraph (Structure handler, pass 2 after childre tags)
+Structure handler for paragraph tag.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::structHandlerText()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">structHandlerText</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $newParent
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">structHandlerText (Structure handler, pass 2 after childre tags)
+Structure handler for #text.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParent</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em><p>node that are going to become new parent.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagClassNamesCleanup()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagClassNamesCleanup</span><span class="nb-faded-text">(
+          string $className
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">tagClassNamesCleanup
+Used by init handlers, removes any oe/tinMCE/browser specific classes and trims the result.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$className</th>
+<td>string</td>
+<td><em><p>'Dirty' class name as provided by TinyMCE</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>Cleaned and trimmed class name</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Static</dt>
+<dd>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameCustomHelper()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameCustomHelper</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameCustomHelper (tag mapping handler)
+Handles u|sub|sup tags and maps them to custom tag if they are enabled</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameDivnImg()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameDivnImg</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameDivnImg (tag mapping handler)
+Handles div|img tags and maps them to embed|embed-inline|custom tag</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameHeader()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameHeader</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameHeader (tag mapping handler)
+Handles H[1-6] tags and maps them to header tag</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameLink()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameLink</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameLink (tag mapping handler)
+Handles a|link tags and maps them to link|anchor tag</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameSpan()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameSpan</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameSpan (tag mapping handler)
+Handles span tag and maps it to embed|custom|strong|emphasize|custom.underline
+Reuses {@link eZOEInputParser::tagNameDivnImg()} for embed and custom tag mapping.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::tagNameTable()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">tagNameTable</span><span class="nb-faded-text">(
+          string $tagName, array $attributes
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">tagNameTable (tag mapping handler)
+Handles table tag and cleanups some attributes for it</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tagName</th>
+<td>string</td>
+<td><em><p>name of input (xhtml) tag</p>
+</em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td>array</td>
+<td><em><p>byref value of tag attributes</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>name of ezxml tag or blank (then tag is removed, but not it's content)</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::transformStyles()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">transformStyles</span><span class="nb-faded-text">(
+          <a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a> $element, array $params
+          )
+        </span>
+        :
+          null | array</code><div class="description"><p class="short_description">transformStyles (init handler, pass 2 before childre tags)
+tryes to convert css styles to attributes.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$element</th>
+<td><a href="http://php.net/manual/en/class.domelement.php">\DOMElement</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$params</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null | array</td>
+<td>changes structure if it contains 'result' key</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::washText()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">washText</span><span class="nb-faded-text">(
+           $textContent
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::washText()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::washText()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$textContent</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor::wordMatchSupport()" class="anchor"></a><div class="method private inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">wordMatchSupport</span><span class="nb-faded-text">(
+           $newTagName,  $attributes,  $attributeString
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description"></p>
+<small>Inherited from:
+                    <a href="db_ezp_Content_FieldType_XmlText_Input_Parser_Base.html#%5Cezp%5CContent%5CFieldType%5CXmlText%5CInput%5CParser%5CBase::wordMatchSupport()">\ezp\Content\FieldType\XmlText\Input\Parser\Base::wordMatchSupport()</a></small>
+</div>
+<div class="code-tabs">
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$newTagName</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$attributes</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$attributeString</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

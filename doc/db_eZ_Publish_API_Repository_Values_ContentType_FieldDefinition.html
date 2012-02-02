@@ -1,0 +1,739 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/Values/ContentType/FieldDefinition.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CContentType%5CFieldDefinition">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">This class represents a field definiton</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>\eZ\Publish\API\Repository\Value\ValueObject</dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\eZ\Publish\API\Repository\Values\ContentType\$names
+                 <span class="highlight"></span>= ''
+                </code><div class="description">
+<p class="short-description">calls getNames() or on access getName($language)</p>calls getNames() or on access getName($language)</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZ\Publish\API\Repository\Values\ContentType\$names</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>calls getNames() or on access getName($language)
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\eZ\Publish\API\Repository\Values\ContentType\$descriptions
+                 <span class="highlight"></span>= ''
+                </code><div class="description">
+<p class="short-description">calls getDescriptions() or on access getDescription($language)</p>calls getDescriptions() or on access getDescription($language)</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZ\Publish\API\Repository\Values\ContentType\$descriptions</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>calls getDescriptions() or on access getDescription($language)
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\eZ\Publish\API\Repository\Values\ContentType\$fieldSettings
+                 <span class="highlight"></span>= ''
+                </code><div class="description">
+<p class="short-description">calls getFieldSettings()</p>calls getFieldSettings()</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZ\Publish\API\Repository\Values\ContentType\$fieldSettings</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>calls getFieldSettings()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\eZ\Publish\API\Repository\Values\ContentType\$validators
+                 <span class="highlight"></span>= ''
+                </code><div class="description">
+<p class="short-description">calls getValidators()</p>calls getValidators()</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZ\Publish\API\Repository\Values\ContentType\$validators</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>calls getValidators()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">\eZ\Publish\API\Repository\Values\ContentType\$defaultValue
+                 <span class="highlight"></span>= ''
+                </code><div class="description">
+<p class="short-description">the default value of the field</p>the default value of the field</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\eZ\Publish\API\Repository\Values\ContentType\$defaultValue</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>the default value of the field
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$defaultValue" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">mixed
+                 <span class="highlight">$defaultValue</span>= ''
+                </code><div class="description">
+<p class="short-description">Default value of the field</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$fieldGroup" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$fieldGroup</span>= ''
+                </code><div class="description">
+<p class="short-description">Field group name</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$fieldGroup" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$fieldGroup</span>= ''
+                </code><div class="description">
+<p class="short-description">the field group name</p>the field group name</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>the field group name
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$fieldType" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$fieldType</span>= ''
+                </code><div class="description">
+<p class="short-description">String identifier of the field type</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$fieldType" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$fieldType</span>= ''
+                </code><div class="description">
+<p class="short-description">String identifier of the field type</p>String identifier of the field type</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>String identifier of the field type
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$id" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">mixed
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<p class="short-description">the unique id of this field definition</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$id" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$id</span>= ''
+                </code><div class="description">
+<p class="short-description">the id of the field definition</p>the id of the field definition</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>the id of the field definition
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$identifier" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$identifier</span>= ''
+                </code><div class="description">
+<p class="short-description">Readable string identifier of a field definition</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$identifier" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">string
+                 <span class="highlight">$identifier</span>= ''
+                </code><div class="description">
+<p class="short-description">the identifier of the field definition</p>the identifier of the field definition</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>the identifier of the field definition
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isInfoCollector" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$isInfoCollector</span>= ''
+                </code><div class="description">
+<p class="short-description">the flag if this field is used for information collection</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isInfoCollector" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">boolean
+                 <span class="highlight">$isInfoCollector</span>= ''
+                </code><div class="description">
+<p class="short-description">indicates if this field is used for information collection</p>indicates if this field is used for information collection</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>indicates if this field is used for information collection
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isRequired" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$isRequired</span>= ''
+                </code><div class="description">
+<p class="short-description">Is the field required</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isRequired" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">boolean
+                 <span class="highlight">$isRequired</span>= ''
+                </code><div class="description">
+<p class="short-description">indicates if this field is required in the content object</p>indicates if this field is required in the content object</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>indicates if this field is required in the content object
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isSearchable" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$isSearchable</span>= ''
+                </code><div class="description">
+<p class="short-description">Indicates if th the content is searchable by this attribute</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isSearchable" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">boolean
+                 <span class="highlight">$isSearchable</span>= ''
+                </code><div class="description">
+<p class="short-description">indicates if the field is searchable</p>indicates if the field is searchable</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>indicates if the field is searchable
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isTranslatable" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$isTranslatable</span>= ''
+                </code><div class="description">
+<p class="short-description">If the field is translatable</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$isTranslatable" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">boolean
+                 <span class="highlight">$isTranslatable</span>= ''
+                </code><div class="description">
+<p class="short-description">indicatats if fields of this definition are translatable</p>indicatats if fields of this definition are translatable</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>indicatats if fields of this definition are translatable
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$position" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">int
+                 <span class="highlight">$position</span>= ''
+                </code><div class="description">
+<p class="short-description">the position of the field definition in the content typr</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::$position" class="anchor"></a><div class="property public magic ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">int
+                 <span class="highlight">$position</span>= ''
+                </code><div class="description">
+<p class="short-description">the position of the field definition in the content typr</p>the position of the field definition in the content typr</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>int</dd>
+<dt>Magic</dt>
+<dd>
+         
+    </dd>
+<dt>Property-read</dt>
+<dd>the position of the field definition in the content typr
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getDescription()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDescription</span><span class="nb-faded-text">(
+          string $languageCode
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">this method returns the name of the field in the given language</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$languageCode</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>the description for the given language or null if none existis.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getDescriptions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDescriptions</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \string[]</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">This method returns the human readable description of the field</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>The structure of this field is:</p>
+
+<pre><code>array( 'eng' => '<description_eng>', 'de' => '<description_de>' );
+</code></pre></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\string[]</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getFieldSettings()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFieldSettings</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">this method returns settings for the field definition supported by the field type</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getName()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getName</span><span class="nb-faded-text">(
+          string $languageCode
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">this method returns the name of the field in the given language</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$languageCode</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>the name for the given language or null if none existis.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getNames()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getNames</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \string[]</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">This method returns the human readable name of this field in all provided languages
+of the content type</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>The structure of the return value is:</p>
+
+<pre><code>array( 'eng' => '<name_eng>', 'de' => '<name_de>' );
+</code></pre></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\string[]</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition::getValidators()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getValidators</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">this method returns the validators of this field definition supported by the field type</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>an array of {@link Validator}</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

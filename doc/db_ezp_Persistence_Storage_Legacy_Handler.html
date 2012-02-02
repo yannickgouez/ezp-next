@@ -1,0 +1,1003 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">ezp/Persistence/Storage/Legacy/Handler.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CHandler">\ezp\Persistence\Storage\Legacy\Handler</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\ezp\Persistence\Storage\Legacy\Handler" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\ezp\Persistence\Storage\Legacy\Handler<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">The repository handler for the legacy storage engine</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_ezp_Persistence_Handler.html#%5Cezp%5CPersistence%5CHandler">\ezp\Persistence\Handler</a></dd>
+<dt>Todo</dt>
+<dd>If possible, the handler should not receive the DSN but the database
+connection instead, so that the implementation becomes fully testable.
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$configurator" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Configurator
+                 <span class="highlight">$configurator</span>= ''
+                </code><div class="description">
+<p class="short-description">Configurator</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Configurator.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CConfigurator">\ezp\Persistence\Storage\Legacy\Configurator</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$contentGateway" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Gateway
+                 <span class="highlight">$contentGateway</span>= ''
+                </code><div class="description">
+<p class="short-description">Content gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Gateway</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$contentHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Handler
+                 <span class="highlight">$contentHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Content handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$contentMapper" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Mapper
+                 <span class="highlight">$contentMapper</span>= ''
+                </code><div class="description">
+<p class="short-description">Content mapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Mapper</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$contentTypeGateway" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Type\Gateway
+                 <span class="highlight">$contentTypeGateway</span>= ''
+                </code><div class="description">
+<p class="short-description">Content Type gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Type\Gateway</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$contentTypeHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Type\Handler
+                 <span class="highlight">$contentTypeHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Content type handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Type\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$fieldHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\FieldHandler
+                 <span class="highlight">$fieldHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Field handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldHandler">\ezp\Persistence\Storage\Legacy\Content\FieldHandler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$fieldValueConverterRegistry" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry
+                 <span class="highlight">$fieldValueConverterRegistry</span>= ''
+                </code><div class="description">
+<p class="short-description">Field value converter registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_Registry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CRegistry">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$languageCache" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Language\Cache
+                 <span class="highlight">$languageCache</span>= ''
+                </code><div class="description">
+<p class="short-description">Language cache</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Language_Cache.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CCache">\ezp\Persistence\Storage\Legacy\Content\Language\Cache</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$languageHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Content\Language\Handler
+                 <span class="highlight">$languageHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Language handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Content_Language_Handler.html#%5Cezp%5CPersistence%5CContent%5CLanguage%5CHandler">\ezp\Persistence\Content\Language\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$languageMaskGenerator" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Language\MaskGenerator
+                 <span class="highlight">$languageMaskGenerator</span>= ''
+                </code><div class="description">
+<p class="short-description">Language mask generator</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Language_MaskGenerator.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CMaskGenerator">\ezp\Persistence\Storage\Legacy\Content\Language\MaskGenerator</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$locationGateway" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway
+                 <span class="highlight">$locationGateway</span>= ''
+                </code><div class="description">
+<p class="short-description">Location gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$locationHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Location\Handler
+                 <span class="highlight">$locationHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Location handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Location\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$locationMapper" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper
+                 <span class="highlight">$locationMapper</span>= ''
+                </code><div class="description">
+<p class="short-description">Location mapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$searchHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Search\Handler
+                 <span class="highlight">$searchHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Search handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Search_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CSearch%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Search\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$sectionHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">mixed
+                 <span class="highlight">$sectionHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Section handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>mixed</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$storageHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\StorageHandler
+                 <span class="highlight">$storageHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Storage registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageHandler">\ezp\Persistence\Storage\Legacy\Content\StorageHandler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$storageRegistry" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\StorageRegistry
+                 <span class="highlight">$storageRegistry</span>= ''
+                </code><div class="description">
+<p class="short-description">Storage registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageRegistry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageRegistry">\ezp\Persistence\Storage\Legacy\Content\StorageRegistry</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$typeUpdateHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\Content\Type\Update\Handler
+                 <span class="highlight">$typeUpdateHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Content Type update handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Update_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CUpdate%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Type\Update\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::$userHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\ezp\Persistence\Storage\Legacy\User\Handler
+                 <span class="highlight">$userHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">User handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_ezp_Persistence_Storage_Legacy_User_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CUser%5CHandler">\ezp\Persistence\Storage\Legacy\User\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $config
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Creates a new repository handler.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The $config parameter expects an array of configuration values as
+follows:</p>
+
+<pre><code>array(
+ 'dsn' =>'<database_type>://<user>:<password>@<host>/<database_name>',
+ 'defer_type_update' => <true|false>,
+ 'external_storages' => array(
+     '<type_name1>' => '<storage_class_1>',
+     '<type_name2>' => '<storage_class_2>',
+     // ...
+ ),
+ 'field_converters' => array(
+     '<type_name1>' => '<converter_class_1>',
+     '<type_name2>' => '<converter_class_2>',
+     // ...
+ ),
+ 'transformation_rule_files' => array(
+     '<full_file_path_1>',
+     '<full_file_path_2>',
+     // ...
+ )
+)
+</code></pre>
+
+<p>The DSN (data source name) defines which database to use. It's format is
+defined by the Apache Zeta Components Database component. Examples are:</p>
+
+<ul>
+<li>mysql://root:secret@localhost/ezp
+for the MySQL database "ezp" on localhost, which will be accessed
+using user "root" with password "secret"</li>
+<li>sqlite://:memory:
+for a SQLite in memory database (used e.g. for unit tests)</li>
+</ul>
+
+<p>For further information on the database setup, please refer to
+{@see http://incubator.apache.org/zetacomponents/documentation/trunk/Database/tutorial.html#handler-usage}</p>
+
+<p>The flag 'defer_type_update' defines if content types should be
+published immediatly (false), when the
+{@link \ezp\Persistence\Content\Type\Handler::publish()} method is
+called, or if a background process should be triggered (true), which is
+then executed by the old eZ Publish core.</p>
+
+<p>In 'external_storages' a mapping of field type names to classes is
+expected. The referred class is instantiated and the resulting object is
+used to store/restore/delete/… data in external storages (e.g. another
+database or a web service). The classes must comply to the
+{@link \ezp\Persistence\Fields\Storage} interface. Note that due to the
+configuration mechanism and missing proper DI, the classes may not
+expect any constructor parameters!</p>
+
+<p>The 'field_converter' configuration array consists of another mapping of
+field type names to classes. Each of the classes is instantiated and
+used to convert content fields and content type field definitions to the
+legacy storage engine. The given class names must derive the
+{@link \ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter}
+class. As for 'external_storage' classes, none of the classes may expect
+parameters in its constructor, due to missing proper DI.</p>
+
+<p>Through the 'transformation_rule_files' array, a list of files with
+full text transformation rules is given. These files are read by an
+instance of
+{@link \ezp\Persistence\Storage\Legacy\Converter\Search\TransformationProcessor}
+and then used for normalization in the full text search.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$config</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::beginTransaction()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">beginTransaction</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::commit()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">commit</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::contentHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">contentHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Handler.html#%5Cezp%5CPersistence%5CContent%5CHandler">\ezp\Persistence\Content\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Handler.html#%5Cezp%5CPersistence%5CContent%5CHandler">\ezp\Persistence\Content\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::contentLanguageHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">contentLanguageHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Language_Handler.html#%5Cezp%5CPersistence%5CContent%5CLanguage%5CHandler">\ezp\Persistence\Content\Language\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Language_Handler.html#%5Cezp%5CPersistence%5CContent%5CLanguage%5CHandler">\ezp\Persistence\Content\Language\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::contentTypeHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">contentTypeHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Type_Handler.html#%5Cezp%5CPersistence%5CContent%5CType%5CHandler">\ezp\Persistence\Content\Type\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Type_Handler.html#%5Cezp%5CPersistence%5CContent%5CType%5CHandler">\ezp\Persistence\Content\Type\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getContentGateway()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getContentGateway</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Gateway</a></code><div class="description"><p class="short_description">Returns a content gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Gateway</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getContentMapper()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getContentMapper</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Mapper</a></code><div class="description"><p class="short_description">Returns a content mapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Mapper</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getContentTypeGateway()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getContentTypeGateway</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Type\Gateway</a></code><div class="description"><p class="short_description">Returns the content type gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Gateway.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CGateway">\ezp\Persistence\Storage\Legacy\Content\Type\Gateway</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getDatabase()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getDatabase</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_EzcDbHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CEzcDbHandler">\ezp\Persistence\Storage\Legacy\EzcDbHandler</a></code><div class="description"><p class="short_description">Returns the Zeta Database handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_EzcDbHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CEzcDbHandler">\ezp\Persistence\Storage\Legacy\EzcDbHandler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getFieldHandler()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getFieldHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_FieldHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldHandler">\ezp\Persistence\Storage\Legacy\Content\FieldHandler</a></code><div class="description"><p class="short_description">Returns a field handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldHandler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldHandler">\ezp\Persistence\Storage\Legacy\Content\FieldHandler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getFieldValueConverterRegistry()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFieldValueConverterRegistry</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_Registry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CRegistry">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry</a></code><div class="description"><p class="short_description">Returns the field value converter registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_FieldValue_Converter_Registry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CFieldValue%5CConverter%5CRegistry">\ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Registry</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getLanguageCache()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getLanguageCache</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Language_Cache.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CCache">\ezp\Persistence\Storage\Legacy\Content\Language\Cache</a></code><div class="description"><p class="short_description">Returns a Language cache</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Language_Cache.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CCache">\ezp\Persistence\Storage\Legacy\Content\Language\Cache</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getLanguageMaskGenerator()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getLanguageMaskGenerator</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Language_MaskGenerator.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CMaskGenerator">\ezp\Persistence\Storage\Legacy\Content\Language\MaskGenerator</a></code><div class="description"><p class="short_description">Returns a language mask generator</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Language_MaskGenerator.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLanguage%5CMaskGenerator">\ezp\Persistence\Storage\Legacy\Content\Language\MaskGenerator</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getLocationGateway()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getLocationGateway</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway_EzcDatabase.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway%5CEzcDatabase">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway\EzcDatabase</a></code><div class="description"><p class="short_description">Returns a location gateway</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Gateway_EzcDatabase.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CGateway%5CEzcDatabase">\ezp\Persistence\Storage\Legacy\Content\Location\Gateway\EzcDatabase</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getLocationMapper()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getLocationMapper</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper</a></code><div class="description"><p class="short_description">Returns a location mapper</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Location_Mapper.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CLocation%5CMapper">\ezp\Persistence\Storage\Legacy\Content\Location\Mapper</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getStorageHandler()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getStorageHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          \ezp\Persistence\Storage\Legacy\StorageHandler</code><div class="description"><p class="short_description">Returns a storage handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\ezp\Persistence\Storage\Legacy\StorageHandler</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getStorageRegistry()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getStorageRegistry</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_StorageRegistry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageRegistry">\ezp\Persistence\Storage\Legacy\Content\StorageRegistry</a></code><div class="description"><p class="short_description">Returns the storage registry</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_StorageRegistry.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CStorageRegistry">\ezp\Persistence\Storage\Legacy\Content\StorageRegistry</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getTransformationProcessor()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getTransformationProcessor</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Search_TransformationProcessor.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CSearch%5CTransformationProcessor">\ezp\Persistence\Storage\Legacy\Content\Search\TransformationProcessor</a></code><div class="description"><p class="short_description">Get a transformation processor for full text search normalization</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Search_TransformationProcessor.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CSearch%5CTransformationProcessor">\ezp\Persistence\Storage\Legacy\Content\Search\TransformationProcessor</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::getTypeUpdateHandler()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getTypeUpdateHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Update_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CUpdate%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Type\Update\Handler</a></code><div class="description"><p class="short_description">Returns a Content Type update handler</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Storage_Legacy_Content_Type_Update_Handler.html#%5Cezp%5CPersistence%5CStorage%5CLegacy%5CContent%5CType%5CUpdate%5CHandler">\ezp\Persistence\Storage\Legacy\Content\Type\Update\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::locationHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">locationHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Location_Handler.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CHandler">\ezp\Persistence\Content\Location\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Location_Handler.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CHandler">\ezp\Persistence\Content\Location\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::rollback()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">rollback</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::searchHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">searchHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Search_Handler.html#%5Cezp%5CPersistence%5CContent%5CSearch%5CHandler">\ezp\Persistence\Content\Search\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Search_Handler.html#%5Cezp%5CPersistence%5CContent%5CSearch%5CHandler">\ezp\Persistence\Content\Search\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::sectionHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">sectionHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Section_Handler.html#%5Cezp%5CPersistence%5CContent%5CSection%5CHandler">\ezp\Persistence\Content\Section\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Section_Handler.html#%5Cezp%5CPersistence%5CContent%5CSection%5CHandler">\ezp\Persistence\Content\Section\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::trashHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">trashHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_Content_Location_Trash_Handler.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CTrash%5CHandler">\ezp\Persistence\Content\Location\Trash\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_Content_Location_Trash_Handler.html#%5Cezp%5CPersistence%5CContent%5CLocation%5CTrash%5CHandler">\ezp\Persistence\Content\Location\Trash\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\ezp\Persistence\Storage\Legacy\Handler::userHandler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">userHandler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_ezp_Persistence_User_Handler.html#%5Cezp%5CPersistence%5CUser%5CHandler">\ezp\Persistence\User\Handler</a></code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Persistence_User_Handler.html#%5Cezp%5CPersistence%5CUser%5CHandler">\ezp\Persistence\User\Handler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

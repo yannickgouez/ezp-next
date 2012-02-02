@@ -1,0 +1,520 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/API/Repository/Values/User/Limitation/CustomLimitation.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation%5CCustomLimitation">\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b></small><p class="short-description">This class represents a Limitation apllied to a policy</p>
+<div class="long-description"><p>Supports readonly properties by marking them as protected.
+In this case they will only be writable using constructor, and need to be documented
+using @property-read <type> <$var> in class doc in addition to inline property doc.
+Writable properties must be public and must be documented inline.</p></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation">\eZ\Publish\API\Repository\Values\User\Limitation</a>
+            &lt;
+            <a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject" style="color: gray; font-size: 0.8em
+                ">\eZ\Publish\API\Repository\Values\ValueObject</a>
+</dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::CONTENTTYPE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">CONTENTTYPE</span>
+                = "Class"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::CONTENTTYPE">\eZ\Publish\API\Repository\Values\User\Limitation::CONTENTTYPE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::CONTENTTYPE">\eZ\Publish\API\Repository\Values\User\Limitation::CONTENTTYPE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::LANGUAGE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">LANGUAGE</span>
+                = "Language"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::LANGUAGE">\eZ\Publish\API\Repository\Values\User\Limitation::LANGUAGE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::LANGUAGE">\eZ\Publish\API\Repository\Values\User\Limitation::LANGUAGE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::LOCATION" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">LOCATION</span>
+                = "Node"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::LOCATION">\eZ\Publish\API\Repository\Values\User\Limitation::LOCATION</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::LOCATION">\eZ\Publish\API\Repository\Values\User\Limitation::LOCATION</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::OWNER" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">OWNER</span>
+                = "Owner"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::OWNER">\eZ\Publish\API\Repository\Values\User\Limitation::OWNER</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::OWNER">\eZ\Publish\API\Repository\Values\User\Limitation::OWNER</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::PARENTOWNER" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">PARENTOWNER</span>
+                = "ParentOwner"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTOWNER">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTOWNER</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTOWNER">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTOWNER</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::PARENTCONTENTTYPE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">PARENTCONTENTTYPE</span>
+                = "ParentClass"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTCONTENTTYPE">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTCONTENTTYPE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTCONTENTTYPE">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTCONTENTTYPE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::PARENTDEPTH" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">PARENTDEPTH</span>
+                = "ParentDepth"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTDEPTH">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTDEPTH</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTDEPTH">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTDEPTH</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::SECTION" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SECTION</span>
+                = "Section"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SECTION">\eZ\Publish\API\Repository\Values\User\Limitation::SECTION</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SECTION">\eZ\Publish\API\Repository\Values\User\Limitation::SECTION</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::SITEACCESS" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SITEACCESS</span>
+                = "SiteAccess"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SITEACCESS">\eZ\Publish\API\Repository\Values\User\Limitation::SITEACCESS</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SITEACCESS">\eZ\Publish\API\Repository\Values\User\Limitation::SITEACCESS</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::STATE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">STATE</span>
+                = "State"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::STATE">\eZ\Publish\API\Repository\Values\User\Limitation::STATE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::STATE">\eZ\Publish\API\Repository\Values\User\Limitation::STATE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::SUBTREE" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">SUBTREE</span>
+                = "Subtree"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SUBTREE">\eZ\Publish\API\Repository\Values\User\Limitation::SUBTREE</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::SUBTREE">\eZ\Publish\API\Repository\Values\User\Limitation::SUBTREE</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::USERGROUP" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">USERGROUP</span>
+                = "Group"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::USERGROUP">\eZ\Publish\API\Repository\Values\User\Limitation::USERGROUP</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::USERGROUP">\eZ\Publish\API\Repository\Values\User\Limitation::USERGROUP</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::PARENTUSERGROUP" class="anchor"></a><div class="constant publicC inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">PARENTUSERGROUP</span>
+                = "ParentGroup"</code><div class="description">
+<span class="attribute">inherited</span><small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTUSERGROUP">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTUSERGROUP</a></small>
+</div>
+<div class="code-tabs"><dl class="constant-info">
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::PARENTUSERGROUP">\eZ\Publish\API\Repository\Values\User\Limitation::PARENTUSERGROUP</a>
+         
+    </dd>
+</dl></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::$limitationValues" class="anchor"></a><div class="property public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public">array
+                 <span class="highlight">$limitationValues</span>= ''
+                </code><div class="description">
+<span class="attribute">inherited</span><p class="short-description">An integer list of ids or identifiers for which the limitation should be applied</p>of mixed<small>Inherited from:
+                        <a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::%24%24limitationValues">\eZ\Publish\API\Repository\Values\User\Limitation::$$limitationValues</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+<dt>Inherited_from</dt>
+<dd>
+<a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::%24%24limitationValues">\eZ\Publish\API\Repository\Values\User\Limitation::$$limitationValues</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::$name" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string
+                 <span class="highlight">$name</span>= ''
+                </code><div class="description">
+<p class="short-description">the custom limitation name</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">constructs a custom limitation for the given limitation name</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Readonly properties values must be set using $properties as they are not writable anymore
+after object has been created.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::__get()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $property
+          )
+        </span>
+        :
+          mixed</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Magic get function handling read to non public properties</p>
+<small>Inherited from:
+                    <a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject::__get()">\eZ\Publish\API\Repository\Values\ValueObject::__get()</a><a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::__get()">\eZ\Publish\API\Repository\Values\User\Limitation::__get()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Returns value for all readonly (protected) properties.
+Throws PropertyNotFound exception on all reads to undefined properties so typos are not silently accepted.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Name of the property</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>When property does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::__set()" class="anchor"></a><div class="method public inherited_from ">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $property, string $value
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">inherited</span><p class="short_description">Magic set function handling writes to non public properties</p>
+<small>Inherited from:
+                    <a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject::__set()">\eZ\Publish\API\Repository\Values\ValueObject::__set()</a><a href="db_eZ_Publish_API_Repository_Values_User_Limitation.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CLimitation::__set()">\eZ\Publish\API\Repository\Values\User\Limitation::__set()</a></small>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>Throws PropertyNotFound exception on all writes to undefined properties so typos are not silently accepted and
+throws PropertyPermission exception on readonly (protected) properties.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$property</th>
+<td>string</td>
+<td><em><p>Name of the property</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyNotFound.html#%5Cezp%5CBase%5CException%5CPropertyNotFound">\ezp\Base\Exception\PropertyNotFound</a></td>
+<td><em>When property does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_PropertyPermission.html#%5Cezp%5CBase%5CException%5CPropertyPermission">\ezp\Base\Exception\PropertyPermission</a></td>
+<td><em>When property is readonly (protected)</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\API\Repository\Values\User\Limitation\CustomLimitation::getIdentifier()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getIdentifier</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">(non-PHPdoc)</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>\User/eZ\Publish\API\Repository\Values\User.Limitation::getIdentifier()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>
