@@ -1,0 +1,911 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/InMemory/Backend.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CeZ%5CPublish%5CCore%5CPersistence%5CInMemory%5CBackend">\eZ\Publish\Core\Persistence\InMemory\Backend</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\Core\Persistence\InMemory\Backend" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\eZ\Publish\Core\Persistence\InMemory\Backend<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">The Storage Engine backend for in memory storage
+Reads input from js files in provided directory and fills in memory db store.</p>
+<div class="long-description"><p>The in memory db store and also json representation have a one to one mapping to defined value objects.
+But only their plain properties, associations are not handled and all data is stored in separate "buckets" similar
+to how it would be in a RDBMS servers.</p></div>
+<dl class="class-info"></dl>
+<h3>Properties</h3>
+<div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::$data" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$data</span>= 'array()'
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::$tempFieldTypeMapping" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">array
+                 <span class="highlight">$tempFieldTypeMapping</span>= 'array(
+        'ezstring' =&gt; 'ezp\Content\FieldType\TextLine',
+        'ezinteger' =&gt; 'ezp\Content\FieldType\Integer',
+        'ezauthor' =&gt; 'ezp\Content\FieldType\Author',
+        'ezfloat' =&gt; 'ezp\Content\FieldType\Float',
+        'eztext' =&gt; 'ezp\Content\FieldType\TextBlock',
+        'ezboolean' =&gt; 'ezp\Content\FieldType\Checkbox',
+        'ezdatetime' =&gt; 'ezp\Content\FieldType\DateAndTime',
+        'ezkeyword' =&gt; 'ezp\Content\FieldType\Keyword',
+        'ezurl' =&gt; 'ezp\Content\FieldType\Url',
+        'ezcountry' =&gt; 'ezp\Content\FieldType\Country',
+        'ezbinaryfile' =&gt; 'ezp\Content\FieldType\BinaryFile',
+        'ezmedia' =&gt; 'ezp\Content\FieldType\Media',
+        'ezxmltext' =&gt; 'ezp\Content\FieldType\XmlText',
+        'ezobjectrelationlist' =&gt; 'ezp\Content\FieldType\RelationList',
+        'ezselection' =&gt; 'ezp\Content\FieldType\Selection',
+        'ezsrrating' =&gt; 'ezp\Content\FieldType\Rating',
+        'ezimage' =&gt; 'ezp\Content\FieldType\Image',
+        'ezobjectrelation' =&gt; 'ezp\Content\FieldType\Relation',
+    )'
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Default value</strong><code>array(
+        'ezstring' =&gt; 'ezp\Content\FieldType\TextLine',
+        'ezinteger' =&gt; 'ezp\Content\FieldType\Integer',
+        'ezauthor' =&gt; 'ezp\Content\FieldType\Author',
+        'ezfloat' =&gt; 'ezp\Content\FieldType\Float',
+        'eztext' =&gt; 'ezp\Content\FieldType\TextBlock',
+        'ezboolean' =&gt; 'ezp\Content\FieldType\Checkbox',
+        'ezdatetime' =&gt; 'ezp\Content\FieldType\DateAndTime',
+        'ezkeyword' =&gt; 'ezp\Content\FieldType\Keyword',
+        'ezurl' =&gt; 'ezp\Content\FieldType\Url',
+        'ezcountry' =&gt; 'ezp\Content\FieldType\Country',
+        'ezbinaryfile' =&gt; 'ezp\Content\FieldType\BinaryFile',
+        'ezmedia' =&gt; 'ezp\Content\FieldType\Media',
+        'ezxmltext' =&gt; 'ezp\Content\FieldType\XmlText',
+        'ezobjectrelationlist' =&gt; 'ezp\Content\FieldType\RelationList',
+        'ezselection' =&gt; 'ezp\Content\FieldType\Selection',
+        'ezsrrating' =&gt; 'ezp\Content\FieldType\Rating',
+        'ezimage' =&gt; 'ezp\Content\FieldType\Image',
+        'ezobjectrelation' =&gt; 'ezp\Content\FieldType\Relation',
+    )</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $data
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Construct backend and assign data</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Use:
+    new Backend( json_decode( file_get_contents( <strong>DIR</strong> . '/data.json' ), true ) );</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$data</th>
+<td>array</td>
+<td><em><p>Data where key is type like "Content" or "Content\Type" which then have to map to Value objects in eZ\Publish\SPI\Persistence*, data is an array of hash values with same structure as the corresponding value object. Foreign keys: In some cases value objects does not contain these as they are internal, so this needs to be handled in InMemory handlers by assigning keys like "_typeId" on Type\FieldDefintion hash values for instance. These will be stored and can be matched with find(), but will not be returned as part of VO so purely internal.</p>
+</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::count()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">count</span><span class="nb-faded-text">(
+          string $type, array $match
+              =
+              array(), array $joinInfo
+              =
+              array()
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Find count of objects of a given type matching a simple $match (empty array will match all)</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Note does not support joins, so only properties on $type is matched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em><p>A flat array with property => value to match against</p>
+</em></td>
+</tr>
+<tr>
+<th>$joinInfo</th>
+<td>array</td>
+<td><em><p>See {@link find()}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\eZ\Publish\Core\Persistence\InMemory\rawFind()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          string $type, array $data, boolean $autoIncrement
+              =
+              true
+          )
+        </span>
+        :
+          object</code><div class="description"><p class="short_description">Creates data in in memory store</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$data</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$autoIncrement</th>
+<td>boolean</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>object</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If $autoIncrement is false but $data does not include an id</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If provided id already exists (and if defined, data contain same status property value)</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          string $type, int | string $id
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes data in in memory store</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$id</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If data does not exist</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\eZ\Publish\Core\Persistence\InMemory\deleteByMatch()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::deleteByMatch()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">deleteByMatch</span><span class="nb-faded-text">(
+          string $type, array $match
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Deletes data in in memory store</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Useful in cases where a specific state of an object should be updated,
+Type with version=0 for instance.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em><p>A flat array with property => value to match against</p>
+</em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If no data to delete have been found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::find()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">find</span><span class="nb-faded-text">(
+          string $type, array $match
+              =
+              array(), array $joinInfo
+              =
+              array()
+          )
+        </span>
+        :
+          \object[]</code><div class="description"><p class="short_description">Find data from in memory store for a specific type that matches $match (empty array will match all)</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Note does not support joins, so only properties on $type is matched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em><p>A multi level array with property => value to match against</p>
+</em></td>
+</tr>
+<tr>
+<th>$joinInfo</th>
+<td>array</td>
+<td><em><p>Optional info on how to join in other objects to become part of a aggregate where $type is root. Format: array( '<property>' => array( 'type' => '<foreign-type>', 'match' => array( '<foreign-key-property>' => '<key-property>' ) ), ['sub' => <$joinInfo>] ) Example (joining Location when finding Content): array( 'locations' => array( 'type' => 'Content\Location', 'match' => array( 'contentId' => 'id' ) ) ) Value of 'sub' follows exactly same format as $joinInfo allowing recursive joining.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\object[]</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\eZ\Publish\Core\Persistence\InMemory\rawFind()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::getFieldTypeNamespace()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getFieldTypeNamespace</span><span class="nb-faded-text">(
+           $obj
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$obj</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::getNextId()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">getNextId</span><span class="nb-faded-text">(
+           $type
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Finds the max id number and that +1</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Makes sure no id conflicts occur if data for some reason contains gaps in id numbers.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::joinToValue()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">joinToValue</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a> $item, array $joinInfo
+              =
+              array()
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a></code><div class="description"><p class="short_description">Creates value objects on join properties</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$item</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$joinInfo</th>
+<td>array</td>
+<td><em><p>See {@link find()}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          string $type, int | string $id
+          )
+        </span>
+        :
+          object</code><div class="description"><p class="short_description">Reads data from in memory store</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$id</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>object</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If data does not exist</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>If several items exists with same id</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::match()" class="anchor"></a><div class="method private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private"><span class="highlight">match</span><span class="nb-faded-text">(
+          array $item, array $match
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if a $item (a raw VO item) matches $match recursively</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$item</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::rawFind()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">rawFind</span><span class="nb-faded-text">(
+          string $type, array $match
+              =
+              array(), array $joinInfo
+              =
+              array()
+          )
+        </span>
+        :
+          \array[]</code><div class="description"><p class="short_description">Find data from in memory store for a specific type that matches $match (empty array will match all)</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Note does not support joins, so only properties on $type is matched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em><p>A multi level array with property => value to match against</p>
+</em></td>
+</tr>
+<tr>
+<th>$joinInfo</th>
+<td>array</td>
+<td><em><p>See {@link find()}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\array[]</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $type</em></td>
+</tr>
+<tr>
+<td><a href="db_ezp_Base_Exception_Logic.html#%5Cezp%5CBase%5CException%5CLogic">\ezp\Base\Exception\Logic</a></td>
+<td><em>When there is a collision between match rules in $joinInfo and $match</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::toValue()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">toValue</span><span class="nb-faded-text">(
+          string $type, array $data, array $joinInfo
+              =
+              array()
+          )
+        </span>
+        :
+          object</code><div class="description"><p class="short_description">Creates Value object based on array value from Backend.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$data</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$joinInfo</th>
+<td>array</td>
+<td><em><p>See {@link find()}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>object</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          string $type, int | string $id, array $data, boolean $union
+              =
+              true
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Updates data in in memory store</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$id</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$data</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$union</th>
+<td>boolean</td>
+<td><em><p>Specifies if data should be merged with existing data or not</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td>False if data does not exist and can not be updated</td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Uses</dt>
+<dd>\eZ\Publish\Core\Persistence\InMemory\updateByMatch()
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Persistence\InMemory\Backend::updateByMatch()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">updateByMatch</span><span class="nb-faded-text">(
+          string $type, array $match, array $data, boolean $union
+              =
+              true
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Updates data in in memory store by match</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Useful in cases where a specific state of an object should be updated,
+Type with version=0 for instance.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$match</th>
+<td>array</td>
+<td><em><p>A flat array with property => value to match against</p>
+</em></td>
+</tr>
+<tr>
+<th>$data</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$union</th>
+<td>boolean</td>
+<td><em><p>Specifies if data should be merged with existing data or not</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td>False if data does not exist and can not be updated</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_InvalidArgumentValue.html#%5Cezp%5CBase%5CException%5CInvalidArgumentValue">\ezp\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

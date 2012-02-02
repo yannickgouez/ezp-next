@@ -1,0 +1,618 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Repository/Repository.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CeZ%5CPublish%5CCore%5CRepository%5CRepository">\eZ\Publish\Core\Repository\Repository</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\Core\Repository\Repository" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\eZ\Publish\Core\Repository\Repository<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">Repository class</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Parent(s)</dt>
+<dd><a href="db_eZ_Publish_API_Repository_Repository.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CRepository">\eZ\Publish\API\Repository\Repository</a></dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\eZ\Publish\Core\Repository\Repository::$ioHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\eZ\Publish\SPI\Io\Handler
+                 <span class="highlight">$ioHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Io Handler object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_eZ_Publish_SPI_Io_Handler.html#%5CeZ%5CPublish%5CSPI%5CIo%5CHandler">\eZ\Publish\SPI\Io\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::$persistenceHandler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\eZ\Publish\SPI\Persistence\Handler
+                 <span class="highlight">$persistenceHandler</span>= ''
+                </code><div class="description">
+<p class="short-description">Repository Handler object</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_eZ_Publish_SPI_Persistence_Handler.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CHandler">\eZ\Publish\SPI\Persistence\Handler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::$sectionService" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\eZ\Publish\Core\Repository\SectionService
+                 <span class="highlight">$sectionService</span>= ''
+                </code><div class="description">
+<p class="short-description">Instance of section service</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_eZ_Publish_Core_Repository_SectionService.html#%5CeZ%5CPublish%5CCore%5CRepository%5CSectionService">\eZ\Publish\Core\Repository\SectionService</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::$user" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\eZ\Publish\API\Repository\Values\User\User
+                 <span class="highlight">$user</span>= ''
+                </code><div class="description">
+<p class="short-description">Currently logged in user object for permission purposes</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\Core\Repository\Repository::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+           $persistenceHandler, <a href="db_eZ_Publish_SPI_Io_Handler.html#%5CeZ%5CPublish%5CSPI%5CIo%5CHandler">\eZ\Publish\SPI\Io\Handler</a> $ioHandler, <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> | null $user
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Constructor</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Construct repository object with provided storage engine</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$persistenceHandler</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$ioHandler</th>
+<td><a href="db_eZ_Publish_SPI_Io_Handler.html#%5CeZ%5CPublish%5CSPI%5CIo%5CHandler">\eZ\Publish\SPI\Io\Handler</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td>
+<a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> | null</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::beginTransaction()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">beginTransaction</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Begin transaction</p></div>
+<div class="code-tabs"><div class="long-description"><p>Begins an transaction, make sure you'll call commit or rollback when done,
+otherwise work will be lost.</p></div></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::canUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">canUser</span><span class="nb-faded-text">(
+          string $module, string $function, <a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject">\eZ\Publish\API\Repository\Values\ValueObject</a> $value, <a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject">\eZ\Publish\API\Repository\Values\ValueObject</a> $target
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Check if current user has access to a certain function on a model</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Indicates if the current user is allowed to perform an action given by the function on the given
+objects</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$module</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$function</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject">\eZ\Publish\API\Repository\Values\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$target</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_ValueObject.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CValueObject">\eZ\Publish\API\Repository\Values\ValueObject</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_Core_Base_Exception_InvalidArgumentValue.html#%5CeZ%5CPublish%5CCore%5CBase%5CException%5CInvalidArgumentValue">\eZ\Publish\Core\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>On invalid $function value</em></td>
+</tr>
+<tr>
+<td><a href="db_eZ_Publish_Core_Base_Exception_Logic.html#%5CeZ%5CPublish%5CCore%5CBase%5CException%5CLogic">\eZ\Publish\Core\Base\Exception\Logic</a></td>
+<td><em>On limitation used in policies but not in $model::defintion()</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::commit()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">commit</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Commit transaction</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Commit transaction, or throw exceptions if no transactions has been started.</p></div>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="http://php.net/manual/en/class.runtimeexception.php">\RuntimeException</a></td>
+<td><em>If no transaction has been started</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getContentLanguageService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getContentLanguageService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_LanguageService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CLanguageService">\eZ\Publish\API\Repository\LanguageService</a></code><div class="description"><p class="short_description">Get Content Language Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get service object to perform operations on Content language objects</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_LanguageService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CLanguageService">\eZ\Publish\API\Repository\LanguageService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getContentService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getContentService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_ContentService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CContentService">\eZ\Publish\API\Repository\ContentService</a></code><div class="description"><p class="short_description">Get Content Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get service object to perform operations on Content objects and it's aggregate members.</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_ContentService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CContentService">\eZ\Publish\API\Repository\ContentService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getContentTypeService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getContentTypeService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_ContentTypeService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CContentTypeService">\eZ\Publish\API\Repository\ContentTypeService</a></code><div class="description"><p class="short_description">Get Content Type Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get service object to perform operations on Content Type objects and it's aggregate members.
+( Group, Field &amp; FieldCategory )</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_ContentTypeService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CContentTypeService">\eZ\Publish\API\Repository\ContentTypeService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getCurrentUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getCurrentUser</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></code><div class="description"><p class="short_description">Get current user</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getLocationService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getLocationService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_LocationService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CLocationService">\eZ\Publish\API\Repository\LocationService</a></code><div class="description"><p class="short_description">Get Content Location Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get service object to perform operations on Location objects and subtrees</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_LocationService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CLocationService">\eZ\Publish\API\Repository\LocationService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getRoleService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getRoleService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_RoleService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CRoleService">\eZ\Publish\API\Repository\RoleService</a></code><div class="description"><p class="short_description">Get RoleService</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_RoleService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CRoleService">\eZ\Publish\API\Repository\RoleService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getSectionService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getSectionService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_SectionService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CSectionService">\eZ\Publish\API\Repository\SectionService</a></code><div class="description"><p class="short_description">Get Content Section Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get Section service that lets you manipulate section objects</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_SectionService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CSectionService">\eZ\Publish\API\Repository\SectionService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getTrashService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTrashService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_TrashService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CTrashService">\eZ\Publish\API\Repository\TrashService</a></code><div class="description"><p class="short_description">Get Content Trash service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Trash service allows to perform operations related to location trash
+(trash/untrash, load/list from trash...)</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_TrashService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CTrashService">\eZ\Publish\API\Repository\TrashService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::getUserService()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getUserService</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_UserService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CUserService">\eZ\Publish\API\Repository\UserService</a></code><div class="description"><p class="short_description">Get User Service</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Get service object to perform operations on Users and UserGroup</p></div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_UserService.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CUserService">\eZ\Publish\API\Repository\UserService</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::hasAccess()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasAccess</span><span class="nb-faded-text">(
+          string $module, string $function, <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user
+              =
+              null
+          )
+        </span>
+        :
+          boolean | array</code><div class="description"><p class="short_description"></p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$module</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$function</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean | array</td>
+<td>if limitations are on this function an array of limitations is returned</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::rollback()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">rollback</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Rollback transaction</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Rollback transaction, or throw exceptions if no transactions has been started.</p></div>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="http://php.net/manual/en/class.runtimeexception.php">\RuntimeException</a></td>
+<td><em>If no transaction has been started</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\Core\Repository\Repository::setCurrentUser()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCurrentUser</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a> $user
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></code><div class="description"><p class="short_description">Set current user</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$user</th>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_API_Repository_Values_User_User.html#%5CeZ%5CPublish%5CAPI%5CRepository%5CValues%5CUser%5CUser">\eZ\Publish\API\Repository\Values\User\User</a></td>
+<td>Old user</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_Core_Base_Exception_InvalidArgumentValue.html#%5CeZ%5CPublish%5CCore%5CBase%5CException%5CInvalidArgumentValue">\eZ\Publish\Core\Base\Exception\InvalidArgumentValue</a></td>
+<td><em>If provided user does not have a valid id value</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

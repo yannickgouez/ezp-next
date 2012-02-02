@@ -114,7 +114,7 @@ The array should at least define 2 keys :
   - connection (the connection handler)
 For example, using Legacy storage engine, $context will be:
   - identifier = 'LegacyStorage'
-  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+  - connection = {@link \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler} object handler (for DB connection),
                  to be used accordingly to
                  {@link http://incubator.apache.org/zetacomponents/documentation/trunk/Database/tutorial.html ezcDatabase} usage</p></div>
 <dl class="class-info"></dl>
@@ -122,7 +122,7 @@ For example, using Legacy storage engine, $context will be:
 <div>
 <a id="\eZ\Publish\SPI\FieldType\FieldStorage::copyFieldData()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copyFieldData</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a> $field, array $context
           )
         </span>
         :
@@ -137,7 +137,7 @@ For example, using Legacy storage engine, $context will be:
 </tr></thead>
 <tr>
 <th>$field</th>
-<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a></td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -190,13 +190,13 @@ For example, using Legacy storage engine, $context will be:
 </div>
 <a id="\eZ\Publish\SPI\FieldType\FieldStorage::getFieldData()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFieldData</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a> $field, array $context
           )
         </span>
         :
           void</code><div class="description"><p class="short_description">Populates $field value property based on the external data.</p></div>
 <div class="code-tabs">
-<div class="long-description"><p>$field->value is a {@link ezp\Persistence\Content\FieldValue} object.
+<div class="long-description"><p>$field->value is a {@link eZ\Publish\SPI\Persistence\Content\FieldValue} object.
 This value holds the data as a {@link ezp\Content\FieldType\Value} based object,
 according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).</p></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -207,7 +207,7 @@ according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\
 </tr></thead>
 <tr>
 <th>$field</th>
-<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a></td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -221,7 +221,7 @@ according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\
 </div>
 <a id="\eZ\Publish\SPI\FieldType\FieldStorage::getIndexData()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getIndexData</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a> $field, array $context
           )
         </span>
         :
@@ -236,7 +236,7 @@ according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\
 </tr></thead>
 <tr>
 <th>$field</th>
-<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a></td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -272,15 +272,15 @@ according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\
 </div>
 <a id="\eZ\Publish\SPI\FieldType\FieldStorage::storeFieldData()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">storeFieldData</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a> $field, array $context
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a> $field, array $context
           )
         </span>
         :
           null | true</code><div class="description"><p class="short_description">Allows custom field types to store data in an external source (e.g. another DB table).</p></div>
 <div class="code-tabs">
 <div class="long-description"><p>Stores value for $field in an external data source.
-The whole {@link ezp\Persistence\Content\Field} object is passed and its value
-is accessible through the {@link ezp\Persistence\Content\FieldValue} 'value' property.
+The whole {@link eZ\Publish\SPI\Persistence\Content\Field} object is passed and its value
+is accessible through the {@link eZ\Publish\SPI\Persistence\Content\FieldValue} 'value' property.
 This value holds the data filled by the user as a {@link ezp\Content\FieldType\Value} based object,
 according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).</p>
 
@@ -295,7 +295,7 @@ The array should at least define 2 keys :
   - connection (the connection handler)
 For example, using Legacy storage engine, $context will be:
   - identifier = 'LegacyStorage'
-  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+  - connection = {@link \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler} object handler (for DB connection),
                  to be used accordingly to
 The context array provides some context for the field handler about the
 currently used storage engine.
@@ -304,7 +304,7 @@ The array should at least define 2 keys :
   - connection (the connection handler)
 For example, using Legacy storage engine, $context will be:
   - identifier = 'LegacyStorage'
-  - connection = {@link \ezp\Persistence\Storage\Legacy\EzcDbHandler} object handler (for DB connection),
+  - connection = {@link \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler} object handler (for DB connection),
                  to be used accordingly to
                  {@link http://incubator.apache.org/zetacomponents/documentation/trunk/Database/tutorial.html ezcDatabase} usage</p>
 
@@ -318,7 +318,7 @@ In any other case, this method must not return anything (null).</p></div>
 </tr></thead>
 <tr>
 <th>$field</th>
-<td><a href="db_ezp_Persistence_Content_Field.html#%5Cezp%5CPersistence%5CContent%5CField">\ezp\Persistence\Content\Field</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Field.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CField">\eZ\Publish\SPI\Persistence\Content\Field</a></td>
 <td><em></em></td>
 </tr>
 <tr>

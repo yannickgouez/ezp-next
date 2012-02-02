@@ -1,0 +1,337 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/SPI/Persistence/Content/Location/Trash/Handler.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">The Trash Handler interface defines operations on Location elements in the storage engine.</p>
+<div class="long-description"></div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_eZ_Publish_Core_Persistence_Legacy_Content_Location_Trash_Handler.html#%5CeZ%5CPublish%5CCore%5CPersistence%5CLegacy%5CContent%5CLocation%5CTrash%5CHandler">\eZ\Publish\Core\Persistence\Legacy\Content\Location\Trash\Handler</a></dd>
+<dd><a href="db_eZ_Publish_Core_Persistence_InMemory_TrashHandler.html#%5CeZ%5CPublish%5CCore%5CPersistence%5CInMemory%5CTrashHandler">\eZ\Publish\Core\Persistence\InMemory\TrashHandler</a></dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::emptyOne()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">emptyOne</span><span class="nb-faded-text">(
+          int $trashedId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a trashed location identified by $trashedLocationId from trash
+Associated content has to be deleted</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$trashedId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::emptyTrash()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">emptyTrash</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Empties the trash
+Everything contained in the trash must be removed</p></div>
+<div class="code-tabs"><div class="long-description"></div></div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::listTrashed()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">listTrashed</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Query_Criterion.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CQuery%5CCriterion">\eZ\Publish\SPI\Persistence\Content\Query\Criterion</a> $criterion
+              =
+              null, \eZ\Publish\SPI\Persistence\Content\Location\Trash\$offset $offset
+              =
+              0, \eZ\Publish\SPI\Persistence\Content\Location\Trash\$limit $limit
+              =
+              null, <a href="db_eZ_Publish_SPI_Persistence_Content_Query_SortClause.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CQuery%5CSortClause">\eZ\Publish\SPI\Persistence\Content\Query\SortClause[]</a> $sort
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed[]</a></code><div class="description"><p class="short_description">Returns an array of all trashed locations satisfying the $criterion (if provided),
+sorted with SortClause objects contained in $sort (if any).</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If no criterion is provided (null), no filter is applied</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$criterion</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Query_Criterion.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CQuery%5CCriterion">\eZ\Publish\SPI\Persistence\Content\Query\Criterion</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$offset</th>
+<td>\eZ\Publish\SPI\Persistence\Content\Location\Trash\$offset</td>
+<td><em><p>Offset to start listing from, 0 by default</p></em></td>
+</tr>
+<tr>
+<th>$limit</th>
+<td>\eZ\Publish\SPI\Persistence\Content\Location\Trash\$limit</td>
+<td><em><p>Limit for the listing. Null by default (no limit)</p>
+</em></td>
+</tr>
+<tr>
+<th>$sort</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Query_SortClause.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CQuery%5CSortClause">\eZ\Publish\SPI\Persistence\Content\Query\SortClause[]</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          int $id
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed</a></code><div class="description"><p class="short_description">Loads the data for the trashed location identified by $id.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>$id is the same as original location (which has been previously trashed)</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::trashSubtree()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">trashSubtree</span><span class="nb-faded-text">(
+          mixed $locationId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed</a></code><div class="description"><p class="short_description">Sends a subtree to the trash</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Moves all locations in the subtree to the Trash. The associated content
+objects are left untouched.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$locationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Location_Trashed.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CLocation%5CTrashed">\eZ\Publish\SPI\Persistence\Content\Location\Trashed</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler::untrashLocation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">untrashLocation</span><span class="nb-faded-text">(
+           $trashedId, mixed $newParentId
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Returns a trashed location to normal state.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Recreates the originally trashed location in the new position.
+If this is not possible (because the old location does not exist any more),
+a ParentNotFound exception is thrown.</p>
+
+<p>Returns newly restored location Id.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$trashedId</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$newParentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>Newly restored location id</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Content_Location_Exception_ParentNotFound.html#%5Cezp%5CContent%5CLocation%5CException%5CParentNotFound">\ezp\Content\Location\Exception\ParentNotFound</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

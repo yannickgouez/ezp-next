@@ -113,7 +113,7 @@ $sc-&gt;getRepository-&gt;getContentService()...;
 <pre><code>$sc = new eZ\Publish\Core\Base\ServiceContainer(
     Configuration::getInstance('service')-&gt;getAll(),
     array(
-        '@persistence_handler' =&gt; new \ezp\Persistence\Storage\InMemory\Handler()
+        '@persistence_handler' =&gt; new \eZ\Publish\Core\Persistence\InMemory\Handler()
     )
 );
 $sc-&gt;getRepository-&gt;getContentService()...;
@@ -128,7 +128,7 @@ arguments[persistence_handler]=@inmemory_persistence_handler
 
 [inmemory_persistence_handler]
 shared=true
-class=ezp\Persistence\Storage\InMemory\Handler
+class=eZ\Publish\Core\Persistence\InMemory\Handler
 </code></pre></div>
 <dl class="class-info">
 <dt>Todo</dt>

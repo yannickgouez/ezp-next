@@ -1,0 +1,753 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.tools.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/SPI/Persistence/Content/Handler.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><a name="interfaces" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\eZ\Publish\SPI\Persistence\Content\Handler" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="interface">\eZ\Publish\SPI\Persistence\Content\Handler<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Default</small><p class="short-description">The Content Handler interface defines content operations on the storage engine.</p>
+<div class="long-description"><p>The basic operations which are performed on content objects are collected in
+this interface. Typically this interface would be used by a service managing
+business logic for content objects.</p></div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_eZ_Publish_Core_Persistence_Legacy_Content_Handler.html#%5CeZ%5CPublish%5CCore%5CPersistence%5CLegacy%5CContent%5CHandler">\eZ\Publish\Core\Persistence\Legacy\Content\Handler</a></dd>
+<dd><a href="db_eZ_Publish_Core_Persistence_InMemory_ContentHandler.html#%5CeZ%5CPublish%5CCore%5CPersistence%5CInMemory%5CContentHandler">\eZ\Publish\Core\Persistence\InMemory\ContentHandler</a></dd>
+</dl>
+<h3>Methods</h3>
+<div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::addRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addRelation</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Relation_CreateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation%5CCreateStruct">\eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct</a> $relation
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation</a></code><div class="description"><p class="short_description">Creates a relation between $sourceContentId in $sourceContentVersionNo
+and $destinationContentId with a specific $type.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$relation</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Relation_CreateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation%5CCreateStruct">\eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Should the existence verifications happen here or is this supposed to be handled at a higher level?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::copy()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">copy</span><span class="nb-faded-text">(
+          mixed $contentId, int | false $version
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></code><div class="description"><p class="short_description">Copy Content with Fields and Versions from $contentId in $version.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Copies all fields from $contentId in $version (or all versions if false)
+to a new object which is returned. Version numbers are maintained.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td>int | false</td>
+<td><em><p>Copy all versions if left false</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>If content or version is not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::create()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_Content_CreateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CCreateStruct">\eZ\Publish\SPI\Persistence\Content\CreateStruct</a> $content
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></code><div class="description"><p class="short_description">Creates a new Content entity in the storage engine.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The values contained inside the $content will form the basis of stored
+entity.</p>
+
+<p>Will contain always a complete list of fields.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_CreateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CCreateStruct">\eZ\Publish\SPI\Persistence\Content\CreateStruct</a></td>
+<td><em><p>Content creation struct.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></td>
+<td>Content value object</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::createDraftFromVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">createDraftFromVersion</span><span class="nb-faded-text">(
+          mixed $contentId, int $srcVersion
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Version.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CVersion">\eZ\Publish\SPI\Persistence\Content\Version</a></code><div class="description"><p class="short_description">Creates a new draft version from $contentId in $srcVersion number.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Copies all fields from $contentId in $srcVersion and creates a new
+version of the referred Content from it.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$srcVersion</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Version.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CVersion">\eZ\Publish\SPI\Persistence\Content\Version</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_ezp_Base_Exception_NotFound.html#%5Cezp%5CBase%5CException%5CNotFound">\ezp\Base\Exception\NotFound</a></td>
+<td><em>Thrown if $contentId and/or $srcVersion are invalid</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          int $contentId
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Deletes all versions and fields, all locations (subtree), and all relations.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Removes the relations, but not the related objects. All subtrees of the
+assigned nodes of this content objects are removed (recursively).</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::getObjectState()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getObjectState</span><span class="nb-faded-text">(
+          mixed $contentId, mixed $stateGroup
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Gets the object-state of object identified by $contentId and $stateGroup to $state.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The $state is the id of the state within one group.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$stateGroup</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::listVersions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">listVersions</span><span class="nb-faded-text">(
+          int $contentId
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_RestrictedVersion.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRestrictedVersion">\eZ\Publish\SPI\Persistence\Content\RestrictedVersion[]</a></code><div class="description"><p class="short_description">Return the versions for $contentId</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_RestrictedVersion.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRestrictedVersion">\eZ\Publish\SPI\Persistence\Content\RestrictedVersion[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::load()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">load</span><span class="nb-faded-text">(
+          int | string $id, int | string $version, \string[] $translations
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></code><div class="description"><p class="short_description">Returns the raw data of a content object identified by $id, in a struct.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>A version to load must be specified. If you want to load the current
+version of a content object use SearchHandler::findSingle() with the
+ContentId criterion.</p>
+
+<p>Optionally a translation filter may be specified. If specified only the
+translations with the listed language codes will be retrieved. If not,
+all translations will be retrieved.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$id</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td>int | string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$translations</th>
+<td>\string[]</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></td>
+<td>Content value object</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::loadRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadRelations</span><span class="nb-faded-text">(
+          mixed $sourceContentId, mixed | null $sourceContentVersionNo
+              =
+              null, int | null $type
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation[]</a></code><div class="description"><p class="short_description">Loads relations from $sourceContentId. Optionally, loads only those with $type and $sourceContentVersionNo.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sourceContentId</th>
+<td>mixed</td>
+<td><em><p>Source Content ID</p></em></td>
+</tr>
+<tr>
+<th>$sourceContentVersionNo</th>
+<td>mixed | null</td>
+<td><em><p>Source Content Version, null if not specified</p></em></td>
+</tr>
+<tr>
+<th>$type</th>
+<td>int | null</td>
+<td><em><p>{@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::loadReverseRelations()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">loadReverseRelations</span><span class="nb-faded-text">(
+          mixed $destinationContentId, int | null $type
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation[]</a></code><div class="description"><p class="short_description">Loads relations from $contentId. Optionally, loads only those with $type.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Only loads relations against published versions.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$destinationContentId</th>
+<td>mixed</td>
+<td><em><p>Destination Content ID</p></em></td>
+</tr>
+<tr>
+<th>$type</th>
+<td>int | null</td>
+<td><em><p>{@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_Relation.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CRelation">\eZ\Publish\SPI\Persistence\Content\Relation[]</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::publish()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">publish</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_Content_UpdateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CUpdateStruct">\eZ\Publish\SPI\Persistence\Content\UpdateStruct</a> $updateStruct
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></code><div class="description"><p class="short_description">Performs the publishing operations required to set the version identified by $updateStruct->versionNo and
+$updateStruct->id as the published one.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The UpdateStruct will also contain an array of Content name indexed by Locale.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$updateStruct</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_UpdateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CUpdateStruct">\eZ\Publish\SPI\Persistence\Content\UpdateStruct</a></td>
+<td><em><p>An UpdateStruct with id, versionNo and name array</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></td>
+<td>The published Content</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::removeRelation()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeRelation</span><span class="nb-faded-text">(
+          mixed $relationId
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Removes a relation by relation Id.</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$relationId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>Should the existence verifications happen here or is this supposed to be handled at a higher level?
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::setObjectState()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setObjectState</span><span class="nb-faded-text">(
+          mixed $contentId, mixed $stateGroup, mixed $state
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Sets the object-state of object identified by $contentId and $stateGroup to $state.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The $state is the id of the state within one group.</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$stateGroup</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$state</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a>
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::setStatus()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setStatus</span><span class="nb-faded-text">(
+          mixed $contentId, int $status, int $version
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Sets the state of object identified by $contentId and $version to $status.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The $status can be one of STATUS_DRAFT, STATUS_PUBLISHED, STATUS_ARCHIVED</p></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$contentId</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$status</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$version</th>
+<td>int</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>See</dt>
+<dd>
+<a href="db_ezp_Content.html#%5Cezp%5CContent">\ezp\Content</a>
+         
+    </dd>
+<dt>Todo</dt>
+<dd>Is this supposed to be constants from Content or Version? They differ..
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\eZ\Publish\SPI\Persistence\Content\Handler::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          <a href="db_eZ_Publish_SPI_Persistence_Content_UpdateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CUpdateStruct">\eZ\Publish\SPI\Persistence\Content\UpdateStruct</a> $content
+          )
+        </span>
+        :
+          <a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></code><div class="description"><p class="short_description">Updates a content object entity with data and identifier $content</p></div>
+<div class="code-tabs">
+<div class="long-description"></div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$content</th>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content_UpdateStruct.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent%5CUpdateStruct">\eZ\Publish\SPI\Persistence\Content\UpdateStruct</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_eZ_Publish_SPI_Persistence_Content.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CContent">\eZ\Publish\SPI\Persistence\Content</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.18.1</a>.
+    </small></body></html>

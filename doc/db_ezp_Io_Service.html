@@ -120,7 +120,7 @@ Differs from other Services in that it uses different handler, namely {@link \ez
 <div class="long-description"></div>
 <strong>Details</strong><dl class="property-info">
 <dt>Type</dt>
-<dd><a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler">\ezp\Io\Handler</a></dd>
+<dd>\ezp\Io\Handler</dd>
 </dl>
 </div>
 <div class="clear"></div>
@@ -151,7 +151,7 @@ Differs from other Services in that it uses different handler, namely {@link \ez
 <div>
 <a id="\ezp\Io\Service::__construct()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
-          <a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a> $repository, <a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler">\ezp\Io\Handler</a> $handler
+          <a href="db_ezp_Base_Repository.html#%5Cezp%5CBase%5CRepository">\ezp\Base\Repository</a> $repository, \ezp\Io\Handler $handler
           )
         </span>
         :
@@ -171,7 +171,7 @@ Differs from other Services in that it uses different handler, namely {@link \ez
 </tr>
 <tr>
 <th>$handler</th>
-<td><a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler">\ezp\Io\Handler</a></td>
+<td>\ezp\Io\Handler</td>
 <td><em></em></td>
 </tr>
 </table>
@@ -180,11 +180,11 @@ Differs from other Services in that it uses different handler, namely {@link \ez
 </div>
 <a id="\ezp\Io\Service::create()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">create</span><span class="nb-faded-text">(
-          <a href="db_ezp_Io_BinaryFileCreateStruct.html#%5Cezp%5CIo%5CBinaryFileCreateStruct">\ezp\Io\BinaryFileCreateStruct</a> $binaryFile
+          \ezp\Io\BinaryFileCreateStruct $binaryFile
           )
         </span>
         :
-          <a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></code><div class="description"><p class="short_description">Stores $binaryFile to the repository</p></div>
+          \ezp\Io\BinaryFile</code><div class="description"><p class="short_description">Stores $binaryFile to the repository</p></div>
 <div class="code-tabs">
 <div class="long-description"><p>It is recommended to use {@link createFromLocalFile()} or {@link createFromUploadedFile()} as they
 handle most use cases with less code needed then using this method directly.</p></div>
@@ -196,7 +196,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </tr></thead>
 <tr>
 <th>$binaryFile</th>
-<td><a href="db_ezp_Io_BinaryFileCreateStruct.html#%5Cezp%5CIo%5CBinaryFileCreateStruct">\ezp\Io\BinaryFileCreateStruct</a></td>
+<td>\ezp\Io\BinaryFileCreateStruct</td>
 <td><em></em></td>
 </tr>
 </table>
@@ -206,14 +206,13 @@ handle most use cases with less code needed then using this method directly.</p>
 <th>Description</th>
 </tr></thead>
 <tr>
-<td><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></td>
+<td>\ezp\Io\BinaryFile</td>
 <td>The created BinaryFile object</td>
 </tr>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::create()">\ezp\Io\Handler::create()</a>
+<dd>\ezp\Io\Handler::create()
          
     </dd>
 </dl>
@@ -226,7 +225,7 @@ handle most use cases with less code needed then using this method directly.</p>
           )
         </span>
         :
-          <a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></code><div class="description"><p class="short_description">Creates a BinaryFile object from $localFile</p></div>
+          \ezp\Io\BinaryFile</code><div class="description"><p class="short_description">Creates a BinaryFile object from $localFile</p></div>
 <div class="code-tabs">
 <div class="long-description"></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -252,7 +251,7 @@ handle most use cases with less code needed then using this method directly.</p>
 <th>Description</th>
 </tr></thead>
 <tr>
-<td><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></td>
+<td>\ezp\Io\BinaryFile</td>
 <td></td>
 </tr>
 </table>
@@ -281,7 +280,7 @@ handle most use cases with less code needed then using this method directly.</p>
           )
         </span>
         :
-          <a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></code><div class="description"><p class="short_description">Creates a BinaryFile object from the uploaded file $uploadedFile</p></div>
+          \ezp\Io\BinaryFile</code><div class="description"><p class="short_description">Creates a BinaryFile object from the uploaded file $uploadedFile</p></div>
 <div class="code-tabs">
 <div class="long-description"></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -308,7 +307,7 @@ handle most use cases with less code needed then using this method directly.</p>
 <th>Description</th>
 </tr></thead>
 <tr>
-<td><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></td>
+<td>\ezp\Io\BinaryFile</td>
 <td></td>
 </tr>
 </table>
@@ -358,8 +357,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::delete()">\ezp\Io\Handler::delete()</a>
+<dd>\ezp\Io\Handler::delete()
          
     </dd>
 </dl>
@@ -399,8 +397,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::exists()">\ezp\Io\Handler::exists()</a>
+<dd>\ezp\Io\Handler::exists()
          
     </dd>
 </dl>
@@ -409,7 +406,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </div>
 <a id="\ezp\Io\Service::fillStruct()" class="anchor"></a><div class="method protected inherited_from ">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">fillStruct</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> $do, array $optionalProperties
+          <a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a> $struct, <a href="db_ezp_Base_Model.html#%5Cezp%5CBase%5CModel">\ezp\Base\Model</a> $do, array $optionalProperties
               =
               array()
           )
@@ -430,7 +427,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </tr></thead>
 <tr>
 <th>$struct</th>
-<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a></td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -496,8 +493,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::getFileContents()">\ezp\Io\Handler::getFileContents()</a>
+<dd>\ezp\Io\Handler::getFileContents()
          
     </dd>
 </dl>
@@ -537,8 +533,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::getFileResource()">\ezp\Io\Handler::getFileResource()</a>
+<dd>\ezp\Io\Handler::getFileResource()
          
     </dd>
 </dl>
@@ -551,7 +546,7 @@ handle most use cases with less code needed then using this method directly.</p>
           )
         </span>
         :
-          <a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></code><div class="description"><p class="short_description">Loads the binary file with $path</p></div>
+          \ezp\Io\BinaryFile</code><div class="description"><p class="short_description">Loads the binary file with $path</p></div>
 <div class="code-tabs">
 <div class="long-description"></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -572,14 +567,13 @@ handle most use cases with less code needed then using this method directly.</p>
 <th>Description</th>
 </tr></thead>
 <tr>
-<td><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></td>
+<td>\ezp\Io\BinaryFile</td>
 <td></td>
 </tr>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::load()">\ezp\Io\Handler::load()</a>
+<dd>\ezp\Io\Handler::load()
          
     </dd>
 </dl>
@@ -588,7 +582,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </div>
 <a id="\ezp\Io\Service::setPropertyByConvention()" class="anchor"></a><div class="method protected inherited_from ">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">setPropertyByConvention</span><span class="nb-faded-text">(
-          <a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a> $struct, string $property
+          <a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a> $struct, string $property
           )
         </span>
         :
@@ -612,7 +606,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </tr></thead>
 <tr>
 <th>$struct</th>
-<td><a href="db_ezp_Persistence_ValueObject.html#%5Cezp%5CPersistence%5CValueObject">\ezp\Persistence\ValueObject</a></td>
+<td><a href="db_eZ_Publish_SPI_Persistence_ValueObject.html#%5CeZ%5CPublish%5CSPI%5CPersistence%5CValueObject">\eZ\Publish\SPI\Persistence\ValueObject</a></td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -636,11 +630,11 @@ handle most use cases with less code needed then using this method directly.</p>
 </div>
 <a id="\ezp\Io\Service::update()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
-          string $originalPath, <a href="db_ezp_Io_BinaryFileUpdateStruct.html#%5Cezp%5CIo%5CBinaryFileUpdateStruct">\ezp\Io\BinaryFileUpdateStruct</a> $updateFile
+          string $originalPath, \ezp\Io\BinaryFileUpdateStruct $updateFile
           )
         </span>
         :
-          <a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></code><div class="description"><p class="short_description">Updates the file identified by $path with data from $updateFile</p></div>
+          \ezp\Io\BinaryFile</code><div class="description"><p class="short_description">Updates the file identified by $path with data from $updateFile</p></div>
 <div class="code-tabs">
 <div class="long-description"></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -656,7 +650,7 @@ handle most use cases with less code needed then using this method directly.</p>
 </tr>
 <tr>
 <th>$updateFile</th>
-<td><a href="db_ezp_Io_BinaryFileUpdateStruct.html#%5Cezp%5CIo%5CBinaryFileUpdateStruct">\ezp\Io\BinaryFileUpdateStruct</a></td>
+<td>\ezp\Io\BinaryFileUpdateStruct</td>
 <td><em></em></td>
 </tr>
 </table>
@@ -666,14 +660,13 @@ handle most use cases with less code needed then using this method directly.</p>
 <th>Description</th>
 </tr></thead>
 <tr>
-<td><a href="db_ezp_Io_BinaryFile.html#%5Cezp%5CIo%5CBinaryFile">\ezp\Io\BinaryFile</a></td>
+<td>\ezp\Io\BinaryFile</td>
 <td>The update BinaryFile</td>
 </tr>
 </table>
 <strong>Details</strong><dl class="function-info">
 <dt>Uses</dt>
-<dd>
-<a href="db_ezp_Io_Handler.html#%5Cezp%5CIo%5CHandler::update()">\ezp\Io\Handler::update()</a>
+<dd>\ezp\Io\Handler::update()
          
     </dd>
 </dl>
