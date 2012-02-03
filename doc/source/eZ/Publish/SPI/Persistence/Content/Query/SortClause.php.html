@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the eZ\Publish\SPI\Persistence\Content\Query\SortClause abstract class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\SPI\Persistence\Content\Query;
+
+use ezp\Content\Query,
+    InvalidArgumentException;
+
+/**
+ * This class is the base for SortClause classes, used to set sorting of content queries
+ */
+abstract class SortClause
+{
+    /**
+     * Sort direction
+     * One of \ezp\Content\Query::SORT_ASC or \ezp\Content\Query::SORT_DESC;
+     * @var string
+     */
+    public $direction = Query::SORT_ASC;
+
+    /**
+     * Sort target, high level: section_identifier, attribute_value, etc
+     * @var string
+     */
+    public $target;
+
+    /**
+     * Extra target data, required by some sort clauses, field for instance
+     * @var SortClauseTarget
+     */
+    public $targetData;
+
+    /**
+     * Constructs a new SortClause on $sortTarget in direction $sortDirection
+     * @param string $sortTarget
+     * @param string $sortDirection one of ezp\Content\Query::SORT_ASC or ezp\Content\Query::SORT_DESC
+     * @param string $targetData Extra target data, used by some clauses (field for instance)
+     *
+     * @throws InvalidArgumentException if the given sort order isn't one of ezp\Content\Query::SORT_ASC or ezp\Content\Query::SORT_DESC
+     */
+    public function __construct( $sortTarget, $sortDirection, $targetData = null )
+    {
+        if ( $sortDirection !== Query::SORT_ASC &amp;&amp; $sortDirection !== Query::SORT_DESC )
+        {
+            throw new InvalidArgumentException( &quot;Sort direction must be one of ezp\Content\Query::SORT_ASC or ezp\Content\Query::SORT_DESC&quot; );
+        }
+
+        $this-&gt;direction = $sortDirection;
+        $this-&gt;target = $sortTarget;
+
+        if ( $targetData !== null )
+        {
+            $this-&gt;targetData = $targetData;
+        }
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

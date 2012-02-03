@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the FieldType Factory class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType;
+use ezp\Base\Configuration,
+    ezp\Base\Exception\MissingClass,
+    eZ\Publish\SPI\Persistence\Content\FieldValue;
+
+/**
+ * FieldType Factory class
+ */
+abstract class Factory
+{
+    /**
+     * Factory method for building field type object based on $identifier.
+     *
+     * @throws \ezp\Base\Exception\MissingClass
+     * @param string $fieldTypeIdentifier
+     * @return \ezp\Content\FieldType
+     */
+    public static function build( $fieldTypeIdentifier )
+    {
+        $fieldTypeNS = self::getFieldTypeNamespace( $fieldTypeIdentifier );
+
+        $fieldTypeClass = &quot;$fieldTypeNS\\Type&quot;;
+        if ( class_exists( $fieldTypeClass ) )
+        {
+            return new $fieldTypeClass;
+        }
+
+        throw new MissingClass( $fieldTypeIdentifier, &quot;FieldType&quot; );
+    }
+
+    /**
+     * Builds a field value object for a field type from a $plainValue.
+     * Field type is identified by $fieldTypeIdentifier (e.g. &quot;ezstring&quot;).
+     * Format for $plainValue is entirely up to the field type value object.
+     *
+     * @param string $fieldTypeIdentifier
+     * @param mixed $plainValue
+     * @return \ezp\Content\FieldType\Value
+     */
+    public static function buildValue( $fieldTypeIdentifier, $plainValue )
+    {
+        $fieldValueClass = self::getFieldTypeNamespace( $fieldTypeIdentifier ) . &quot;\\Value&quot;;
+        return new $fieldValueClass( $plainValue );
+    }
+
+    /**
+     * Returns field type namespace.
+     * Field type is identified by $fiedTypeIdentifier.
+     * Will throw a MissingClass exception if $fieldTypeIdentifier cannot be identified as a valid field type.
+     * &lt;code&gt;
+     * use ezp\Content\FieldType\Factory as FieldTypeFactory,
+     *     ezp\Base\Exception\MissingClass;
+     *
+     * try
+     * {
+     *     // Will return &quot;ezp\Content\FieldType\TextLine&quot;
+     *     $fieldTypeIdentifier = &quot;ezstring&quot;;
+     *     $fieldTypeNS = FieldTypeFactory::getFiedTypeNamespace( $fieldTypeIdentifier );
+     * }
+     * catch ( MissingClass $e )
+     * {
+     *     echo &quot;Oops, seems that field type '$fieldTypeIdentifier' is invalid :-/&quot;;
+     * }
+     * &lt;/code&gt;
+     *
+     * @param string $fieldTypeIdentifier Field type identifier
+     * @return string
+     * @throws \ezp\Base\Exception\MissingClass
+     */
+    public static function getFieldTypeNamespace( $fieldTypeIdentifier )
+    {
+        $fieldTypeMap = Configuration::getInstance( &quot;content&quot; )-&gt;get( &quot;fields&quot;, &quot;Type&quot; );
+        if ( !isset( $fieldTypeMap[$fieldTypeIdentifier] ) )
+            throw new MissingClass( $fieldTypeIdentifier, &quot;FieldType&quot; );
+
+        return $fieldTypeMap[$fieldTypeIdentifier];
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

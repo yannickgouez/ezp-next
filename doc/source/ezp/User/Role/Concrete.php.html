@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing Concrete Role object
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User\Role;
+use ezp\Base\Model,
+    ezp\Base\Collection\Type as TypeCollection,
+    ezp\User\Role,
+    ezp\User\Policy,
+    ezp\Persistence\User\Role as RoleValue;
+
+/**
+ * This class represents a Concrete Role item
+ *
+ * @property-read mixed $id
+ * @property string $name
+ * @property-read mixed[] $groupIds Use {@link \ezp\User\Service::addGroup} &amp; {@link \ezp\User\Service::removeGroup}
+ * @property-read \ezp\User\Policy[] $policies Use {@link \ezp\User\Service::addPolicy} &amp; {@link \ezp\User\Service::removePolicy}
+ */
+class Concrete extends Model implements Role
+{
+    /**
+     * @var array Readable of properties on this object
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'name' =&gt; true,
+        'groupIds' =&gt; false,
+    );
+
+    /**
+     * @var array Dynamic properties on this object
+     */
+    protected $dynamicProperties = array(
+        //'groups' =&gt; false,
+        'policies' =&gt; true,
+    );
+
+    /**
+     * @var \ezp\User\Policy[]
+     */
+    protected $policies;
+
+    /**
+     * Creates and setups User object
+     */
+    public function __construct()
+    {
+        $this-&gt;properties = new RoleValue();
+        $this-&gt;policies = new TypeCollection( 'ezp\\User\\Policy' );
+    }
+
+    /**
+     * Returns definition of the role object, atm: permissions
+     *
+     * @access private
+     * @return array
+     */
+    public static function definition()
+    {
+        return array(
+            'module' =&gt; 'role',
+            // @todo Add functions (with group limitations?)
+            // suggested functions can be found in service permission checks, but
+            // might only need view, edit and assign like on section
+        );
+    }
+
+    /**
+     * @return \ezp\User\Policy[]
+     */
+    public function getPolicies()
+    {
+        return $this-&gt;policies;
+    }
+
+    /**
+     * @internal Use {@link \ezp\User\Service::addPolicy()}
+     * @param Policy $policy
+     * @return void
+     */
+    public function addPolicy( Policy $policy )
+    {
+        if ( $this-&gt;policies-&gt;indexOf( $policy ) !== false )
+            return;
+
+        $this-&gt;policies[] = $policy;
+        $this-&gt;properties-&gt;policies[] = $policy-&gt;getState( 'properties' );
+    }
+
+    /**
+     * @internal Use {@link \ezp\User\Service::removePolicy()}
+     * @param Policy $policy
+     * @return void
+     */
+    public function removePolicy( Policy $policy )
+    {
+        $key = $this-&gt;policies-&gt;indexOf( $policy );
+        if ( $key === false )
+            return;
+
+        unset( $this-&gt;policies[$key] );
+        unset( $this-&gt;properties-&gt;policies[$key] );//order should be same, so reusing key
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

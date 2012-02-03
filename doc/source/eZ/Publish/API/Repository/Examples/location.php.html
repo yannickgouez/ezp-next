@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+// browsing locations in the main language
+
+use eZ\Publish\API\Repository\Values\Content\Location;
+
+/**
+ * assumed as injected
+ * @var eZ\Publish\API\Repository\Repository $repository
+ */
+$repository = null;
+
+$contentService = $repository-&gt;getContentService();
+$locationService = $repository-&gt;getLocationService();
+
+/**
+ * Get the Home location ( $homeLocation is a int )
+ */
+$location = $locationService-&gt;loadLocation( $homeLocation );
+
+// print out the computed name of the content object in the main language
+echo  $location-&gt;contentInfo-&gt;name . '\n';
+
+// get the 10 first childs in the sort settings of the home location
+$childLocations = $locationService-&gt;loadLocationChildren( $location, 0, 10 );
+
+foreach ( $childLocations as $child )
+{
+    // print a + if the child location has children
+    if ( $child-&gt;childCount &gt; 0 )
+        echo &quot;+ &quot;;
+    else
+        echo &quot;  &quot;;
+    echo  $child-&gt;contentInfo-&gt;name . '\n';
+}
+
+// browsing locations in a specific language
+$location = $locationService-&gt;loadLocation( $homeLocation );
+
+// load the published version
+$publishedVersion = $contentService-&gt;loadVersionInfo( $location-&gt;contentInfo );
+
+$otherLanguageCode = 'ger-GB';
+echo $publishedVersion-&gt;names[$otherLanguageCode];
+
+// get the 10 first childs in the sort settings of the home location
+$childLocations = $locationService-&gt;loadLocationChildren( $location, 0, 10 );
+
+foreach ( $childLocations as $child )
+{
+    // print a + if the child location has children
+    if ( $child-&gt;childCount &gt; 0 )
+        echo &quot;+ &quot;;
+    else
+        echo &quot;  &quot;;
+    $publishedChildVersion = $contentService-&gt;loadVersionInfo( $child-&gt;contentInfo );
+    echo $publishedChildVersion-&gt;names[$otherLanguageCode];
+}
+
+// create a new loaction for a content object
+
+$contentInfo = $contentService-&gt;loadContentInfo( $contentId );
+$locationCreate = $locationService-&gt;newLocationCreateStruct( $parentId );
+$locationCreate-&gt;priority = 3;
+$locationService-&gt;createLocation( $contentInfo, $locationCreate );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

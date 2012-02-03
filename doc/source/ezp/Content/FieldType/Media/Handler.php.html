@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\Media;
+use ezp\Content\FieldType\BinaryFile\Handler as BinaryFileHandler;
+
+/**
+ * Media file handler
+ */
+class Handler extends BinaryFileHandler
+{
+    const PLUGINSPAGE_FLASH = 'http://www.adobe.com/go/EN_US-H-GET-FLASH',
+          PLUGINSPAGE_QUICKTIME = 'http://quicktime.apple.com',
+          PLUGINSPAGE_REAL = 'http://www.real.com',
+          PLUGINSPAGE_SILVERLIGHT = 'http://go.microsoft.com/fwlink/?LinkID=108182',
+          PLUGINSPAGE_WINDOWSMEDIA = 'http://microsoft.com/windows/mediaplayer/en/download/';
+
+    /**
+     * Returns default plugin page depending on $mediaType
+     *
+     * @param $mediaType
+     * @return string
+     */
+    public function getPluginspageByType( $mediaType )
+    {
+        switch ( $mediaType )
+        {
+            case Type::TYPE_FLASH:
+                $pluginPage = self::PLUGINSPAGE_FLASH;
+                break;
+
+            case Type::TYPE_QUICKTIME:
+                $pluginPage = self::PLUGINSPAGE_QUICKTIME;
+                break;
+
+            case Type::TYPE_REALPLAYER:
+                $pluginPage = self::PLUGINSPAGE_REAL;
+                break;
+
+            case Type::TYPE_SILVERLIGHT:
+                $pluginPage = self::PLUGINSPAGE_SILVERLIGHT;
+                break;
+
+            case Type::TYPE_WINDOWSMEDIA:
+                $pluginPage = self::PLUGINSPAGE_WINDOWSMEDIA;
+                break;
+
+            case Type::TYPE_HTML5_VIDEO:
+            case Type::TYPE_HTML5_AUDIO:
+            default:
+                $pluginPage = '';
+        }
+
+        return $pluginPage;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

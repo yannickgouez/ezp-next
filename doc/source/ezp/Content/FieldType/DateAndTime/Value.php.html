@@ -1,0 +1,147 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the DateAndTime Value class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\DateAndTime;
+use ezp\Content\FieldType\ValueInterface,
+    ezp\Content\FieldType\Value as BaseValue,
+    ezp\Base\Exception\InvalidArgumentValue,
+    ezp\Base\Exception\InvalidArgumentType,
+    Exception,
+    DateTime;
+
+/**
+ * Value for DateAndTime field type
+ */
+class Value extends BaseValue implements ValueInterface
+{
+    /**
+     * Date content
+     *
+     * @var \DateTime
+     */
+    public $value;
+
+    /**
+     * Date format to be used by {@link __toString()}
+     *
+     * @var string
+     */
+    public $stringFormat = 'U';
+
+    /**
+     * Construct a new Value object and initialize with $dateTime
+     *
+     * @param \DateTime|string $dateTime Date/Time as a DateTime object or a string understood by the DateTime class
+     * @throws \ezp\Base\Exception\InvalidArgumentType If $dateTime does not comply to a valid dateTime or string
+     * @throws \ezp\Base\Exception\InvalidArgumentValue If $dateTime does not comply to a valid date format string
+     */
+    public function __construct( $dateTime = &quot;now&quot; )
+    {
+        if ( $dateTime !== null )
+        {
+            if ( is_string( $dateTime ) )
+            {
+                try
+                {
+                    $dateTime = new DateTime( $dateTime );
+                }
+                catch ( Exception $e )
+                {
+                    throw new InvalidArgumentValue( '$dateTime', $dateTime, __CLASS__, $e );
+                }
+            }
+
+            if ( ! $dateTime instanceof DateTime )
+                throw new InvalidArgumentType( &quot;dateTime&quot;, &quot;DateTime&quot;, $dateTime );
+
+            $this-&gt;value = $dateTime;
+        }
+    }
+
+    /**
+     * @param string $stringValue A valid date/time string.
+     *                            Valid formats are explained in {@link http://php.net/manual/en/datetime.formats.php Date and Time Formats}.
+     * @throws \ezp\Base\Exception\InvalidArgumentValue If $stringValue does not comply a valid date format
+     * @return \ezp\Content\FieldType\DateAndTime\Value
+     * @see \ezp\Content\FieldType\Value
+     */
+    public static function fromString( $stringValue )
+    {
+        try
+        {
+            return new static( new DateTime( $stringValue ) );
+        }
+        catch ( Exception $e )
+        {
+            throw new InvalidArgumentValue( '$stringValue', $stringValue, __CLASS__, $e );
+        }
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     */
+    public function __toString()
+    {
+        return $this-&gt;value-&gt;format( $this-&gt;stringFormat );
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\ValueInterface::getTitle()
+     * @todo Return format taken from locale configuration
+     */
+    public function getTitle()
+    {
+        return $this-&gt;value-&gt;format( 'D Y-d-m H:i:s' );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

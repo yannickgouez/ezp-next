@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the (content) FieldValue class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\SPI\Persistence\Content;
+use eZ\Publish\SPI\Persistence\ValueObject,
+    ezp\Content\FieldType\Value;
+
+/**
+ */
+class FieldValue extends ValueObject
+{
+    /**
+     * FieldType Value object
+     *
+     * @note: For the &quot;old&quot; storage engine we will need adaptors to map them to
+     * the existing database fields, like data_int, data_float, data_text.
+     *
+     * @var ezp\Content\FieldType\Value
+     */
+    public $data;
+
+    /**
+     * Collection of custom properties which are specific to the field type.
+     * Typically these properties are used to configure behaviour of field types
+     * and normally set in the FieldDefinition on ContentTypes.
+     *
+     * Example: List of base choices in ezselection field type
+     *
+     * Settings are indexed by field setting name.
+     *
+     * @var \ezp\Content\FieldType\FieldSettings
+     */
+    public $fieldSettings;
+
+    /**
+     * Mixed sort key
+     *
+     * @note: For the &quot;old&quot; storage engine we will need adaptors to map them to
+     * the existing database fields, like sort_key_int, sort_key_string
+     *
+     * @var mixed
+     */
+    public $sortKey;
+
+    public function __clone()
+    {
+        // Force object cloning to avoid them to point to the same object (same reference)
+        if ( isset( $this-&gt;data ) )
+            $this-&gt;data = clone $this-&gt;data;
+        if ( isset( $this-&gt;fieldSettings ) )
+            $this-&gt;fieldSettings = clone $this-&gt;fieldSettings;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Language MaskGenerator class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Language;
+
+/**
+ * Language MaskGenerator
+ */
+class MaskGenerator
+{
+    /**
+     * Language lookup
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\Lookup
+     */
+    protected $languageLookup;
+
+    /**
+     * Creates a new Language MaskGenerator
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Language\Lookup $languageLookup
+     */
+    public function __construct( Lookup $languageLookup )
+    {
+        $this-&gt;languageLookup = $languageLookup;
+    }
+
+    /**
+     * Generates a language mask from the keys of $languages
+     *
+     * @param array $languages
+     * @return int
+     */
+    public function generateLanguageMask( array $languages )
+    {
+        $mask = 0;
+        if ( isset( $languages['always-available'] ) )
+        {
+            $mask |= $languages['always-available'] ? 1 : 0;
+            unset( $languages['always-available'] );
+        }
+
+        foreach ( $languages as $language =&gt; $value )
+        {
+            $mask |= $this-&gt;languageLookup-&gt;getByLocale( $language )-&gt;id;
+        }
+
+        return $mask;
+    }
+
+    /**
+     * Generates a language indicator from $locale and $alwaysAvailable
+     *
+     * @param string $locale
+     * @param boolean $alwaysAvailable
+     * @return int
+     */
+    public function generateLanguageIndicator( $locale, $alwaysAvailable )
+    {
+        return $this-&gt;languageLookup-&gt;getByLocale( $locale )-&gt;id
+            | ( $alwaysAvailable ? 1 : 0 );
+    }
+
+    /**
+     * Checks if $language is always available in $languages;
+     *
+     * @param string $language
+     * @param array $languages
+     * @return bool
+     */
+    public function isLanguageAlwaysAvailable( $language, array $languages )
+    {
+        return ( isset( $languages['always-available'] )
+           &amp;&amp; ( $languages['always-available'] == $language )
+        );
+    }
+
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

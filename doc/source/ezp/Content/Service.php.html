@@ -1,0 +1,824 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Service class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content;
+use ezp\Base\Service as BaseService,
+    ezp\Base\Collection\LazyType,
+    ezp\Base\Exception\Forbidden,
+    ezp\Base\Exception\NotFound,
+    ezp\Base\Exception\Logic,
+    ezp\Base\Exception\InvalidArgumentType,
+    ezp\Base\Configuration,
+    ezp\Content,
+    ezp\Content\Concrete as ConcreteContent,
+    ezp\content\Proxy as ProxyContent,
+    ezp\Content\Section\Proxy as ProxySection,
+    ezp\Content\Location\Proxy as ProxyLocation,
+    ezp\Content\Type\Proxy as ProxyType,
+    ezp\Content\Type\Concrete as ConcreteType,
+    ezp\Content\Version\Proxy as ProxyVersion,
+    ezp\Content\Version\Concrete as ConcreteVersion,
+    ezp\User\Proxy as ProxyUser,
+    ezp\Content\Version\LazyCollection as LazyVersionCollection,
+    ezp\Content\Field\LazyCollection as LazyFieldCollection,
+    ezp\Content\Field\StaticCollection as StaticFieldCollection,
+    ezp\Content\Search\Result,
+    ezp\Content\Utils\NamePatternResolver,
+    ezp\Persistence\Content as ContentValue,
+    ezp\Persistence\Content\CreateStruct,
+    ezp\Persistence\Content\UpdateStruct,
+    ezp\Persistence\Content\Location\CreateStruct as LocationCreateStruct,
+    ezp\Persistence\Content\Query\Criterion\ContentId,
+    ezp\Persistence\Content\Query\Criterion\LogicalOr,
+    ezp\Persistence\Content\Query\Criterion\LogicalAnd,
+    ezp\Persistence\Content\Relation\CreateStruct as RelationCreateStruct,
+    ezp\Persistence\Content\Version as VersionValue,
+    ezp\Persistence\Content\RestrictedVersion as RestrictedVersionValue,
+    ezp\Persistence\ValueObject;
+
+/**
+ * Content service, used for Content operations
+ *
+ */
+class Service extends BaseService
+{
+    /**
+     * Creates the new $content in the content repository
+     *
+     * @param \ezp\Content $content
+     * @return \ezp\Content The newly created content
+     * @throws \ezp\Base\Exception\InvalidArgumentType If $content already has an id
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to create provided object
+     * @todo If/when we have some sort of object storage, use that to check if object is persisted instead of just id
+     */
+    public function create( Content $content )
+    {
+        if ( $content-&gt;id )
+            throw new InvalidArgumentType( '$content-&gt;id', 'false' );
+
+        $currentVersion = $content-&gt;getCurrentVersion();
+
+        $currentVersion-&gt;notify( 'pre_create', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        $struct = new CreateStruct();
+        if ( !$content-&gt;sectionId &amp;&amp; $content-&gt;getMainLocation() )
+        {
+            $struct-&gt;sectionId = $content-&gt;getMainLocation()-&gt;getParent()-&gt;getContent()-&gt;sectionId;
+        }
+
+        $this-&gt;fillStruct( $struct, $content, array( 'parentLocations', 'fields', 'name' ) );
+        // @todo : Take translations into account instead of hardcoding eng-GB :)
+        $struct-&gt;name = array(
+            'eng-GB' =&gt; $this-&gt;generateContentName( $currentVersion )
+        );
+
+        $checkCreate = true;
+        foreach ( $content-&gt;getLocations() as $location )
+        {
+            $checkCreate = false;
+            if ( !$this-&gt;repository-&gt;canUser( 'create', $content, $location-&gt;getParent() ) )
+                throw new Forbidden( 'Content', 'create' );
+
+            // @todo: Generate pathIdentificationString?
+            // @todo set sort order and fields based on settings in type
+            $struct-&gt;locations[] = $this-&gt;fillStruct(
+                new LocationCreateStruct(
+                    array(
+                        &quot;pathIdentificationString&quot; =&gt; &quot;&quot;,
+                        &quot;sortField&quot; =&gt; Location::SORT_FIELD_PUBLISHED,
+                        &quot;sortOrder&quot; =&gt; Location::SORT_ORDER_DESC,
+                    )
+                ),
+                $location,
+                array( &quot;contentId&quot;, &quot;contentVersion&quot;, &quot;mainLocationId&quot; )
+            );
+        }
+
+        // Check create permissions w/o parent if no location is provided
+        if ( $checkCreate &amp;&amp; !$this-&gt;repository-&gt;canUser( 'create', $content ) )
+            throw new Forbidden( 'Content', 'create' );
+
+        foreach ( $currentVersion-&gt;getFields() as $field )
+        {
+            $fieldVo = $field-&gt;getState( 'properties' );
+            $fieldVo-&gt;value = $field-&gt;fieldDefinition-&gt;type-&gt;toFieldValue();
+            // @todo Properly implement language here instead of hardcoding eng-GB
+            $fieldVo-&gt;language = 'eng-GB';
+            $struct-&gt;fields[] = $fieldVo;
+        }
+        $vo = $this-&gt;handler-&gt;contentHandler()-&gt;create( $struct );
+
+        $currentVersion-&gt;notify( 'post_create', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        return $this-&gt;buildDomainObject( $vo );
+    }
+
+    /**
+     * Updates $content in the content repository
+     *
+     * @param \ezp\Content $content
+     * @param \ezp\Content\Version $version
+     * @return \ezp\Content
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function update( Content $content, Version $version )
+    {
+        // @todo : Do any necessary actions to update $content in the content repository
+        // go through all locations to create or update them?
+
+        $version-&gt;notify( 'pre_create', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        $struct = new UpdateStruct();
+        $this-&gt;fillStruct( $struct, $content, array( &quot;versionNo&quot;, &quot;creatorId&quot;, &quot;fields&quot; ) );
+        $struct-&gt;creatorId = $version-&gt;creatorId;
+        $struct-&gt;versionNo = $version-&gt;versionNo;
+        // @todo : Take translations into account instead of hardcoding eng-GB :)
+        $struct-&gt;name = array(
+            'eng-GB' =&gt; $this-&gt;generateContentName( $version )
+        );
+
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $content ) )
+            throw new Forbidden( 'Content', 'edit' );
+
+        foreach ( $version-&gt;getFields() as $field )
+        {
+            $fieldStruct = $field-&gt;getState( 'properties' );
+            $fieldStruct-&gt;value = $field-&gt;fieldDefinition-&gt;type-&gt;toFieldValue();
+            $struct-&gt;fields[] = $fieldStruct;
+        }
+
+        $do = $this-&gt;buildDomainObject(
+            $this-&gt;handler-&gt;contentHandler()-&gt;update( $struct  )
+        );
+
+        $version-&gt;notify( 'post_create', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        return $do;
+    }
+
+    /**
+     * Loads a content from its id ($contentId)
+     *
+     * @param mixed $contentId
+     * @return \ezp\Content
+     * @throws \ezp\Base\Exception\NotFound if content could not be found
+     */
+    public function load( $contentId )
+    {
+        $contentVO = $this-&gt;handler-&gt;searchHandler()-&gt;findSingle( new ContentId( $contentId ) );
+        if ( !$contentVO instanceof ContentValue )
+            throw new NotFound( 'Content', $contentId );
+
+        return $this-&gt;buildDomainObject( $contentVO );
+    }
+
+    /**
+     * Loads a version from its id and versionNo
+     *
+     * @param mixed $contentId
+     * @param int|null $versionNo If null (default), then current version is returned
+     * @return \ezp\Content\Version
+     * @throws \ezp\Base\Exception\NotFound If content/version could not be found
+     */
+    public function loadVersion( $contentId, $versionNo = null )
+    {
+        if ( $versionNo === null )
+            $contentVO = $this-&gt;handler-&gt;searchHandler()-&gt;findSingle( new ContentId( $contentId ) );
+        else
+            $contentVO = $this-&gt;handler-&gt;contentHandler()-&gt;load( $contentId, $versionNo );
+
+        if ( !$contentVO instanceof ContentValue )
+            throw new NotFound( 'Content\\Version', $contentId . ' ' . $versionNo  );
+
+        $this-&gt;buildDomainObject( $contentVO, $versionDO );
+        return $versionDO;
+    }
+
+    /**
+     * Deletes a content from the repository
+     *
+     * @param \ezp\Content $content
+     * @throws \ezp\Base\Exception\NotFound if content could not be found
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to remove provided object
+     */
+    public function delete( Content $content )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'remove', $content ) )
+            throw new Forbidden( 'Content', 'remove' );
+
+        $this-&gt;handler-&gt;contentHandler()-&gt;delete( $content-&gt;id );
+    }
+
+    /**
+     * List versions of a $content
+     *
+     * @access private For use in $content-&gt;versions, hence why it returns native array
+     * @param int $contentId
+     * @return \ezp\Content\Version[]
+     */
+    public function listVersions( $contentId )
+    {
+        $list = array();
+        $contentHandler = $this-&gt;handler-&gt;contentHandler();
+        $content = $this-&gt;load( $contentId );
+
+        foreach ( $contentHandler-&gt;listVersions( $contentId ) as $versionVO )
+        {
+            $version = $this-&gt;buildVersionDomainObject( $content, $versionVO );
+            $list[$versionVO-&gt;versionNo] = $version;
+        }
+
+        return $list;
+    }
+
+    /**
+     * List fields for a content $version.
+     *
+     * @access private For use in $version-&gt;getFields() when lazy loaded, hence why it returns native array
+     * @param \ezp\Content\Version $version
+     * @return \ezp\Content\Field[]
+     * @throws \ezp\Base\Exception\NotFound If version can not be found
+     * @todo Deal with translations
+     * @todo Should take id + versionNo as input to avoid cyclic references, identity map is needed to make sure same
+     *       Version object is used
+     */
+    public function loadFields( Version $version )
+    {
+        if ( !$version-&gt;contentId )
+            throw new NotFound( 'Version-&gt;contentId', $version-&gt;contentId );
+        if ( !$version-&gt;versionNo )
+            throw new NotFound( 'Version-&gt;versionNo', $version-&gt;versionNo );
+
+        if ( $version instanceof ConcreteVersion &amp;&amp; $version-&gt;getFields() instanceof StaticFieldCollection )
+            return $version-&gt;getFields()-&gt;getArrayCopy();
+
+        $newVersion = $this-&gt;loadVersion( $version-&gt;contentId, $version-&gt;versionNo );
+        $versionVo = $newVersion-&gt;getState( 'properties' );
+
+        $version-&gt;setState( array( 'properties' =&gt; $versionVo ) );
+        $defaultFields = new StaticFieldCollection( $version );
+        $fields = array();
+        foreach ( $defaultFields as $identifier =&gt; $field )
+        {
+            foreach ( $versionVo-&gt;fields as $voField )
+            {
+                if ( $field-&gt;fieldDefinitionId == $voField-&gt;fieldDefinitionId )
+                {
+                    // @todo Attach observer to Field. See why this method isn't used in buildVersionDomainObject
+                    $fields[$identifier] = $field-&gt;setState( array( 'properties' =&gt; $voField ) );
+                    $fields[$identifier]-&gt;setValue( $voField-&gt;value-&gt;data );
+
+                    // Make the FieldType an Observer for publish events
+                    $type = $fields[$identifier]-&gt;getFieldDefinition()-&gt;getType();
+                    continue 2;
+                }
+            }
+            throw new Logic( 'field:' . $identifier, 'could not find this field in returned Version value data'  );
+        }
+        return $fields;
+    }
+
+    /**
+     * Adds an object relation between $contentFrom and $contentTo.
+     *
+     * The relation created will be of type Relation::COMMON,
+     *
+     * @param \ezp\Content $contentFrom
+     * @param \ezp\Content $contentTo
+     * @param mixed|null $versionFromNo Version number for use in relation, $contentFrom-&gt;currentVersionNo used if null
+     * @return \ezp\Content\Relation
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function addRelation( Content $contentFrom, Content $contentTo, $versionFromNo = null )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $contentFrom ) )
+            throw new Forbidden( 'Content', 'edit' );
+
+        if ( $versionFromNo === null )
+        {
+            // version is in legacy system not optional, it must be derived from the content in question if not provided
+            $versionFromNo = $contentFrom-&gt;currentVersionNo;
+        }
+
+        $relation = new Relation( Relation::COMMON, $contentTo );
+        $struct = $this-&gt;fillStruct(
+            new RelationCreateStruct(
+                array(
+                    'sourceContentId' =&gt; $contentFrom-&gt;id,
+                    'sourceContentVersionNo' =&gt; $versionFromNo
+                )
+            ),
+            $relation,
+            array(
+                'sourceFieldDefinitionId'
+            )
+        );
+        return $relation-&gt;setState(
+            array(
+                &quot;properties&quot; =&gt; $this-&gt;handler-&gt;contentHandler()-&gt;addRelation( $struct )
+            )
+        );
+    }
+
+    /**
+     * Removes content object relation represented by $relation.
+     *
+     * @param \ezp\Content\Relation $relation
+     * @return void
+     * @throws \ezp\Base\Exception\NotFound If the relation to be removed is not found.
+     * @todo Add permission checks when contentFrom object is available
+     */
+    public function removeRelation( Relation $relation )
+    {
+        $this-&gt;handler-&gt;contentHandler()-&gt;removeRelation( $relation-&gt;id );
+    }
+
+    /**
+     * Loads content relations from its id ($contentId)
+     *
+     * @todo Implement it (should be similar to listVersions())
+     *       and use it for $content-&gt;relations lazy collection
+     *       So should likewise be marked as private and take Version is argument?
+     * @param int $contentId
+     * @param int|null $version
+     */
+    public function loadRelations( $contentId, $version = null )
+    {
+        $relations = array();
+        foreach ( $this-&gt;handler-&gt;contentHandler()-&gt;loadRelations( $contentId, $version ) as $relationStruct )
+        {
+            $relation = new Relation(
+                $relationStruct-&gt;type,
+                new ProxyContent( $relationStruct-&gt;destinationContentId, $this-&gt;repository-&gt;getContentService() )
+            );
+            $relations[] = $relation-&gt;setState( array( 'properties' =&gt; $relationStruct ) );
+        }
+        return $relations;
+    }
+
+    /**
+     * Copies $content in $version and returns the new copy.
+     * If no version is provided, all versions will be copied
+     *
+     * @param \ezp\Content $content
+     * @param \ezp\Content\Version $version
+     * @return \ezp\Content
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to create provided object
+     */
+    public function copy( Content $content, Version $version = null )
+    {
+        // @todo API mistake: As parent is not provided, it will throw if user has Node/Subtree limitation
+        if ( !$this-&gt;repository-&gt;canUser( 'create', $content ) )
+            throw new Forbidden( 'Content', 'create' );
+
+        $versionNo = isset( $version ) ? $version-&gt;versionNo : false;
+        return $this-&gt;buildDomainObject( $this-&gt;handler-&gt;contentHandler()-&gt;copy( $content-&gt;id, $versionNo ) );
+    }
+
+    /**
+     * Creates a new draft version from $content in $srcVersion.
+     *
+     * Copies all fields from $content in $srcVersion and creates a new
+     * version of the referred Content from it.
+     * If $srcVersion (default value) is null, currentVersion from $content will be taken
+     *
+     * @param \ezp\Content $content
+     * @param \ezp\Content\Version $srcVersion The source version to use. currentVersion is used if not specificed
+     * @return \ezp\Content\Version
+     * @throws \ezp\Base\Exception\NotFound
+     * @todo Language support
+     * @todo User support
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function createDraftFromVersion( Content $content, Version $srcVersion = null )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $content ) )
+            throw new Forbidden( 'Content', 'edit' );
+
+        if ( !isset( $srcVersion ) )
+            $srcVersion = $content-&gt;getCurrentVersion();
+
+        $newVersionVo = $this-&gt;handler-&gt;contentHandler()-&gt;createDraftFromVersion( $content-&gt;id, $srcVersion-&gt;versionNo );
+        return $content-&gt;versions[$newVersionVo-&gt;versionNo] = $this-&gt;buildVersionDomainObject( $content, $newVersionVo );
+    }
+
+    /**
+     * Triggers a content search against $query.
+     * $query should have been built using {@link \ezp\Content\Query\Builder} interface:
+     * &lt;code&gt;
+     * $qb = new ezp\Content\Query\Builder();
+     * $qb-&gt;addCriteria(
+     *     $qb-&gt;fullText-&gt;like( 'eZ Publish' ),
+     *     $qb-&gt;urlAlias-&gt;like( '/cms/amazing/*' ),
+     *     $qb-&gt;contentTypeId-&gt;eq( 'folder' ),
+     *     $qb-&gt;field-&gt;eq( 'author', 'community@ez.no' )
+     * )-&gt;addSortClause(
+     *     $qb-&gt;sort-&gt;field( 'folder', 'name', Query::SORT_ASC ),
+     *     $qb-&gt;sort-&gt;dateCreated( Query::SORT_DESC )
+     * )-&gt;setOffset( 5 )-&gt;setLimit( 15 );
+     * $contentList = $contentService-&gt;find( $qb-&gt;getQuery() );
+     * &lt;/code&gt;
+     *
+     * @param \ezp\Content\Query $query
+     * @param bool $filterOnUserPermissions
+     * @return \ezp\Content\Result
+     * @todo Translation filter
+     */
+    public function find( Query $query, $filterOnUserPermissions = true )
+    {
+        if ( $filterOnUserPermissions &amp;&amp; !$this-&gt;addUserPermissionsTo( $query ) )
+        {
+            // User does not have read access to content at all
+            return new Result( array(), 0, $query );
+        }
+
+        // @TODO: handle $translations with $query object (not implemented yet)
+        $translations = null;
+        $result = $this-&gt;handler-&gt;searchHandler()-&gt;find(
+            $query-&gt;criterion,
+            $query-&gt;offset,
+            $query-&gt;limit,
+            $query-&gt;sortClauses,
+            $translations
+        );
+
+        $aContent = array();
+        foreach ( $result-&gt;content as $contentVo )
+        {
+            $aContent[] = $this-&gt;buildDomainObject( $contentVo );
+        }
+
+        return new Result( $aContent, $result-&gt;count, $query );
+    }
+
+    /**
+     * Triggers a content search against $query and returns only one content object
+     *
+     * @param \ezp\Content\Query $query
+     * @param bool $filterOnUserPermissions
+     * @return \ezp\Content
+     * @todo Translation filter
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to content read
+     */
+    public function findSingle( Query $query, $filterOnUserPermissions = true )
+    {
+        if ( $filterOnUserPermissions &amp;&amp; !$this-&gt;addUserPermissionsTo( $query ) )
+        {
+            // User does not have read access to content at all
+            throw new Forbidden( 'Content', 'read' );
+        }
+        // @TODO: handle $translations with $query object (not implemented yet)
+        $translations = null;
+        $contentVo = $this-&gt;handler-&gt;searchHandler()-&gt;findSingle(
+            $query-&gt;criterion,
+            $translations
+        );
+
+        return $this-&gt;buildDomainObject( $contentVo );
+    }
+
+    /**
+     * Add Permissions criteria to Query if current user has read limitations
+     *
+     * @param \ezp\Content\Query $query
+     * @throws \ezp\Base\Exception\Logic If some read limitation is missing query function
+     * @return bool False if user does not have any read permissions at all
+     */
+    protected function addUserPermissionsTo( Query $query  )
+    {
+        $definition = ConcreteContent::definition();
+        $limitationArray = $this-&gt;repository-&gt;getUser()-&gt;hasAccessTo( $definition['module'], 'read' );
+        if ( $limitationArray === false || $limitationArray === true )
+        {
+            return $limitationArray;
+        }
+
+        // Create OR conditions for every &quot;policy&quot; that contains AND conditions for limitations
+        $orCriteria = array();
+        foreach ( $limitationArray as $limitationSet )
+        {
+            $andCriteria = array();
+            foreach ( $limitationSet as $limitationKey =&gt; $limitationValues )
+            {
+                if ( !isset( $definition['functions']['read'][$limitationKey]['query'] ) )
+                {
+                    throw new Logic(
+                        &quot;\$definition[functions][read][{$limitationKey}][query]&quot;,
+                        &quot;could not find limitation query function on ezp\\Content\\Concrete::definition()&quot;
+                    );
+                }
+
+                $limitationQueryFn = $definition['functions']['read'][$limitationKey]['query'];
+                if ( !is_callable( $limitationQueryFn ) )
+                {
+                    throw new Logic(
+                        &quot;\$definition[functions][read][{$limitationKey}][query]&quot;,
+                        &quot;query function from ezp\\Content\\Concrete::definition() is not callable&quot;
+                    );
+                }
+
+                $andCriteria[] = $limitationQueryFn( $limitationValues, $this-&gt;repository );
+            }
+            $orCriteria[] = isset( $andCriteria[1] ) ? new LogicalAnd( $andCriteria ) : $andCriteria[0];
+        }
+
+        // Merge with $query-&gt;criterion
+        if ( $query-&gt;criterion instanceof LogicalAnd )
+        {
+            $query-&gt;criterion-&gt;criteria[] = isset( $orCriteria[1] ) ? new LogicalOr( $orCriteria ) : $orCriteria[0];
+        }
+        else
+        {
+            $query-&gt;criterion = new LogicalAnd(
+                array(
+                    $query-&gt;criterion,
+                    isset( $orCriteria[1] ) ? new LogicalOr( $orCriteria ) : $orCriteria[0]
+                )
+            );
+        }
+        return true;
+    }
+
+    /**
+     * Deletes $version
+     *
+     * @param \ezp\Content\Version $version
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to version-remove provided object
+     */
+    public function deleteVersion( Version $version )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'versionremove', $version-&gt;getContent() ) )
+            throw new Forbidden( 'Content', 'versionremove' );
+
+        $this-&gt;handler-&gt;contentHandler()-&gt;deleteVersion( $version-&gt;id );
+    }
+
+    /**
+     * Publishes $version
+     *
+     * @param \ezp\Content\Version $version
+     * @return \ezp\Content\Version The updated, published Version
+     * @throws \ezp\Base\Exception\Logic if $version doesn't have the DRAFT status
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function publish( Version $version )
+    {
+        // Only drafts can be published
+        if ( $version-&gt;status !== Version::STATUS_DRAFT )
+        {
+            throw new Logic( '$version-&gt;status', 'Version should be in Version::STATUS_DRAFT state' );
+        }
+
+        $content = $version-&gt;getContent();
+
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $content ) )
+            throw new Forbidden( 'Content', 'edit' );
+
+        // $this-&gt;handler-&gt;beginTransaction();
+
+        $version-&gt;notify( 'pre_publish', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        // Archive the previous version if it exists
+        if ( $version-&gt;versionNo &gt; 1 )
+        {
+            $this-&gt;handler-&gt;contentHandler()-&gt;setStatus( $version-&gt;contentId, Version::STATUS_ARCHIVED, $content-&gt;currentVersionNo );
+            $content-&gt;versions[$content-&gt;currentVersionNo]-&gt;getState( &quot;properties&quot; )-&gt;status = Version::STATUS_ARCHIVED;
+        }
+        // @todo Maybe allow this to be part of Update struct to reduce backend calls?
+        $this-&gt;handler-&gt;contentHandler()-&gt;setStatus( $version-&gt;contentId, Version::STATUS_PUBLISHED, $version-&gt;versionNo );
+        $content-&gt;versions[$version-&gt;versionNo]-&gt;getState( &quot;properties&quot; )-&gt;status = Version::STATUS_PUBLISHED;
+
+        // @todo: Update $content-&gt;currentVersionNo to $version-&gt;versionNo
+
+        $updateStruct = new UpdateStruct();
+        $updateStruct-&gt;id = $version-&gt;contentId;
+        $updateStruct-&gt;ownerId = $version-&gt;getOwnerId();
+        $updateStruct-&gt;creatorId = $version-&gt;creatorId;
+        $updateStruct-&gt;versionNo = $version-&gt;versionNo;
+
+        // @todo Make it possible to get these from the public API (set on the Content)
+        // Default should still be the current time()
+        $updateStruct-&gt;modified = $updateStruct-&gt;published = time();
+
+        // @todo : Take translations into account instead of hardcoding eng-GB :)
+        $updateStruct-&gt;name = array(
+            'eng-GB' =&gt; $this-&gt;generateContentName( $version )
+        );
+        $version-&gt;getState( &quot;properties&quot; )-&gt;name = $updateStruct-&gt;name;
+
+        $content-&gt;setState(
+            array(
+                &quot;properties&quot; =&gt; $this-&gt;handler-&gt;contentHandler()-&gt;publish( $updateStruct ),
+                &quot;currentVersion&quot; =&gt; $version,
+            )
+        );
+
+        $content-&gt;getState( &quot;properties&quot; )-&gt;currentVersionNo = $version-&gt;versionNo;
+
+        $version-&gt;notify( 'post_publish', array( 'repository' =&gt; $this-&gt;repository ) );
+
+        // $this-&gt;handler-&gt;commit();
+
+        return $version;
+    }
+
+    /**
+     * Generates content name for $content in $version
+     *
+     * @param \ezp\Content $content
+     * @param \ezp\Content\Version $version
+     * @return string
+     * @todo Implement translations
+     */
+    private function generateContentName( Version $version )
+    {
+        $nameResolver = new NamePatternResolver( $version-&gt;getContentType()-&gt;nameSchema, $version );
+        $conf = Configuration::getInstance( 'ini' );
+
+        $length = (int)$conf-&gt;get( 'ContentSettings', 'ContentObjectNameLimit', '150' );
+        if ( $length &lt; 1 || $length &gt; NamePatternResolver::CONTENT_NAME_MAX_LENGTH )
+            $length = NamePatternResolver::CONTENT_NAME_MAX_LENGTH;
+        $sequence = $conf-&gt;get( 'ContentSettings', 'ContentObjectNameLimitSequence', '...' );
+
+        return $nameResolver-&gt;resolveNamePattern( $length, $sequence );
+    }
+
+    /**
+     * Build a content Domain Object from a content Value object returned by Persistence
+     * @param \ezp\Persistence\Content $vo
+     * @param \ezp\Content\Version $version Will be set to version object during execution
+     * @return \ezp\Content
+     */
+    protected function buildDomainObject( ContentValue $vo, &amp;$version = null )
+    {
+        $content = new Concrete(
+            new ProxyType( $vo-&gt;typeId, $this-&gt;repository-&gt;getContentTypeService() ),
+            new ProxyUser( $vo-&gt;ownerId, $this-&gt;repository-&gt;getUserService() )
+        );
+
+        $content-&gt;setState(
+            array(
+                &quot;section&quot; =&gt; new ProxySection( $vo-&gt;sectionId, $this-&gt;repository-&gt;getSectionService() ),
+                &quot;properties&quot; =&gt; $vo
+            )
+        );
+
+        $version = $this-&gt;buildVersionDomainObject( $content, $vo-&gt;version );
+        if ( $vo-&gt;currentVersionNo == $vo-&gt;version-&gt;versionNo )
+        {
+             $content-&gt;setState(
+                 array(
+                     &quot;currentVersion&quot; =&gt; $version,
+                     &quot;versions&quot; =&gt; new LazyVersionCollection( $this, $vo-&gt;id, array( $version-&gt;versionNo =&gt; $version ) )
+                 )
+             );
+        }
+        else
+        {
+            $content-&gt;setState(
+                 array(
+                     &quot;currentVersion&quot; =&gt; new ProxyVersion( $content-&gt;id, $vo-&gt;currentVersionNo, $this ),
+                     &quot;versions&quot; =&gt; new LazyVersionCollection( $this, $vo-&gt;id, array( $version-&gt;versionNo =&gt; $version ) )
+                 )
+             );
+        }
+
+        $locationService = $this-&gt;repository-&gt;getLocationService();
+        $locations = $content-&gt;getLocations();
+        foreach ( $vo-&gt;locations as $locationValue )
+        {
+            $locations[] = $location = new Location\Concrete( $content );
+            $location-&gt;setState(
+                array(
+                    &quot;properties&quot; =&gt; $locationValue,
+                    &quot;parent&quot; =&gt; new ProxyLocation( $locationValue-&gt;parentId, $locationService ),
+                    &quot;children&quot; =&gt; new LazyType(
+                        &quot;ezp\\Content\\Location&quot;,
+                        $locationService,
+                        $location, // api uses location to be able to use sort info
+                        'children'
+                    )
+                )
+            );
+        }
+
+        return $content;
+    }
+
+    /**
+     * Builds a version Domain Object from its value object returned by persistence
+     *
+     * @param \ezp\Content $content
+     * @param \ezp\Persistence\Content\Version|\ezp\Persistence\Content\RestrictedVersion $versionVo
+     * @return \ezp\Content\Version
+     */
+    protected function buildVersionDomainObject( Content $content, $versionVo )
+    {
+        if ( !$versionVo instanceof VersionValue &amp;&amp; !$versionVo instanceof RestrictedVersionValue )
+            throw new InvalidArgumentType( '$versionVo', 'Version or RestrictedVersion', $versionVo );
+
+        $version = new ConcreteVersion( $content );
+
+        $version-&gt;setState( array( 'properties' =&gt; $versionVo ) );
+
+        // lazy load fields if Version does not contain fields
+        if ( $versionVo instanceof RestrictedVersionValue )
+        {
+            $version-&gt;setState( array( 'fields' =&gt; new LazyFieldCollection( $this, $version ) ) );
+            return $version;
+        }
+
+        $version-&gt;setState( array( 'fields' =&gt; new StaticFieldCollection( $version ) ) );
+        // @todo Deal with translations
+        foreach ( $version-&gt;getFields() as $identifier =&gt; $field )
+        {
+            foreach ( $versionVo-&gt;fields as $voField )
+            {
+                if ( $field-&gt;fieldDefinitionId == $voField-&gt;fieldDefinitionId )
+                {
+                    $field-&gt;setState( array( 'properties' =&gt; $voField ) );
+                    $field-&gt;setValue( $voField-&gt;value-&gt;data );
+                    continue 2;
+                }
+            }
+            throw new Logic( &quot;field:{$field-&gt;fieldDefinitionId}/&quot; . $identifier, 'could not find this field in returned Version value data'  );
+        }
+
+        return $version;
+    }
+
+    /**
+     * Defines specific conventions for filling content/update structs.
+     * This method is here mainly to provide fallbacks if a struct property cannot be set in another way (aka not implemented yet)
+     *
+     * @todo initialLanguageId should be processed via translation management, not hardcoded
+     * @see \ezp\Base\Service::setPropertyByConvention()
+     */
+    protected function setPropertyByConvention( ValueObject $struct, $property )
+    {
+        switch ( $property )
+        {
+            // Hardcoding this property for now, until we have proper translation management
+            // See #EZPNEXT-75
+            case 'initialLanguageId':
+                $struct-&gt;$property = 2;
+                break;
+
+            default:
+                return parent::setPropertyByConvention( $struct, $property );
+        }
+
+        return true;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

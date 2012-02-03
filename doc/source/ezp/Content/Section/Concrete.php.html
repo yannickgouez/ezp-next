@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Section\Concrete class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\Section;
+use ezp\Base\Model,
+    ezp\Base\Repository,
+    ezp\Base\Exception\Logic,
+    ezp\Content,
+    ezp\Content\Section,
+    ezp\Persistence\Content\Section as SectionValue;
+
+/**
+ * This class represents a Concrete Section object
+ *
+ * @property-read integer $id
+ *                The ID, automatically assigned by the persistence layer
+ * @property string $identifier
+ *                Unique identifier for the section.
+ * @property string $name
+ *                Human readable name of the section (preferably short for gui's)
+ */
+class Concrete extends Model implements Section
+{
+    /**
+     * @inherit-doc
+     * @var array
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'identifier' =&gt; true,
+        'name' =&gt; true,
+    );
+
+    /**
+     * Constructor, setups all internal objects.
+     */
+    public function __construct()
+    {
+        $this-&gt;properties = new SectionValue();
+    }
+
+    /**
+     * Returns definition of the section object, atm: permissions
+     *
+     * @access private
+     * @return array
+     */
+    public static function definition()
+    {
+        return array(
+            'module' =&gt; 'section',
+            'functions' =&gt; array(
+                'assign' =&gt; array(
+                    'Class' =&gt; array(
+                        'compare' =&gt; function( Section $newSection, array $limitationsValues, Repository $repository, Content $content )
+                        {
+                            return in_array( $content-&gt;typeId, $limitationsValues );
+                        },
+                    ),
+                    'Section' =&gt; array(
+                        'compare' =&gt; function( Section $newSection, array $limitationsValues, Repository $repository, Content $content )
+                        {
+                            return in_array( $content-&gt;sectionId, $limitationsValues );
+                        },
+                    ),
+                    'Owner' =&gt; array(
+                        'options' =&gt; function( Repository $repository )
+                        {
+                            return array( '1' =&gt; 'Self' );
+                        },
+                        'compare' =&gt; function( Section $newSection, array $limitationsValues, Repository $repository, Content $content )
+                        {
+                            if ( $limitationsValues !== array( '1' ) )
+                                throw new Logic(
+                                    'Policy module:section function:assign limitation:Owner',
+                                    'expected value: array( 0 =&gt; \'1\' ), got : ' . var_export( $limitationsValues, true )
+                                );
+                            return $content-&gt;ownerId === $repository-&gt;getUser()-&gt;id;
+                        },
+                    ),
+                    'NewSection' =&gt; array(
+                        'compare' =&gt; function( Section $newSection, array $limitationsValues )
+                        {
+                            return in_array( $newSection-&gt;id, $limitationsValues );
+                        },
+                    ),
+                    // @todo For role limitations Subtree and Node limitations needs to be here as well
+                ),
+                'edit' =&gt; array(),
+                'view' =&gt; array(),
+            ),
+        );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

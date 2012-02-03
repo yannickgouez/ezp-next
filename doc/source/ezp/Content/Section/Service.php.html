@@ -1,0 +1,214 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Section\Service class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\Section;
+use ezp\Base\Exception\NotFound,
+    ezp\Base\Exception\Logic,
+    ezp\Base\Exception\Forbidden,
+    ezp\Base\Service as BaseService,
+    ezp\Content,
+    ezp\Content\Section,
+    ezp\Persistence\ValueObject;
+
+/**
+ * Section service, used for section operations
+ */
+class Service extends BaseService
+{
+    /**
+     * Creates the a new Section in the content repository
+     *
+     * @param \ezp\Content\Section $section
+     * @return \ezp\Content\Section The newly create section
+     * @todo Should api be adjusted to take name and identifier like handler instead of object?
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function create( Section $section )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $section ) )
+            throw new Forbidden( 'Section', 'edit' );
+
+        $valueObject = $this-&gt;handler-&gt;sectionHandler()-&gt;create( $section-&gt;name, $section-&gt;identifier );
+        return $section-&gt;setState( array( 'properties' =&gt; $valueObject ) );
+    }
+
+    /**
+     * Updates $section in the content repository
+     *
+     * @param \ezp\Content\Section $section
+     * @return \ezp\Content\Section
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function update( Section $section )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $section ) )
+            throw new Forbidden( 'Section', 'edit' );
+
+        $this-&gt;handler-&gt;sectionHandler()-&gt;update( $section-&gt;id, $section-&gt;name, $section-&gt;identifier );
+        return $section;
+    }
+
+    /**
+     * Loads a Section from its id ($sectionId)
+     *
+     * @param int $sectionId
+     * @return \ezp\Content\Section|null
+     * @throws \ezp\Base\Exception\NotFound if section could not be found
+     */
+    public function load( $sectionId )
+    {
+        $valueObject = $this-&gt;handler-&gt;sectionHandler()-&gt;load( $sectionId );
+        if ( !$valueObject )
+            throw new NotFound( 'Section', $sectionId );
+
+        $section = $this-&gt;buildDomainObject( $valueObject );
+        //if ( !$this-&gt;repository-&gt;canUser( 'view', $section ) )
+            //throw new Forbidden( 'Section', 'view' );
+
+        return $section;
+    }
+
+    /**
+     * Loads a Section from its identifier ($sectionIdentifier)
+     *
+     * @param string $sectionIdentifier
+     * @return \ezp\Content\Section
+     * @throws \ezp\Base\Exception\NotFound if section could not be found
+     */
+    public function loadByIdentifier( $sectionIdentifier )
+    {
+        $valueObject = $this-&gt;handler-&gt;sectionHandler()-&gt;loadByIdentifier( $sectionIdentifier );
+        if ( !$valueObject )
+            throw new NotFound( 'Section', $sectionIdentifier );
+
+        $section = $this-&gt;buildDomainObject( $valueObject );
+        //if ( !$this-&gt;repository-&gt;canUser( 'view', $section ) )
+            //throw new Forbidden( 'Section', 'view' );
+
+        return $section;
+    }
+
+    /**
+     * Counts the contents which $section is assigned to
+     *
+     * @param mixed $sectionId
+     * @return int
+     */
+    public function countAssignedContents( $sectionId )
+    {
+        //if ( $this-&gt;repository-&gt;getUser()-&gt;hasAccessTo( 'section', 'view' ) !== true )
+            //throw new Forbidden( 'Section', 'view' );
+
+        return $this-&gt;handler-&gt;sectionHandler()-&gt;assignmentsCount( $sectionId );
+    }
+
+    /**
+     * Counts the contents which $section is assigned to
+     *
+     *
+     * @param \ezp\Content\Section $section
+     * @param Content $content
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to view provided object
+     */
+    public function assign( Section $section, Content $content )
+    {
+        if ( $section-&gt;id === $content-&gt;sectionId )
+            return;// @todo Throw exception?
+
+        if ( !$this-&gt;repository-&gt;canUser( 'assign', $section, $content ) )
+            throw new Forbidden( 'Section', 'view' );
+
+        $this-&gt;handler-&gt;sectionHandler()-&gt;assign( $section-&gt;id, $content-&gt;id );
+        $content-&gt;setSection( $section );
+    }
+
+    /**
+     * Deletes $section from content repository
+     *
+     * @param \ezp\Content\Section $section
+     * @return void
+     * @throws \ezp\Base\Exception\Logic
+     *         if section can not be deleted
+     *         because it is still assigned to some contents.
+     * @throws \ezp\Base\Exception\NotFound If the specified section is not found
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function delete( Section $section )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $section ) )
+            throw new Forbidden( 'Section', 'edit' );
+
+        if ( $this-&gt;countAssignedContents( $section-&gt;id ) &gt; 0 )
+        {
+            throw new Logic(
+                &quot;delete( {$section-&gt;id} )&quot;,
+                &quot;section can not be deleted as its assigned to content objects.&quot;
+            );
+        }
+        $this-&gt;handler-&gt;sectionHandler()-&gt;delete( $section-&gt;id );
+    }
+
+    /**
+     * Build DO based on VO
+     *
+     * @param \ezp\Persistence\ValueObject $vo
+     * @return \ezp\Content\Section
+     */
+    protected function buildDomainObject( ValueObject $vo )
+    {
+        $section = new Concrete();
+        return $section-&gt;setState( array( 'properties' =&gt; $vo ) );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

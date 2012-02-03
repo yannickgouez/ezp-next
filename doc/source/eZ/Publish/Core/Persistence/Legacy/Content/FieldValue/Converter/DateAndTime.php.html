@@ -1,0 +1,243 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the DateAndTime converter
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue,
+    eZ\Publish\SPI\Persistence\Content\FieldValue,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    ezp\Content\FieldType\DateAndTime\Type as DateAndTimeType,
+    ezp\Content\FieldType\DateAndTime\Value as DateAndTimeValue,
+    ezp\Content\FieldType\FieldSettings,
+    ezp\Base\Exception\InvalidArgumentType,
+    DateTime,
+    DateInterval,
+    DOMDocument,
+    SimpleXMLElement;
+
+class DateAndTime implements Converter
+{
+    /**
+     * Converts data from $value to $storageFieldValue
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $value
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $storageFieldValue
+     */
+    public function toStorageValue( FieldValue $value, StorageFieldValue $storageFieldValue )
+    {
+        $storageFieldValue-&gt;dataInt = 0;
+        if ( $value-&gt;data-&gt;value instanceof DateTime )
+            $storageFieldValue-&gt;dataInt = $value-&gt;data-&gt;value-&gt;getTimestamp();
+
+        $storageFieldValue-&gt;sortKeyInt = $value-&gt;sortKey['sort_key_int'];
+    }
+
+    /**
+     * Converts data from $value to $fieldValue
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $value
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $fieldValue
+     */
+    public function toFieldValue( StorageFieldValue $value, FieldValue $fieldValue )
+    {
+        $date = new DateTime;
+        $date-&gt;setTimestamp( $value-&gt;dataInt );
+
+        $fieldValue-&gt;data = new DateAndTimeValue( $date );
+        $fieldValue-&gt;sortKey = array( 'sort_key_int' =&gt; $value-&gt;sortKeyInt );
+    }
+
+    /**
+     * Converts field definition data in $fieldDef into $storageFieldDef
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     */
+    public function toStorageFieldDefinition( FieldDefinition $fieldDef, StorageFieldDefinition $storageDef )
+    {
+        $storageDef-&gt;dataInt2 = $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings['useSeconds'] ? 1 : 0;
+        $storageDef-&gt;dataInt1 = $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings['defaultType'];
+
+        if ( $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings['defaultType'] === DateAndTimeType::DEFAULT_CURRENT_DATE_ADJUSTED )
+        {
+            $storageDef-&gt;dataText5 = $this-&gt;generateDateIntervalXML(
+                $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings['dateInterval']
+            );
+        }
+    }
+
+    /**
+     * Converts field definition data in $storageDef into $fieldDef
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     */
+    public function toFieldDefinition( StorageFieldDefinition $storageDef, FieldDefinition $fieldDef )
+    {
+        $useSeconds = (bool)$storageDef-&gt;dataInt2;
+        $dateInterval = $this-&gt;getDateIntervalFromXML( $storageDef-&gt;dataText5 );
+
+        $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings = new FieldSettings(
+            array(
+                'defaultType' =&gt; $storageDef-&gt;dataInt1,
+                'useSeconds' =&gt; $useSeconds,
+                'dateInterval' =&gt; $dateInterval
+            )
+        );
+
+        // Building default value
+        switch ( $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings['defaultType'] )
+        {
+            case DateAndTimeType::DEFAULT_CURRENT_DATE:
+                $date = new DateTime;
+                break;
+
+            case DateAndTimeType::DEFAULT_CURRENT_DATE_ADJUSTED:
+                if ( !$useSeconds )
+                    $dateInterval-&gt;s = 0;
+                $date = new DateTime;
+                $date-&gt;add( $dateInterval );
+                break;
+
+            default:
+                $date = null;
+        }
+        $fieldDef-&gt;defaultValue-&gt;data = new DateAndTimeValue( $date );
+    }
+
+    /**
+     * Returns the name of the index column in the attribute table
+     *
+     * Returns the name of the index column the datatype uses, which is either
+     * &quot;sort_key_int&quot; or &quot;sort_key_string&quot;. This column is then used for
+     * filtering and sorting for this type.
+     *
+     * @return string
+     */
+    public function getIndexColumn()
+    {
+        return 'sort_key_int';
+    }
+
+    /**
+     * Generates the internal XML structure for $dateInterval, used for date adjustment
+     *
+     * @param \DateInterval $dateInterval
+     * @return string The generated XML string
+     */
+    protected function generateDateIntervalXML( DateInterval $dateInterval )
+    {
+        // Constructing XML structure
+        $doc = new DOMDocument( '1.0', 'utf-8' );
+        $root = $doc-&gt;createElement( 'adjustment' );
+
+        $year = $doc-&gt;createElement( 'year' );
+        $year-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%y' ) );
+        $root-&gt;appendChild( $year );
+        unset( $year );
+
+        $month = $doc-&gt;createElement( 'month' );
+        $month-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%m' ) );
+        $root-&gt;appendChild( $month );
+        unset( $month );
+
+        $day = $doc-&gt;createElement( 'day' );
+        $day-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%d' ) );
+        $root-&gt;appendChild( $day );
+        unset( $day );
+
+        $hour = $doc-&gt;createElement( 'hour' );
+        $hour-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%h' ) );
+        $root-&gt;appendChild( $hour );
+        unset( $hour );
+
+        $minute = $doc-&gt;createElement( 'minute' );
+        $minute-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%i' ) );
+        $root-&gt;appendChild( $minute );
+        unset( $minute );
+
+        $second = $doc-&gt;createElement( 'second' );
+        $second-&gt;setAttribute( 'value', $dateInterval-&gt;format( '%s' ) );
+        $root-&gt;appendChild( $second );
+        unset( $second );
+
+        $doc-&gt;appendChild( $root );
+        return $doc-&gt;saveXML();
+    }
+
+    /**
+     * Generates a DateInterval object from $xmlText
+     *
+     * @param string $xmlText
+     * @return \DateInterval
+     */
+    protected function getDateIntervalFromXML( $xmlText )
+    {
+        if ( empty( $xmlText ) )
+            return;
+
+        $xml = new SimpleXMLElement( $xmlText );
+        $aIntervalString = array(
+            (int)$xml-&gt;year['value'] . ' years',
+            (int)$xml-&gt;month['value'] . ' months',
+            (int)$xml-&gt;day['value'] . ' days',
+            (int)$xml-&gt;hour['value'] . ' hours',
+            (int)$xml-&gt;minute['value'] . ' minutes',
+            (int)$xml-&gt;second['value'] . ' seconds',
+        );
+
+        return DateInterval::createFromDateString( implode( ', ', $aIntervalString ) );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

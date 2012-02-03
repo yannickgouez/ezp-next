@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing Content Type interface
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content;
+use ezp\Base\ModelDefinition;
+
+/**
+ * Content Type interface
+ *
+ * @property-read mixed $id
+ * @property-read int $status
+ * @property string[] $name
+ * @property string[] $description
+ * @property string $identifier
+ * @property mixed $created
+ * @property mixed $creatorId
+ * @property mixed $modified
+ * @property mixed $modifierId
+ * @property-read string $remoteId
+ * @property string $urlAliasSchema
+ * @property string $nameSchema
+ * @property bool $isContainer
+ * @property int $initialLanguageId
+ * @property bool $defaultAlwaysAvailable
+ * @property int $sortField Valid values are found at {@link \ezp\Content\Location::SORT_FIELD_*}
+ * @property int $sortOrder Valid values are {@link \ezp\Content\Location::SORT_ORDER_*}
+ * @property-read int[] $groupIds
+ * @property Type\FieldDefinition[] $fields Appending items after it has been created has no effect, use TypeService-&gt;addFieldDefinition()
+ * @property-read Type\Group[] $groups Appended items after it has been created has no effect, use TypeService-&gt;link()
+ */
+interface Type extends ModelDefinition
+{
+    /**
+     * @return \ezp\Content\Type\FieldDefinition[]
+     */
+    public function getFields();
+
+    /**
+     * @return \ezp\Content\Type\Group[]
+     */
+    public function getGroups();
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

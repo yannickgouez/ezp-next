@@ -1,0 +1,228 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Configuration class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ * @uses ezcPhpGenerator To generate INI cache
+ */
+
+namespace eZ\Publish\Core\Base;
+use eZ\Publish\Core\Base\Exception\InvalidArgumentValue;
+
+/**
+ * Configuration manager class
+ *
+ *
+ * Setup:
+ *
+ *     // Setup global configuration that needs to be defined before loading setting files
+ *     $manager = new ConfigurationManager( include 'config.php' );
+ *
+ * Usage:
+ *
+ *     // Default value on $module is 'base', so this will parse base.ini[.append.php] files given setup above
+ *     $bool = $manager-&gt;getConfiguration('base')-&gt;get( 'ClassLoader', 'Repositories' );
+ *
+ *
+ * Usage2:
+ *
+ *     $array = $manager-&gt;getConfiguration( 'content' )-&gt;get( 'Fields', 'Type' );
+ *
+ *
+ * @uses \ezcPhpGenerator When generating cache files.
+ */
+class ConfigurationManager
+{
+    /**
+     * The global configuration path array, scoped in the order they should be parsed
+     *
+     * Usually something like:
+     * array(
+     *    'base' =&gt; array( 'settings/' ),
+     *    'modules' =&gt; array(),
+     *    'access' =&gt; array(),
+     *    'global' =&gt; array( 'settings/override/' ),
+     *  )
+     * @var array
+     */
+    protected $globalPaths;
+
+    /**
+     * The global configuration data (overrides all other configuration)
+     *
+     * @var array
+     */
+    protected $globalConfiguration = array();
+
+    /**
+     * List of instances pr settings type (array key).
+     *
+     * @var Configuration[]
+     */
+    protected $instances = array();
+
+    /**
+     * Create a instance of Configuration Manager
+     *
+     * @param array $globalConfiguration
+     */
+    public function __construct(
+        array $globalConfiguration,
+        array $globalPaths = array(
+             'base' =&gt; array( 'settings/' ),
+             'modules' =&gt; array( 'eZ/Publish/Core/settings/' ),
+             'access' =&gt; array(),
+             'global' =&gt; array( 'settings/override/' ),
+        )
+    )
+    {
+        $this-&gt;globalConfiguration = $globalConfiguration;
+        $this-&gt;globalPaths = $globalPaths;
+    }
+
+    /**
+     * Get configuration instance and load it automatically
+     *
+     * @uses load() Used the first time an instance is created
+     * @param string $moduleName The name of the module (w/o .ini suffix as we would want to support other formats in the future)
+     * @return \eZ\Publish\Core\Base\Configuration
+     */
+    public function getConfiguration( $moduleName = 'base' )
+    {
+        if ( !isset( $this-&gt;instances[ $moduleName ] ) )
+        {
+            $this-&gt;instances[ $moduleName ] = new Configuration(
+                $moduleName,
+                $this-&gt;globalPaths,
+                $this-&gt;globalConfiguration
+            );
+            $this-&gt;instances[ $moduleName ]-&gt;load();
+        }
+        return $this-&gt;instances[ $moduleName ];
+    }
+
+    /**
+     * Get global configuration data.
+     *
+     * @return array
+     */
+    public function getGlobalConfiguration()
+    {
+        return $this-&gt;globalConfiguration;
+    }
+
+    /**
+     * Get raw global override path list data.
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     * @return array
+     */
+    public function getGlobalDirs( $scope = null )
+    {
+        if ( $scope === null )
+            return $this-&gt;globalPaths;
+        if ( !isset( $this-&gt;globalPaths[$scope] ) )
+            throw new InvalidArgumentValue( 'scope', $scope, __CLASS__ );
+
+        return $this-&gt;globalPaths[$scope];
+    }
+
+    /**
+     * Set raw global override path list data.
+     *
+     * Note: Full reset of Configuration instances are done when this function is called.
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param array $paths
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     * @return bool Return true if paths actually changed, and thus instances where reset.
+     */
+    public function setGlobalDirs( array $paths, $scope = null )
+    {
+        if ( $scope === null )
+        {
+            if ( $this-&gt;globalPaths === $paths )
+                return false;
+            $this-&gt;globalPaths = $paths;
+        }
+        else if ( !isset( $this-&gt;globalPaths[$scope] ) )
+        {
+            throw new InvalidArgumentValue( 'scope', $scope, get_class( $this ) );
+        }
+        else if ( $this-&gt;globalPaths[$scope] === $paths )
+        {
+            return false;
+        }
+        else
+        {
+            $this-&gt;globalPaths[$scope] = $paths;
+        }
+
+        $this-&gt;reset();
+        return true;
+    }
+
+    /**
+     * Reset instance list, in most cases it should be enough to call reloadAll
+     *
+     * @param string|null $moduleName Optionally Reset a specific instance if string
+     */
+    public function reset( $moduleName = null )
+    {
+        if ( $moduleName === null )
+        {
+            $this-&gt;instances = array();
+        }
+        else
+            unset( $this-&gt;instances[ $moduleName ] );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

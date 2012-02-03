@@ -1,0 +1,404 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Repository class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+use eZ\Publish\SPI\Persistence\Handler as PersistenceHandler,
+    RuntimeException,
+    DomainException,
+    ezp\Base\Configuration,
+    ezp\Base\Exception\BadConfiguration,
+    ezp\Base\Exception\InvalidArgumentValue,
+    ezp\Base\Exception\Logic,
+    ezp\Base\ModelDefinition,
+    ezp\Base\ModelState,
+    ezp\Io\Handler as IoHandler,
+    ezp\User,
+    ezp\User\Proxy as ProxyUser;
+
+/**
+ * Repository class
+ *
+ */
+class Repository
+{
+    /**
+     * Repository Handler object
+     *
+     * @var \eZ\Publish\SPI\Persistence\Handler
+     */
+    protected $persistenceHandler;
+
+    /**
+     * Io Handler object
+     *
+     * @var \ezp\Io\Handler
+     */
+    protected $ioHandler;
+
+    /**
+     * Currently logged in user object for permission purposes
+     *
+     * @var \ezp\User
+     */
+    protected $user;
+
+    /**
+     * Instances of services
+     *
+     * @var Service[]
+     */
+    protected $services = array();
+
+    /**
+     * Constructor
+     *
+     * Construct repository object with provided storage engine
+     *
+     * @param \eZ\Publish\SPI\Persistence\Handler $handler
+     * @param \ezp\Io\Handler $ioHandler
+     * @param \ezp\User|null $user
+     */
+    public function __construct( PersistenceHandler $persistenceHandler, IoHandler $ioHandler, User $user = null )
+    {
+        $this-&gt;persistenceHandler = $persistenceHandler;
+        $this-&gt;ioHandler = $ioHandler;
+
+        if ( $user !== null )
+            $this-&gt;setUser( $user );
+        else
+            $this-&gt;user = new ProxyUser(
+                Configuration::getInstance( 'site' )-&gt;get( 'UserSettings', 'AnonymousUserID', 10 ),
+                $this-&gt;getUserService()
+            );
+
+    }
+
+    /**
+     * Get current user
+     *
+     * @return \ezp\User
+     */
+    function getUser()
+    {
+        return $this-&gt;user;
+    }
+
+    /**
+     * Set current user
+     *
+     * @param \ezp\User $user
+     * @throws \ezp\Base\Exception\InvalidArgumentValue If provided user does not have a valid id value
+     * @todo throw something if $user is not persisted to backend (not stored)
+     * @return \ezp\User Old user
+     */
+    function setUser( User $user )
+    {
+        if ( !$user-&gt;id )
+            throw new InvalidArgumentValue( '$user-&gt;id', $user-&gt;id );
+
+        $oldUser = $this-&gt;user;
+        $this-&gt;user = $user;
+        return $oldUser;
+    }
+
+    /**
+     * Check if current user has access to a certain function on a model
+     *
+     * @param string $function Eg: read, move, create
+     * @param \ezp\Base\ModelDefinition $model An model instance
+     * @param \ezp\Base\ModelState $assignment An additional model instance in cases like 'assign' and so on
+     * @param array $deniedBy Optional array by reference that will contain limitations that denied access for debug use
+     * @return bool
+     * @throws \ezp\Base\Exception\InvalidArgumentValue On invalid $function value
+     * @throws \ezp\Base\Exception\BadConfiguration On missing __module__ in $model::defintion()
+     * @throws \ezp\Base\Exception\Logic On limitation used in policies but not in $model::defintion()
+     */
+    public function canUser( $function, ModelDefinition $model, ModelState $assignment = null, &amp;$deniedBy = null )
+    {
+        $definition = $model-&gt;definition();
+        $className = get_class( $model );
+
+        if ( !isset( $definition['module'] ) )
+        {
+            throw new BadConfiguration( &quot;{$className}::definition()&quot;, 'missing module key with name of module' );
+        }
+        if ( !empty( $definition['functions'] ) &amp;&amp; !isset( $definition['functions'][$function] ) )
+        {
+            throw new InvalidArgumentValue( '$function', $function, $className );
+        }
+
+        $limitationArray = $this-&gt;getUser()-&gt;hasAccessTo( $definition['module'], $function );
+        if ( $limitationArray === false || $limitationArray === true )
+        {
+            return $limitationArray;
+        }
+        if ( empty( $definition['functions'][$function] ) )
+        {
+            throw new BadConfiguration(
+                &quot;{$className}::definition()&quot;,
+                &quot;function limitations returned for '{$function}', but none defined in definition()&quot;
+            );
+        }
+
+        foreach ( $limitationArray as $limitationSet )
+        {
+            $limitationSetSaysYes = true;
+            foreach ( $limitationSet as $limitationKey =&gt; $limitationValues )
+            {
+                if ( !isset( $definition['functions'][$function][$limitationKey]['compare'] ) )
+                {
+                    throw new Logic(
+                        &quot;\$definition[functions][{$function}][{$limitationKey}][compare]&quot;,
+                        &quot;could not find limitation compare function on {$className}::definition()&quot;
+                    );
+                }
+
+                $limitationCompareFn = $definition['functions'][$function][$limitationKey]['compare'];
+                if ( !is_callable( $limitationCompareFn ) )
+                {
+                    throw new Logic(
+                        &quot;\$definition[functions][{$function}][{$limitationKey}][compare]&quot;,
+                        &quot;compare function from {$className}::definition() is not callable&quot;
+                    );
+                }
+
+                if ( !$limitationCompareFn( $model, $limitationValues, $this, $assignment ) )
+                {
+                    $limitationSetSaysYes = false;
+                    // Break to next limitationSet unless $deniedBy is used
+                    if ( $deniedBy === null )
+                        break;
+                    else
+                        $deniedBy[] = array( 'limitation' =&gt; $limitationKey, 'values' =&gt; $limitationValues );
+                }
+            }
+            if ( $limitationSetSaysYes )
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handles class loading for service objects
+     *
+     * @param string $className
+     * @return Service
+     * @throws RuntimeException
+     */
+    protected function service( $className )
+    {
+        if ( isset( $this-&gt;services[$className] ) )
+            return $this-&gt;services[$className];
+
+        if ( class_exists( $className ) )
+        {
+            // @todo Use Service Container? But then it needs to be a dependency though
+            if ( strpos( $className, 'ezp\\Io\\' ) === 0 )
+                return $this-&gt;services[$className] = new $className( $this, $this-&gt;ioHandler );
+
+            return $this-&gt;services[$className] = new $className( $this, $this-&gt;persistenceHandler );
+        }
+
+        throw new RuntimeException( &quot;Could not load '$className' service!&quot; );
+    }
+
+    /**
+     * Get Content Service
+     *
+     * Get service object to perform operations on Content objects and it's aggregate members.
+     * ( ContentLocation, ContentVersion, ContentField )
+     *
+     * @return \ezp\Content\Service
+     */
+    public function getContentService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Service' );
+    }
+
+    /**
+     * Get Content Language Service
+     *
+     * Get service object to perform operations on Content language objects
+     *
+     * @return \ezp\Content\Language\Service
+     */
+    public function getContentLanguageService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Language\\Service' );
+    }
+
+    /**
+     * Get Content Type Service
+     *
+     * Get service object to perform operations on Content Type objects and it's aggregate members.
+     * ( Group, Field &amp; FieldCategory )
+     *
+     * @return \ezp\Content\Type\Service
+     */
+    public function getContentTypeService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Type\\Service' );
+    }
+
+    /**
+     * Get Content Location Service
+     *
+     * Get service object to perform operations on Location objects and subtrees
+     *
+     * @return \ezp\Content\Location\Service
+     */
+    public function getLocationService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Location\\Service' );
+    }
+
+    /**
+     * Get Content Trash service
+     *
+     * Trash service allows to perform operations related to location trash
+     * (trash/untrash, load/list from trash...)
+     *
+     * @return type \ezp\Content\Location\Trash\Service
+     */
+    public function getTrashService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Location\\Trash\\Service' );
+    }
+
+    /**
+     * Get Content Section Service
+     *
+     * Get Section service that lets you manipulate section objects
+     *
+     * @return \ezp\Content\Section\Service
+     */
+    public function getSectionService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\Section\\Service' );
+    }
+
+    /**
+     * Get Io Service
+     *
+     * Get service object to perform operations on binary files
+     *
+     * @return \ezp\Io\Service
+     */
+    public function getIoService()
+    {
+        return $this-&gt;service( 'ezp\\Io\\Service' );
+    }
+
+    /**
+     * Get User Service
+     *
+     * Get service object to perform operations on User objects and it's aggregate members.
+     * ( UserGroups, UserRole, UserRolePolicy &amp; UserRolePolicyLimitation )
+     *
+     * @return \ezp\User\Service
+     */
+    public function getUserService()
+    {
+        return $this-&gt;service( 'ezp\\User\\Service' );
+    }
+
+    /**
+     * Get internal field type service.
+     *
+     * Internal api for use by certain Field types
+     *
+     * @internal
+     * @access private
+     * @return \ezp\Content\FieldType\Service
+     */
+    public function getInternalFieldTypeService()
+    {
+        return $this-&gt;service( 'ezp\\Content\\FieldType\\Service' );
+    }
+
+    /**
+     * Begin transaction
+     *
+     * Begins an transaction, make sure you'll call commit or rollback when done,
+     * otherwise work will be lost.
+     */
+    public function beginTransaction()
+    {
+        $this-&gt;persistenceHandler-&gt;beginTransaction();
+    }
+
+    /**
+     * Commit transaction
+     *
+     * Commit transaction, or throw exceptions if no transactions has been started.
+     *
+     * @throws RuntimeException If no transaction has been started
+     */
+    public function commit()
+    {
+        $this-&gt;persistenceHandler-&gt;commit();
+    }
+
+    /**
+     * Rollback transaction
+     *
+     * Rollback transaction, or throw exceptions if no transactions has been started.
+     *
+     * @throws RuntimeException If no transaction has been started
+     */
+    public function rollback()
+    {
+        $this-&gt;persistenceHandler-&gt;rollback();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

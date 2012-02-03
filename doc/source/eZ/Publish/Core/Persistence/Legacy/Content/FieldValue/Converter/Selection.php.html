@@ -1,0 +1,178 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Selection converter
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\FieldValue,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    ezp\Content\FieldType\FieldSettings,
+    ezp\Content\FieldType\Selection\Value as SelectionValue,
+    DOMDocument;
+
+class Selection implements Converter
+{
+    /**
+     * Converts data from $value to $storageFieldValue
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $value
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $storageFieldValue
+     */
+    public function toStorageValue( FieldValue $value, StorageFieldValue $storageFieldValue )
+    {
+        $optionsFlip = array_flip( $value-&gt;fieldSettings[&quot;options&quot;] );
+        $options = array();
+        foreach ( $value-&gt;data-&gt;selection as $value )
+        {
+            if ( isset( $optionsFlip[$value] ) )
+            {
+                $options[] = $optionsFlip[$value];
+            }
+        }
+        $storageFieldValue-&gt;sortKeyString = $storageFieldValue-&gt;dataText = join( &quot;-&quot;, $options );
+    }
+
+    /**
+     * Converts data from $value to $fieldValue
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $value
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $fieldValue
+     */
+    public function toFieldValue( StorageFieldValue $value, FieldValue $fieldValue )
+    {
+        $fieldValue-&gt;data = new SelectionValue(
+            array_values(
+                array_intersect_key(
+                    $fieldValue-&gt;fieldSettings[&quot;options&quot;],
+                    $value-&gt;dataText !== &quot;&quot;
+                        ? array_flip( explode( &quot;-&quot;, $value-&gt;dataText ) )
+                        : array()
+                )
+            )
+        );
+    }
+
+    /**
+     * Converts field definition data in $fieldDef into $storageFieldDef
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     */
+    public function toStorageFieldDefinition( FieldDefinition $fieldDef, StorageFieldDefinition $storageDef )
+    {
+        $fieldSettings = $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings;
+
+        if ( isset( $fieldSettings[&quot;isMultiple&quot;] ) )
+            $storageDef-&gt;dataInt1 = (int)$fieldSettings[&quot;isMultiple&quot;];
+
+        if ( !empty( $fieldSettings[&quot;options&quot;] ) )
+        {
+            $xml = new DOMDocument( &quot;1.0&quot;, &quot;utf-8&quot; );
+            $xml-&gt;appendChild(
+                $selection = $xml-&gt;createElement( &quot;ezselection&quot; )
+            );
+            $selection-&gt;appendChild(
+                $options = $xml-&gt;createElement( &quot;options&quot; )
+            );
+            foreach ( $fieldSettings[&quot;options&quot;] as $id =&gt; $name )
+            {
+                $options-&gt;appendChild(
+                    $option = $xml-&gt;createElement( &quot;option&quot; )
+                );
+                $option-&gt;setAttribute( &quot;id&quot;, $id );
+                $option-&gt;setAttribute( &quot;name&quot;, $name );
+            }
+            $storageDef-&gt;dataText5 = $xml-&gt;saveXML();
+        }
+    }
+
+    /**
+     * Converts field definition data in $storageDef into $fieldDef
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     */
+    public function toFieldDefinition( StorageFieldDefinition $storageDef, FieldDefinition $fieldDef )
+    {
+        $options = array();
+
+        foreach ( simplexml_load_string( $storageDef-&gt;dataText5 )-&gt;options-&gt;option as $option )
+        {
+            $options[(int)$option[&quot;id&quot;]] = (string)$option[&quot;name&quot;];
+        }
+
+        $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings = new FieldSettings(
+            array(
+                &quot;isMultiple&quot; =&gt; !empty( $storageDef-&gt;dataInt1 ) ? (bool)$storageDef-&gt;dataInt1 : false,
+                &quot;options&quot; =&gt; $options,
+            )
+        );
+    }
+
+    /**
+     * Returns the name of the index column in the attribute table
+     *
+     * Returns the name of the index column the datatype uses, which is either
+     * &quot;sort_key_int&quot; or &quot;sort_key_string&quot;. This column is then used for
+     * filtering and sorting for this type.
+     *
+     * @return string
+     */
+    public function getIndexColumn()
+    {
+        return &quot;sort_key_string&quot;;
+    }
+
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

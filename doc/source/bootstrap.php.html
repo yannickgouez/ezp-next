@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the bootstrapping of eZ Publish Next
+ *
+ * Returns instance of Service Container setup with configuration service and setups autoloader.
+ *
+ * @copyright Copyright (C) 1999-2011 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+
+use eZ\Publish\Core\Base\ClassLoader,
+    eZ\Publish\Core\Base\ConfigurationManager,
+    eZ\Publish\Core\Base\ServiceContainer;
+
+// Setup autoloaders
+if ( !( $settings = include( __DIR__ . '/config.php' ) ) )
+{
+    die( 'Could not find config.php, please copy config.php-DEVELOPMENT to config.php customize to your needs!' );
+}
+
+require __DIR__ . '/eZ/Publish/Core/Base/ClassLoader.php';
+$loader = new ClassLoader( $settings['base']['ClassLoader']['Repositories'], ClassLoader::MODE_PSR_0_STRICT );
+spl_autoload_register( array( $loader, 'load' ) );
+
+// Zeta Components
+require $settings['base']['ClassLoader']['ezcBase'];
+spl_autoload_register( array( 'ezcBase', 'autoload' ) );
+
+
+$configManager = new ConfigurationManager(
+    $settings,
+    $settings['base']['Configuration']['Paths']
+);
+
+// Access matching before we get active modules or opposite?
+// anyway access matching should use event filters hence be optional.
+
+// Setup configuration for modules
+/*$paths = array();
+foreach ( $settings['base']['ClassLoader']['Repositories'] as $ns =&gt; $nsPath )
+{
+    foreach ( glob( &quot;{$nsPath}/*&quot;, GLOB_ONLYDIR ) as $path )//@todo Take from configuration
+    {
+        $paths[] = &quot;{$path}/settings/&quot;;
+    }
+}
+
+$configManager-&gt;setGlobalDirs( $paths, 'modules' );*/
+
+$sc = new ServiceContainer(
+    $configManager-&gt;getConfiguration('service')-&gt;getAll(),
+    array(
+        '@classLoader' =&gt; $loader,
+        '@configuration' =&gt; $configManager,
+    )
+);
+
+return $sc;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

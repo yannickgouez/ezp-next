@@ -1,0 +1,332 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Media class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\SPI\Persistence\Fields\Storage,
+    eZ\Publish\SPI\Persistence\Content\Field,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    ezp\Content\FieldType\Media\Value as MediaValue,
+    ezp\Io\ContentType;
+
+/**
+ * Converter for Media field type external storage
+ */
+class MediaStorage implements Storage
+{
+    const MEDIA_TABLE = 'ezmedia';
+
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Fields\Storage
+     */
+    public function storeFieldData( Field $field, array $context )
+    {
+        $dbHandler = $context['connection'];
+        if ( $this-&gt;mediaExists( $field-&gt;id, $field-&gt;versionNo, $dbHandler ) )
+            $this-&gt;update( $field, $dbHandler );
+        else
+            $this-&gt;insert( $field, $dbHandler );
+    }
+
+    /**
+     * Populates $field value property based on the external data.
+     * $field-&gt;value is a {@link eZ\Publish\SPI\Persistence\Content\FieldValue} object.
+     * This value holds the data as a {@link ezp\Content\FieldType\Value} based object,
+     * according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     * @return void
+     */
+    public function getFieldData( Field $field, array $context )
+    {
+        $media = $this-&gt;fetch( $field-&gt;id, $field-&gt;versionNo, $context['connection'] );
+        list( $type, $subType ) = explode( '/', $media['mime_type'] );
+
+        $mediaValue = new MediaValue;
+        $mediaValue-&gt;file = $mediaValue-&gt;getHandler()-&gt;loadFileFromContentType(
+            $media['filename'],
+            new ContentType( $type, $subType )
+        );
+        $mediaValue-&gt;file-&gt;originalFile = $mediaValue-&gt;originalFilename = $media['original_filename'];
+        $mediaValue-&gt;controls = (bool)$media['controls'];
+        $mediaValue-&gt;hasController = (bool)$media['has_controller'];
+        $mediaValue-&gt;width = $media['width'];
+        $mediaValue-&gt;height = $media['height'];
+        $mediaValue-&gt;isAutoplay = (bool)$media['is_autoplay'];
+        $mediaValue-&gt;isLoop = (bool)$media['is_loop'];
+        $mediaValue-&gt;pluginspage = $media['pluginspage'];
+        $mediaValue-&gt;quality = $media['quality'];
+
+        $field-&gt;value-&gt;data = $mediaValue;
+    }
+
+    /**
+     * @param array $fieldId
+     * @param array $context
+     * @return bool
+     */
+    public function deleteFieldData( array $fieldId, array $context )
+    {
+
+    }
+
+    /**
+     * Checks if field type has external data to deal with
+     *
+     * @return bool
+     */
+    public function hasFieldData()
+    {
+        return true;
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function copyFieldData( Field $field, array $context )
+    {
+
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function getIndexData( Field $field, array $context )
+    {
+
+    }
+
+    /**
+     * Fetches a row in ezmedia table referenced by $fieldId and $versionNo
+     *
+     * @param $fieldId
+     * @param $versionNo
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return void|array Hash with columns as keys or void if no entry can be found
+     */
+    private function fetch( $fieldId, $versionNo, EzcDbHandler $dbHandler )
+    {
+        $q = $dbHandler-&gt;createSelectQuery();
+        $e = $q-&gt;expr;
+        $q
+            -&gt;select( '*' )
+            -&gt;from( $dbHandler-&gt;quoteTable( self::MEDIA_TABLE ) )
+            -&gt;where(
+                $e-&gt;eq( 'contentobject_attribute_id', $q-&gt;bindValue( $fieldId, null, \PDO::PARAM_INT ) ),
+                $e-&gt;eq( 'version', $q-&gt;bindValue( $versionNo, null, \PDO::PARAM_INT ) )
+            );
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+        $rows = $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+        if ( !empty( $rows ) )
+        {
+            return $rows[0];
+        }
+    }
+
+    /**
+     * Inserts a new entry in ezmedia table with $field value data
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return void
+     */
+    private function insert( Field $field, EzcDbHandler $dbHandler )
+    {
+        $data = $field-&gt;value-&gt;data;
+        $q = $dbHandler-&gt;createInsertQuery();
+
+        $q-&gt;insertInto(
+            $dbHandler-&gt;quoteTable( self::MEDIA_TABLE )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'contentobject_attribute_id' ),
+            $q-&gt;bindValue( $field-&gt;id, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'version' ),
+            $q-&gt;bindValue( $field-&gt;versionNo, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'filename' ),
+            $q-&gt;bindValue( basename( $data-&gt;file-&gt;path ) )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'mime_type' ),
+            $q-&gt;bindValue( (string)$data-&gt;file-&gt;contentType )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'original_filename' ),
+            $q-&gt;bindValue( $data-&gt;originalFilename )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'width' ),
+            $q-&gt;bindValue( $data-&gt;width, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'height' ),
+            $q-&gt;bindValue( $data-&gt;height, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'has_controller' ),
+            $q-&gt;bindValue( (int)$data-&gt;hasController, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'controls' ),
+            $q-&gt;bindValue( (int)$data-&gt;controls, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'is_autoplay' ),
+            $q-&gt;bindValue( $data-&gt;isAutoplay, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'pluginspage' ),
+            $q-&gt;bindValue( $data-&gt;pluginspage )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'quality' ),
+            $q-&gt;bindValue( $data-&gt;quality, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'is_loop' ),
+            $q-&gt;bindValue( (int)$data-&gt;isLoop, null, \PDO::PARAM_INT )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Updates an existing entry in ezmedia table with $field value data
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return void
+     */
+    private function update( Field $field, EzcDbHandler $dbHandler )
+    {
+        $data = $field-&gt;value-&gt;data;
+        $q = $dbHandler-&gt;createUpdateQuery();
+
+        $q-&gt;update(
+            $dbHandler-&gt;quoteTable( self::MEDIA_TABLE )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'filename' ),
+            $q-&gt;bindValue( basename( $data-&gt;file-&gt;path ) )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'mime_type' ),
+            $q-&gt;bindValue( (string)$data-&gt;file-&gt;contentType )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'original_filename' ),
+            $q-&gt;bindValue( $data-&gt;originalFilename )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'width' ),
+            $q-&gt;bindValue( $data-&gt;width, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'height' ),
+            $q-&gt;bindValue( $data-&gt;height, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'has_controller' ),
+            $q-&gt;bindValue( (int)$data-&gt;hasController, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'controls' ),
+            $q-&gt;bindValue( (int)$data-&gt;controls, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'is_autoplay' ),
+            $q-&gt;bindValue( $data-&gt;isAutoplay, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'pluginspage' ),
+            $q-&gt;bindValue( $data-&gt;pluginspage )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'quality' ),
+            $q-&gt;bindValue( $data-&gt;quality, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( 'is_loop' ),
+            $q-&gt;bindValue( (int)$data-&gt;isLoop, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $q-&gt;expr-&gt;eq( $dbHandler-&gt;quoteColumn( 'ezcontentobject_attribute_id' ), $field-&gt;id ),
+            $q-&gt;expr-&gt;eq( $dbHandler-&gt;quoteColumn( 'version' ), $field-&gt;versionNo )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Checks if an entry exists in ezmedia table with $fieldId and $version as keys
+     *
+     * @param type $fieldId
+     * @param type $version
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return bool
+     */
+    private function mediaExists( $fieldId, $version, EzcDbHandler $dbHandler )
+    {
+        $q = $dbHandler-&gt;createSelectQuery();
+        $e = $q-&gt;expr;
+        $q-&gt;select(
+            $q-&gt;alias( $e-&gt;count( '*' ), 'count' )
+        )-&gt;from(
+            $dbHandler-&gt;quoteTable( self::MEDIA_TABLE )
+        )-&gt;where(
+            $e-&gt;eq(
+                $dbHandler-&gt;quoteColumn( 'ezcontentobject_attribute_id' ),
+                $fieldId
+            ),
+            $e-&gt;eq(
+                $dbHandler-&gt;quoteColumn( 'version' ),
+                $version
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+        $rows = $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+        if ( !empty( $rows ) || $rows[0]['count'] &gt; 0 )
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

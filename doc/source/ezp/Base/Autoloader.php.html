@@ -1,0 +1,350 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Autoloader definition for eZ Publish
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+use ezcPhpGenerator,
+    eZAutoloadGenerator;
+
+/**
+ * Provides the native autoload functionality for eZ Publish
+ *
+ * Use:
+ * require 'ezp/Base/Autoloader.php'
+ * spl_autoload_register( array( new ezp\Base\Autoloader(), 'load' ) );
+ *
+ * @uses ezcPhpGenerator To generate cache files.
+ */
+class Autoloader
+{
+    /**
+     * @var array|null
+     */
+    protected $classes;
+
+    /**
+     * @var array
+     */
+    protected $settings;
+
+    /**
+     * @var string
+     */
+    const CACHE_FILE = 'var/cache/autoload.php';
+
+    /**
+     * Construct a autoload instance
+     *
+     * @param array $settings Misc autoload settings
+     * @param array|null $ezpClasses Optional classes to autoload by hash lookup, for testing
+     */
+    public function __construct( array $settings, array $ezpClasses = null )
+    {
+        $this-&gt;classes = $ezpClasses;
+        $this-&gt;settings = $settings + array(
+            'ezc-path' =&gt; 'ezc/',
+            'ezc-src-path' =&gt; '/',
+            'ezc-loaded' =&gt; false,
+            'ezc-prefixes' =&gt; array( 'base', 'persistent', 'configuration', 'php_generator' ),
+            'repositories' =&gt; array( 'ezp' =&gt; 'ezp', 'ezx' =&gt; 'ezx' ),
+            'development-mode' =&gt; false,
+            'allow-kernel-override' =&gt; false,
+        );
+    }
+
+    /**
+     * Autoload eZ Publish, extension classes and lazy load ezcBase autoloader if needed
+     *
+     * @param  $className
+     * @return bool|mixed
+     */
+    public function load( $className )
+    {
+        $className = ltrim( $className, '\\' );
+
+        // Load class list array from cache or generate + save if it is not loaded
+        if ( $this-&gt;classes === null )
+        {
+            if ( !$this-&gt;settings['development-mode'] &amp;&amp; file_exists( self::CACHE_FILE ) )
+            {
+                $this-&gt;classes = include self::CACHE_FILE;
+            }
+            else
+            {
+                $this-&gt;classes = $this-&gt;generateClassesList();
+                if ( !$this-&gt;settings['development-mode'] )
+                    $this-&gt;saveClassesListCache( $this-&gt;classes );
+            }
+        }
+
+        // Load class by autoload array
+        if ( isset( $this-&gt;classes[$className] ) )
+        {
+            require $this-&gt;classes[$className];
+            return true;
+        }
+
+        // Lazy load ezcBase if a ezc class is requested
+        if ( !$this-&gt;settings['ezc-loaded'] &amp;&amp; strncmp( $className, 'ezc', 3 ) === 0 )
+        {
+            $this-&gt;registerEzc();
+            return $className === 'ezcBase';
+        }
+
+        // PSR-0 like autoloading of repositories namespaces if defined
+        if ( empty( $this-&gt;settings['repositories'] ) )
+            return;
+
+        foreach ( $this-&gt;settings['repositories'] as $namespace =&gt; $subPath )
+        {
+            if ( strpos( $className, $namespace . '\\' ) !== 0 )
+                continue;
+
+            $classNamePos = strripos( $className, '\\' );
+            $classPath = &quot;$subPath/&quot; .
+                // Replacing '\' to '/' in namespace part
+                substr( strtr( substr( $className, 0, $classNamePos ), '\\', '/' ), strlen( $namespace ) +1 ) .
+                // Appending class name + .php which corresponds to the filename
+                '/' . str_replace( '_', '/', substr( $className, $classNamePos + 1 ) ) . '.php';
+            if ( !file_exists( $classPath ) )
+            {
+                return false;
+            }
+
+            require $classPath;
+            return true;
+        }
+    }
+
+    /**
+     * Merges all autoload files and return result
+     *
+     * @return array
+     */
+    public function generateClassesList()
+    {
+        $ezpClasses = array();
+        $ezpTestClasses = array();
+        $ezpExtensionClasses = array();
+        $ezpKernelOverrideClasses = array();
+
+        // Load eZ Publish autoload files
+        // @todo Temporary, should be forced as the file should be there
+        if ( file_exists( 'autoload/ezp_kernel.php' ) )
+        {
+            $ezpClasses = require 'autoload/ezp_kernel.php';
+        }
+
+        if ( file_exists( 'var/autoload/ezp_extension.php' ) )
+        {
+            $ezpExtensionClasses = require 'var/autoload/ezp_extension.php';
+        }
+
+        if ( file_exists( 'var/autoload/ezp_tests.php' ) )
+        {
+            $ezpTestClasses = require 'var/autoload/ezp_tests.php';
+        }
+
+        if ( $this-&gt;settings['allow-kernel-override'] &amp;&amp; file_exists( 'var/autoload/ezp_override.php' ) )
+        {
+            $ezpKernelOverrideClasses = require 'var/autoload/ezp_override.php';
+        }
+
+        $ezpClasses = $ezpKernelOverrideClasses + $ezpTestClasses + $ezpExtensionClasses + $ezpClasses;
+
+        // Load eZ Component autoload files that are used often
+        foreach ( $this-&gt;settings['ezc-prefixes'] as $prefix )
+        {
+            $tempOverrideClasses = include &quot;{$this-&gt;settings['ezc-path']}autoload/{$prefix}_autoload.php&quot;;
+            if ( $tempOverrideClasses )
+            {
+                $ezpClasses = $this-&gt;expandEzcClassList( $tempOverrideClasses ) + $ezpClasses;
+            }
+        }
+
+        // Load API module autoload files
+        foreach ( $this-&gt;settings['repositories'] as $subPath )
+        {
+            // @todo: Use configuration so class list only include activated extensions.
+            // But then this loading will have to happen after configuration and siteaccess is loaded!
+            foreach ( glob( &quot;$subPath/*&quot;, GLOB_ONLYDIR ) as $path )
+            {
+                if ( !file_exists( &quot;$path/autoload.php&quot; ) )
+                    continue;
+
+                foreach ( include &quot;$path/autoload.php&quot; as $class =&gt; $relativePath )
+                {
+                    $ezpClasses[$class] = &quot;$path/&quot; . $relativePath;
+                }
+            }
+        }
+        return $ezpClasses;
+    }
+
+    /**
+     * Expand an array of ezc class paths using $settings
+     *
+     * @param array $classes
+     * @return array
+     */
+    protected function expandEzcClassList( array $classes )
+    {
+        foreach ( $classes as $class =&gt; $path )
+        {
+            list( $first, $second ) = explode( '/', $path, 2 );
+            $classes[$class] = $this-&gt;settings['ezc-path'] . $first . $this-&gt;settings['ezc-src-path'] . $second;
+        }
+        return $classes;
+    }
+
+    /**
+     * Save autoload cache file for override classes.
+     *
+     * @param array $classes
+     * @return bool
+     */
+    protected function saveClassesListCache( $classes )
+    {
+        try
+        {
+            $generator = new ezcPhpGenerator( self::CACHE_FILE );
+            $generator-&gt;appendComment( &quot;This is auto generated hash of autoload override classes!&quot; );
+            $generator-&gt;appendValueAssignment( 'classes', $classes );
+            $generator-&gt;appendCustomCode( 'return $classes;' );
+            $generator-&gt;finish();
+        }
+        catch ( Exception $e )
+        {
+            // constructor     : ezcBaseFileNotFoundException or ezcBaseFilePermissionException
+            // all other calls : ezcPhpGeneratorException
+            trigger_error(
+                'Exception: ' . $e-&gt;getMessage() . ' in ' . $e-&gt;getFile() . ' on line ' . $e-&gt;getLine(),
+                E_USER_WARNING
+            );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Register ezcBase autoloader based on optional constants defined in config.php
+     */
+    protected function registerEzc()
+    {
+        $this-&gt;settings['ezc-loaded'] = true;
+        if ( class_exists( 'ezcBase', false ) )
+        {
+            if ( !in_array( array( 'ezcBase', 'autoload' ), spl_autoload_functions(), true ) )
+                spl_autoload_register( array( 'ezcBase', 'autoload' ) );
+            return true;
+        }
+
+        require $this-&gt;settings['ezc-path'] . 'Base' . $this-&gt;settings['ezc-src-path'] . 'base.php';
+        spl_autoload_register( array( 'ezcBase', 'autoload' ) );
+        return true;
+    }
+
+    /**
+     * Delete autoload cache file for override classes.
+     *
+     * @return bool
+     */
+    public static function deleteClassesCache()
+    {
+        if ( file_exists( self::CACHE_FILE ) )
+        {
+            return unlink( self::CACHE_FILE );
+        }
+        return false;
+    }
+
+    /**
+     * Resets the local, in-memory autoload cache.
+     *
+     * If the autoload arrays are extended during a requests lifetime, this
+     * method must be called, to make them available.
+     *
+     * @param bool $clearFileCache Also clear on disk autoload file cache.
+     * @return void
+     */
+    public function reset( $clearFileCache = true )
+    {
+        $this-&gt;classes = null;
+        if ( $clearFileCache )
+        {
+            self::deleteClassesCache();
+        }
+    }
+
+    /**
+     * Shortcut to regenerate autoload files, also takes care of refreshing autoload cache
+     */
+    public function updateExtensionAutoloadArray()
+    {
+        $autoloadGenerator = new eZAutoloadGenerator();
+        try
+        {
+            $autoloadGenerator-&gt;buildAutoloadArrays();
+            $this-&gt;reset();
+        }
+        catch ( Exception $e )
+        {
+            trigger_error(
+                'Exception: ' . $e-&gt;getMessage() . ' in ' . $e-&gt;getFile() . ' on line ' . $e-&gt;getLine(),
+                E_USER_WARNING
+            );
+        }
+    }
+}
+
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

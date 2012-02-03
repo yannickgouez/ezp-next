@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ContentType class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Io;
+
+use finfo,
+    ezp\Base\Exception\NotFound;
+
+/**
+ * This struct describes a file content type, as described in RFC 2045, RFC 2046,
+ * RFC 2047, RFC 4288, RFC 4289 and RFC 2049.
+ */
+class ContentType
+{
+    /**
+     * The type (audio, video, text, image)
+     * @var string
+     */
+    public $type;
+
+    /**
+     * The subtype (mp3, mp4, plain, jpeg, ...)
+     * @var string
+     */
+    public $subType;
+
+    public function __construct( $type, $subType )
+    {
+        $this-&gt;type = $type;
+        $this-&gt;subType = $subType;
+    }
+
+    /**
+     * Returns the ContentType's string representation: type/subtype
+     */
+    public function __toString()
+    {
+        return &quot;$this-&gt;type/$this-&gt;subType&quot;;
+    }
+
+    /**
+     * Returns a ContentType object from a file path, using fileinfo
+     * @param string $path
+     * @return ContentType
+     * @todo Remove hardcoded dependency on fileinfo, use injection
+     */
+    public static function getFromPath( $path )
+    {
+        if ( file_exists( $path ) )
+        {
+            $finfo = new finfo( FILEINFO_MIME_TYPE );
+            $mime = $finfo-&gt;file( $path );
+            $mimeParts = explode( '/', $mime );
+            return new self( $mimeParts[0], $mimeParts[1] );
+        }
+
+        throw new NotFound( 'File', $path );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,655 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File contains User Service
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User;
+use ezp\Base\Configuration,
+    ezp\Base\Service as BaseService,
+    ezp\Base\Collection\Lazy,
+    ezp\Base\Collection\LazyType,
+    ezp\Base\Collection\Type as TypeCollection,
+    ezp\Base\Exception\BadConfiguration,
+    ezp\Base\Exception\Forbidden,
+    ezp\Base\Exception\InvalidArgumentType,
+    ezp\Base\Exception\NotFound,
+    ezp\Base\Exception\NotFoundWithType,
+    ezp\Base\Exception\PropertyNotFound,
+    ezp\Base\Exception\Logic,
+    ezp\Content,
+    ezp\Content\Location,
+    ezp\Content\Proxy as ProxyContent,
+    ezp\User,
+    ezp\User\Concrete as ConcreteUser,
+    ezp\User\Exception\FailedLogin,
+    ezp\User\Proxy as ProxyUser,
+    ezp\User\Group\Concrete as ConcreteGroup,
+    ezp\User\Group\Proxy as ProxyGroup,
+    ezp\User\Role\Concrete as ConcreteRole,
+    ezp\User\Role\Proxy as ProxyRole,
+    ezp\Persistence\User as UserValueObject,
+    ezp\Persistence\User\Role as RoleValueObject,
+    ezp\Persistence\User\RoleUpdateStruct,
+    ezp\Persistence\User\Policy as PolicyValueObject;
+
+/**
+ * User Service, extends repository with user specific operations
+ *
+ */
+class Service extends BaseService
+{
+    /**
+     * Crate a User object
+     *
+     * @param \ezp\User $user
+     * @return \ezp\User
+     * @throws \ezp\Base\Exception\PropertyNotFound If property is missing or has a value of null
+     * @throws \ezp\Base\Exception\NotFound If attached content object with same id does not exist
+     */
+    public function create( User $user )
+    {
+        $struct = new UserValueObject();
+        $this-&gt;fillStruct( $struct, $user );
+
+        return $this-&gt;buildUser(
+            $this-&gt;handler-&gt;userHandler()-&gt;create( $struct ),
+            // before create() to validate -&gt;id
+            $this-&gt;repository-&gt;getContentService()-&gt;load( $user-&gt;id )
+        );
+    }
+
+    /**
+     * Load a User object by id
+     *
+     * @param mixed $id
+     * @return \ezp\User
+     * @throws \ezp\Base\Exception\NotFound If user is not found
+     */
+    public function load( $id )
+    {
+        return $this-&gt;buildUser(
+            $this-&gt;handler-&gt;userHandler()-&gt;load( $id ),
+            new ProxyContent( $id, $this-&gt;repository-&gt;getContentService() )
+        );
+    }
+
+    /**
+     * Load a User object by login and password if user is enabled
+     *
+     * @param string $login
+     * @param string $password
+     * @return \ezp\User
+     * @throws \ezp\Base\Exception\NotFound If user is not found
+     * @throws \ezp\User\Exception\FailedLogin If password does not match
+     */
+    public function loadByCredentials( $login, $password )
+    {
+        $match = Configuration::getInstance( 'site' )-&gt;get( 'UserSettings', 'AuthenticateMatch', 'login' );
+        $users = $this-&gt;handler-&gt;userHandler()-&gt;loadByLogin( $login, strpos( 'email', $match ) === false );
+
+        if ( empty( $users ) )
+            throw new NotFound( 'User', $login );
+
+        foreach ( $users as $user )
+        {
+            if ( !$user-&gt;isEnabled )
+            {
+                continue;
+            }
+
+            if ( $user-&gt;passwordHash == self::createHash( $user-&gt;login, $password, $user-&gt;hashAlgorithm ) )
+            {
+                return $this-&gt;buildUser( $user, new ProxyContent( $user-&gt;id, $this-&gt;repository-&gt;getContentService() ) );
+            }
+        }
+        throw new FailedLogin();
+    }
+
+    /**
+     * Create user password hash
+     *
+     * @param string $login
+     * @param string $password
+     * @param int $type One of User::PASSWORD_HASH_* constants
+     * @return string
+     */
+    protected static function createHash( $login, $password, $type )
+    {
+        if ( $type == User::PASSWORD_HASH_MD5_USER )
+        {
+            return md5( &quot;$login\n$password&quot; );
+        }
+        if ( $type == User::PASSWORD_HASH_MD5_SITE )
+        {
+            $site = Configuration::getInstance( 'site' )-&gt;get( 'UserSettings', 'SiteName', 'ez.no' );
+            return md5( &quot;$login\n$password\n$site&quot; );
+        }
+        if ( $type == User::PASSWORD_HASH_PLAIN_TEXT )
+        {
+            return $password;
+        }
+        //if ( $type == User::PASSWORD_HASH_MD5_PASSWORD )
+        return md5( $password );
+    }
+
+    /**
+     * Update a User object
+     *
+     * @param \ezp\User $user
+     * @throws \ezp\Base\Exception\PropertyNotFound If property is missing or has a value of null
+     */
+    public function update( User $user )
+    {
+        $struct = new UserValueObject();
+        $this-&gt;fillStruct( $struct, $user );
+        $this-&gt;handler-&gt;userHandler()-&gt;update( $struct );
+    }
+
+    /**
+     * Delete a User object by id
+     *
+     * @param \ezp\User $user
+     */
+    public function delete( User $user )
+    {
+        $this-&gt;handler-&gt;userHandler()-&gt;delete( $user-&gt;id );
+    }
+
+    /**
+     * Crate a Group object
+     *
+     * Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints
+     *
+     * @param \ezp\User\Group $parentGroup
+     * @param string $name
+     * @param string $description
+     * @return \ezp\User\Group
+     * @throws \ezp\Base\Exception\PropertyNotFound If name or description properties (fields) are not found
+     */
+    public function createGroup( Group $parentGroup, $name, $description = '' )
+    {
+        $typeId = Configuration::getInstance( 'site' )-&gt;get( 'UserSettings', 'UserGroupClassID', 3 );
+        $parentContent = $parentGroup-&gt;getState( 'content' );
+        if ( !$parentContent instanceof Content  )
+            throw new Logic( 'createGroup', 'can not create group when $parentGroup is not created (persisted)' );
+
+        $parentLocation = $parentContent-&gt;getMainLocation();
+        if ( !$parentLocation instanceof Location  )
+            throw new Logic( 'createGroup', 'can not create group when $parentGroup is not created (persisted)' );
+
+        $type = $this-&gt;repository-&gt;getContentTypeService()-&gt;load( $typeId );
+        if ( !$type )
+            throw new BadConfiguration( 'site.ini[UserSettings]UserGroupClassID', 'could not load type:' . $typeId );
+
+        $content = new Content\Concrete( $type, $this-&gt;repository-&gt;getUser() );
+        $content-&gt;addParent( $parentLocation );
+        $content-&gt;getState( 'properties' )-&gt;sectionId = $parentContent-&gt;sectionId;
+
+        $fields = $content-&gt;getCurrentVersion()-&gt;getFields();
+        if ( !isset( $fields['name'] ) )
+            throw new PropertyNotFound( 'name', get_class( $content ) );
+        if ( !isset( $fields['description'] ) )
+            throw new PropertyNotFound( 'description', get_class( $content ) );
+
+        $fields['name'] = $name;
+        $fields['description'] = $description;
+
+        return $this-&gt;buildGroup( $this-&gt;repository-&gt;getContentService()-&gt;create( $content ) );
+    }
+
+    /**
+     * Load a Group object by id
+     *
+     * Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints
+     *
+     * @param mixed $id
+     * @return \ezp\User\Group
+     * @throws \ezp\Base\Exception\NotFound If group is not found
+     * @throws \ezp\Base\Exception\NotFoundWithType If content found with $id does not have correct typeId
+     */
+    public function loadGroup( $id )
+    {
+        $typeId = Configuration::getInstance( 'site' )-&gt;get( 'UserSettings', 'UserGroupClassID', 3 );
+        $content = $this-&gt;repository-&gt;getContentService()-&gt;load( $id );
+        if ( $content-&gt;typeId != $typeId )
+            throw new NotFoundWithType( &quot;User Group({$typeId})&quot;, $id );
+
+        return $this-&gt;buildGroup( $content );
+    }
+
+    /**
+     * Load a Group object by user id
+     *
+     * Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints
+     *
+     * @access private Used by $user-&gt;getGroups()
+     * @param mixed $id
+     * @return \ezp\User\Group[]
+     * @throws \ezp\Base\Exception\InvalidArgumentType If $id does not belong to a user object
+     * @throws \ezp\Base\Exception\NotFoundWithType If any of locations user is assigned to is not a user group
+     */
+    public function loadGroupsByUserId( $id )
+    {
+        $configuration = Configuration::getInstance( 'site' );
+        $userTypeId = $configuration-&gt;get( 'UserSettings', 'UserClassID', 4 );
+        $groupTypeId = $configuration-&gt;get( 'UserSettings', 'UserGroupClassID', 3 );
+
+        // @todo Implement more efficiently when there is api for getting parent locations (incl content) directly
+        $contentUser = $this-&gt;repository-&gt;getContentService()-&gt;load( $id );
+        if ( $contentUser-&gt;typeId != $userTypeId )
+            throw new InvalidArgumentType( &quot;id&quot;, 'id of user object, got typeId:' . $contentUser-&gt;typeId );
+
+        $groups = array();
+        foreach ( $contentUser-&gt;getLocations() as $location )
+        {
+            $parentContent = $location-&gt;getParent()-&gt;getContent();
+            if ( $parentContent-&gt;typeId != $groupTypeId )
+                throw new NotFoundWithType( &quot;User Group({$groupTypeId})&quot;, $parentContent-&gt;id );
+
+            $groups[] = $this-&gt;buildGroup( $parentContent );
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Assign a Group to User
+     *
+     * Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints
+     *
+     * @param \ezp\User\Group $group
+     * @param \ezp\User $user
+     * @throws \ezp\Base\Exception\Logic If $object has not been persisted yet
+     */
+    public function assignGroup( Group $group, User $user )
+    {
+        $content = $user-&gt;getState( 'content' );
+        if ( !$content instanceof Content  )
+            throw new Logic( 'assignGroup', 'can not assign $parent location to non created (persisted) $object' );
+
+        $groups = $user-&gt;getGroups();
+        if ( $groups-&gt;indexOf( $group ) !== false )
+            throw new Logic( 'assignGroup', 'can not assign group that is already assigned' );
+
+        $this-&gt;repository-&gt;getLocationService()-&gt;create(
+            $content-&gt;addParent( $group-&gt;getState( 'content' )-&gt;getMainLocation() )
+        );
+
+        $groups[] = $group;
+        $user-&gt;setState( array( 'groups' =&gt; $groups ) );
+    }
+
+    /**
+     * Remove a Group assignment from a User
+     *
+     * Notice: Group related api currently deals with content in the background, see Readme.rst for info and constraints
+     *
+     * @todo: Either allow removing last group of a user or define which api should be used for deleting users + tree
+     *
+     * @param \ezp\User\Group $group
+     * @param \ezp\User $user
+     * @throws \ezp\Base\Exception\Logic If $object has not been persisted yet
+     */
+    public function unAssignGroup( Group $group, User $user )
+    {
+        $content = $user-&gt;getState( 'content' );
+        if ( !$content instanceof Content  )
+            throw new Logic( 'unAssignGroup', 'can not remove $group to non created (persisted) $user' );
+
+        $groups = $user-&gt;getGroups();
+        $key = $groups-&gt;indexOf( $group );
+        if ( $key === false )
+            throw new Logic( 'unAssignGroup', 'can not remove $group that is not part of $user-&gt;groups' );
+
+        if ( !count( $groups ) )// $groups is collection so need to use count()
+            throw new Logic( 'unAssignGroup', 'can not remove $group, it seems to be last group on user' );
+
+        $groupLocation = $group-&gt;getState( 'content' )-&gt;getMainLocation();
+        if ( !$groupLocation instanceof Location  )
+            throw new Logic( 'unAssignGroup', 'can not remove non created (persisted)$groupLocation on $group' );
+
+        $locationKey = false;
+        $locations = $content-&gt;getLocations();
+        foreach ( $locations as $key =&gt; $location )
+        {
+            if ( $location-&gt;parentId == $groupLocation-&gt;id )
+            {
+                $locationKey = $key;
+                break;
+            }
+        }
+        if ( $locationKey === false  )
+            throw new Logic( 'unAssignGroup', 'could not find provided $groupLocation among locations on $user-&gt;content' );
+
+        $this-&gt;repository-&gt;getLocationService()-&gt;delete( $location );
+
+        unset( $locations[$locationKey] );
+        unset( $groups[$key] );
+        $user-&gt;setState( array( 'groups' =&gt; $groups ) );
+    }
+
+    /**
+     * Crate a Role object
+     *
+     * @param \ezp\User\Role $role
+     * @return \ezp\User\Role
+     * @throws \ezp\Base\Exception\PropertyNotFound If property is missing or has a value of null
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to create provided object
+     */
+    public function createRole( Role $role )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'create', $role ) )
+            throw new Forbidden( 'Role', 'create' );
+
+        $struct = new RoleValueObject();
+        $this-&gt;fillStruct( $struct, $role, array( 'id' ) );
+
+        return $this-&gt;buildRole(
+            $this-&gt;handler-&gt;userHandler()-&gt;createRole( $struct )
+        );
+    }
+
+    /**
+     * Load a Role object by id
+     *
+     * @param mixed $id
+     * @return \ezp\User\Role
+     * @throws \ezp\Base\Exception\NotFound If user is not found
+     */
+    public function loadRole( $id )
+    {
+        return $this-&gt;buildRole( $this-&gt;handler-&gt;userHandler()-&gt;loadRole( $id ) );
+    }
+
+    /**
+     * Load list of Roles assigned to a certain user [group] by id
+     *
+     * @access private Used by $group-&gt;getRoles()
+     * @param mixed $id The user [group] id that returned roles are assigned to
+     * @return \ezp\User\Role[]
+     * @throws \ezp\Base\Exception\NotFound If role is not found
+     */
+    public function loadRolesByGroupId( $id )
+    {
+        $roles = $this-&gt;handler-&gt;userHandler()-&gt;loadRolesByGroupId( $id );
+        foreach ( $roles as &amp;$value )
+            $value = $this-&gt;buildRole( $value );
+        return $roles;
+    }
+
+    /**
+     * Update a Role object
+     *
+     * @param \ezp\User\Role $role
+     * @throws \ezp\Base\Exception\PropertyNotFound If property is missing or has a value of null
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function updateRole( Role $role )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $role ) )
+            throw new Forbidden( 'Role', 'edit' );
+
+        $struct = new RoleUpdateStruct();
+        $this-&gt;fillStruct( $struct, $role );
+        $this-&gt;handler-&gt;userHandler()-&gt;updateRole( $struct );
+    }
+
+    /**
+     * Delete a Role object by id
+     *
+     * @param \ezp\User\Role $role
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to delete provided object
+     */
+    public function deleteRole( Role $role )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'delete', $role ) )
+            throw new Forbidden( 'Role', 'delete' );
+
+        $this-&gt;handler-&gt;userHandler()-&gt;deleteRole( $role-&gt;id );
+    }
+
+    /**
+     * Add a policy to a persisted role
+     *
+     * @param \ezp\User\Role $role
+     * @param \ezp\User\Policy $policy
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function addPolicy( Role $role, Policy $policy )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $role ) )
+            throw new Forbidden( 'Role', 'edit' );
+
+        $this-&gt;handler-&gt;userHandler()-&gt;addPolicy( $role-&gt;id, $policy-&gt;getState( 'properties' ) );
+        $role-&gt;addPolicy( $policy );
+    }
+
+    /**
+     * Remove a policy from a persisted role
+     *
+     * @param \ezp\User\Role $role
+     * @param \ezp\User\Policy $policy
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to edit provided object
+     */
+    public function removePolicy( Role $role, Policy $policy )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'edit', $role ) )
+            throw new Forbidden( 'Role', 'edit' );
+
+        $this-&gt;handler-&gt;userHandler()-&gt;removePolicy( $role-&gt;id, $policy-&gt;id );
+        $role-&gt;removePolicy( $policy );
+    }
+
+    /**
+     * Load list of Policies assigned and inherited on a user [group]
+     *
+     * @access Private Used by $user-&gt;getPolicies()
+     * @param mixed $id The user [group] id that returned roles are assigned to
+     * @return \ezp\User\Policy[]
+     * @throws \ezp\Base\Exception\NotFound If user is not found
+     */
+    public function loadPoliciesByUserId( $id )
+    {
+        $policies = $this-&gt;handler-&gt;userHandler()-&gt;loadPoliciesByUserId( $id );
+        foreach ( $policies as &amp;$value )
+            $value = $this-&gt;buildPolicy( $value, new ProxyRole( $value-&gt;roleId, $this ) );
+        return $policies;
+    }
+
+    /**
+     * @param \ezp\User\Group $group
+     * @param \ezp\User\Role $role
+     * @throws \ezp\Base\Exception\InvalidArgumentValue If group is already contains role
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to assign provided object
+     */
+    public function assignRole( Group $group, Role $role )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'assign', $role ))//, $group ) )
+            throw new Forbidden( 'Role', 'assign' );
+
+        $this-&gt;handler-&gt;userHandler()-&gt;assignRole( $group-&gt;id, $role-&gt;id );
+
+        $roles = $group-&gt;getRoles();
+        // Do not add if not loaded lazy loaded collection as it will duplicate object
+        if ( !$roles instanceof Lazy || $roles-&gt;isLoaded() )
+        {
+            $roles[] = $role;
+        }
+
+        $role-&gt;getState( 'properties' )-&gt;groupIds[] = $group-&gt;id;
+    }
+
+    /**
+     * @param \ezp\User\Group $group Can also take instance of user atm
+     * @param \ezp\User\Role $role
+     * @throws \ezp\Base\Exception\InvalidArgumentValue If group does not contain role
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to (un)assign provided object
+     */
+    public function unAssignRole( Groupable $group, Role $role )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'assign', $role ))//, $group ) )
+            throw new Forbidden( 'Role', 'assign' );
+
+        $this-&gt;handler-&gt;userHandler()-&gt;unAssignRole( $group-&gt;id, $role-&gt;id );
+
+        $roles = $group-&gt;getRoles();
+        // Do not remove if not loaded lazy loaded collection as it will duplicate object
+        if ( !$roles instanceof Lazy || $roles-&gt;isLoaded() )
+        {
+            unset( $roles[$roles-&gt;indexOf( $role )] );
+        }
+
+        $role-&gt;getState( 'properties' )-&gt;groupIds = array_values( array_diff( $role-&gt;groupIds, array( $group-&gt;id ) ) );
+    }
+
+    /**
+     * @param \ezp\Persistence\User $vo
+     * @param \ezp\Content $content
+     * @return \ezp\User
+     */
+    protected function buildUser( UserValueObject $vo, Content $content )
+    {
+        $do = new ConcreteUser();
+        $do-&gt;setState(
+            array(
+                &quot;properties&quot; =&gt; $vo,
+                &quot;content&quot; =&gt; $content,
+                &quot;groups&quot; =&gt; new LazyType(
+                    &quot;ezp\\User\\Group&quot;,
+                    $this,
+                    $vo-&gt;id,
+                    &quot;loadGroupsByUserId&quot;
+                ),
+                &quot;roles&quot; =&gt; new LazyType(
+                    &quot;ezp\\User\\Role&quot;,
+                    $this,
+                    $vo-&gt;id,
+                    &quot;loadRolesByGroupId&quot;
+                ),
+                &quot;policies&quot; =&gt; new LazyType(
+                    &quot;ezp\\User\\Policy&quot;,
+                    $this,
+                    $vo-&gt;id,
+                    &quot;loadPoliciesByUserId&quot;
+                ),
+            )
+        );
+        return $do;
+    }
+
+    /**
+     * @param \ezp\Content $content
+     * @return \ezp\User\Group
+     */
+    protected function buildGroup( Content $content )
+    {
+        $parent = null;
+        if ( $content-&gt;getMainLocation()-&gt;parentId &gt; 1 )
+        {
+            $parent = new ProxyGroup(
+                // not very lazy, callback / api?
+                $content-&gt;getMainLocation()-&gt;getParent()-&gt;getContent()-&gt;id,
+                $this
+            );
+        }
+        $do = new ConcreteGroup( $content );
+        $do-&gt;setState(
+            array(
+                &quot;parent&quot; =&gt; $parent,
+                &quot;roles&quot; =&gt; new LazyType(
+                    &quot;ezp\\User\\Role&quot;,
+                    $this,
+                    $content-&gt;id,
+                    &quot;loadRolesByGroupId&quot;
+                ),
+            )
+        );
+        return $do;
+    }
+
+    /**
+     * @param \ezp\Persistence\User\Role $vo
+     * @return \ezp\User\Role
+     */
+    protected function buildRole( RoleValueObject $vo )
+    {
+        $do = new ConcreteRole();
+        $policies = array();
+        foreach ( $vo-&gt;policies as $policyVo )
+        {
+            $policies[] = $this-&gt;buildPolicy( $policyVo, $do );
+        }
+        $do-&gt;setState(
+            array(
+                &quot;properties&quot; =&gt; $vo,
+                &quot;policies&quot; =&gt; new TypeCollection( 'ezp\\User\\Policy', $policies ),
+            )
+        );
+        return $do;
+    }
+
+    /**
+     * @param \ezp\Persistence\User\Policy $vo
+     * @param \ezp\User\Role $role
+     * @return \ezp\User\Policy
+     */
+    protected function buildPolicy( PolicyValueObject $vo, Role $role )
+    {
+        $do = new Policy( $role );
+        $do-&gt;setState(
+            array(
+                &quot;properties&quot; =&gt; $vo,
+            )
+        );
+        return $do;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

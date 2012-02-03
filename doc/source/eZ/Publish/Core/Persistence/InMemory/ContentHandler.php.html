@@ -1,0 +1,635 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ContentHandler implementation
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\InMemory;
+use eZ\Publish\SPI\Persistence\Content\Handler as ContentHandlerInterface,
+    eZ\Publish\SPI\Persistence\Content\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\RestrictedVersion,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\ContentId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\Operator,
+    eZ\Publish\SPI\Persistence\Content\FieldValue,
+    ezp\Content,
+    ezp\Content\Version,
+    ezp\Base\Exception\NotFound,
+    RuntimeException,
+    eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as RelationCreateStruct;
+
+/**
+ * @see eZ\Publish\SPI\Persistence\Content\Handler
+ */
+class ContentHandler implements ContentHandlerInterface
+{
+    /**
+     * @var Handler
+     */
+    protected $handler;
+
+    /**
+     * @var Backend
+     */
+    protected $backend;
+
+    /**
+     * Setups current handler instance with reference to Handler object that created it.
+     *
+     * @param Handler $handler
+     * @param Backend $backend The storage engine backend
+     */
+    public function __construct( Handler $handler, Backend $backend )
+    {
+        $this-&gt;handler = $handler;
+        $this-&gt;backend = $backend;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function create( CreateStruct $content )
+    {
+        $contentObj = $this-&gt;backend-&gt;create(
+            'Content', array(
+                'typeId' =&gt; $content-&gt;typeId,
+                'sectionId' =&gt; $content-&gt;sectionId,
+                'ownerId' =&gt; $content-&gt;ownerId,
+                'status' =&gt; Content::STATUS_DRAFT,
+                'currentVersionNo' =&gt; 1,
+                'modified' =&gt; $content-&gt;modified,
+                'published' =&gt; $content-&gt;published,
+            )
+        );
+        $time = time();
+        $version = $this-&gt;backend-&gt;create(
+            'Content\\Version',
+            array(
+                // @todo: Name should be computed!
+                'name' =&gt; $content-&gt;name,
+                'modified' =&gt; $time,
+                'creatorId' =&gt; $content-&gt;ownerId,
+                'created' =&gt; $time,
+                'contentId' =&gt; $contentObj-&gt;id,
+                'status' =&gt; Version::STATUS_DRAFT,
+                'versionNo' =&gt; 1
+            )
+        );
+        foreach ( $content-&gt;fields as $field )
+        {
+            $version-&gt;fields[] = $this-&gt;backend-&gt;create(
+                'Content\\Field',
+                array(
+                    'versionNo' =&gt; $version-&gt;versionNo,
+                    // Using internal _contentId since it's not directly exposed by Persistence
+                    '_contentId' =&gt; $contentObj-&gt;id,
+                    'value' =&gt; new FieldValue(
+                        array(
+                            'data' =&gt; $field-&gt;value-&gt;data,
+                            'sortKey' =&gt; array( 'sort_key_string' =&gt; $field-&gt;value-&gt;sortKey )
+                        )
+                    )
+                ) + (array)$field
+            );
+        }
+        $contentObj-&gt;version = $version;
+
+        $locationHandler = $this-&gt;handler-&gt;locationHandler();
+        foreach ( $content-&gt;locations as $locationStruct )
+        {
+            $locationStruct-&gt;contentId = $contentObj-&gt;id;
+            $locationStruct-&gt;contentVersion = $contentObj-&gt;currentVersionNo;
+            $contentObj-&gt;locations[] = $locationHandler-&gt;create( $locationStruct );
+        }
+        return $contentObj;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function createDraftFromVersion( $contentId, $srcVersion )
+    {
+        $aVersion = $this-&gt;backend-&gt;find(
+            'Content\\Version',
+            array(
+                'contentId' =&gt; $contentId,
+                'versionNo' =&gt; $srcVersion
+            )
+        );
+        if ( empty( $aVersion ) )
+            throw new NotFound( &quot;Version&quot;, &quot;contentId: $contentId // versionNo: $srcVersion&quot; );
+
+        // Create new version
+        $newVersionNo = $this-&gt;getLastVersionNumber( $contentId ) + 1;
+        $time = time();
+        $newVersion = $this-&gt;backend-&gt;create(
+            'Content\\Version',
+            array(
+                'modified' =&gt; $time,
+                // @todo: implement real user
+                'creatorId' =&gt; $aVersion[0]-&gt;creatorId,
+                'created' =&gt; $time,
+                'contentId' =&gt; $contentId,
+                'status' =&gt; Version::STATUS_DRAFT,
+                'versionNo' =&gt; $newVersionNo
+            )
+        );
+
+        // Duplicate fields
+        // @todo: language support
+        foreach (
+            $this-&gt;backend-&gt;find(
+                'Content\\Field',
+                // Using internal _contentId since it's not directly exposed by Persistence
+                array( '_contentId' =&gt; $contentId, 'versionNo' =&gt; $srcVersion )
+            ) as $field
+        )
+        {
+            $fieldVo = $this-&gt;backend-&gt;create(
+                'Content\\Field',
+                array( 'versionNo' =&gt; $newVersionNo, '_contentId' =&gt; $contentId ) + (array)$field
+            );
+            $newVersion-&gt;fields[] = $fieldVo;
+        }
+
+        return $newVersion;
+    }
+
+    /**
+     * Copy Content with Fields and Versions from $contentId in $version.
+     *
+     * Copies all fields from $contentId in $version (or all versions if false)
+     * to a new object which is returned. Version numbers are maintained.
+     *
+     * @param int $contentId
+     * @param int|false $versionNo Copy all versions if left false
+     * @return \eZ\Publish\SPI\Persistence\Content
+     * @throws \ezp\Base\Exception\NotFound If content or version is not found
+     * @todo Language support
+     */
+    public function copy( $contentId, $versionNo )
+    {
+        $content = $this-&gt;backend-&gt;load( &quot;Content&quot;, $contentId );
+        if ( !$content )
+            throw new NotFound( &quot;Content&quot;, &quot;contentId: $contentId&quot; );
+
+        $currentVersionNo = $versionNo === false ? $content-&gt;currentVersionNo : $versionNo;
+        $contentObj = $this-&gt;backend-&gt;create(
+            &quot;Content&quot;, array(
+                &quot;typeId&quot; =&gt; $content-&gt;typeId,
+                &quot;sectionId&quot; =&gt; $content-&gt;sectionId,
+                &quot;ownerId&quot; =&gt; $content-&gt;ownerId,
+                &quot;status&quot; =&gt; $content-&gt;status,
+                &quot;currentVersionNo&quot; =&gt; $currentVersionNo,
+            )
+        );
+
+        $time = time();
+        // Copy version(s)
+        foreach (
+            $this-&gt;backend-&gt;find(
+                &quot;Content\\Version&quot;,
+                $versionNo === false ?
+                array( &quot;contentId&quot; =&gt; $content-&gt;id ) :
+                array( &quot;contentId&quot; =&gt; $content-&gt;id, &quot;versionNo&quot; =&gt; $versionNo )
+            ) as $version )
+        {
+            $this-&gt;backend-&gt;create(
+                &quot;Content\\Version&quot;,
+                array(
+                    &quot;name&quot; =&gt; $version-&gt;name,
+                    &quot;versionNo&quot; =&gt; $version-&gt;versionNo,
+                    &quot;modified&quot; =&gt; $time,
+                    &quot;creatorId&quot; =&gt; $version-&gt;creatorId,
+                    &quot;created&quot; =&gt; $time,
+                    &quot;contentId&quot; =&gt; $contentObj-&gt;id,
+                    &quot;status&quot; =&gt; $version-&gt;status,
+                )
+            );
+        }
+
+        // Associate last version to content VO
+        $aVersion = $this-&gt;backend-&gt;find(
+            'Content\\Version',
+            array(
+                'contentId' =&gt; $contentObj-&gt;id,
+                'versionNo' =&gt; $currentVersionNo
+            )
+        );
+        if ( empty( $aVersion ) )
+            throw new NotFound( &quot;Version&quot;, &quot;contentId: $contentObj-&gt;id // versionNo: $currentVersionNo&quot; );
+
+        $contentObj-&gt;version = $aVersion[0];
+
+        // Copy fields
+        // @todo: language support
+        foreach (
+            $this-&gt;backend-&gt;find(
+                &quot;Content\\Field&quot;,
+                // Using internal _contentId since it's not directly exposed by Persistence
+                $versionNo === false ?
+                array( &quot;_contentId&quot; =&gt; $content-&gt;id ) :
+                array( &quot;_contentId&quot; =&gt; $content-&gt;id, &quot;versionNo&quot; =&gt; $versionNo )
+            ) as $field
+        )
+        {
+            $this-&gt;backend-&gt;create(
+                'Content\\Field',
+                array( '_contentId' =&gt; $contentObj-&gt;id ) + (array)$field
+            );
+        }
+
+        // Associate last version's fields
+        // @todo: Throw NotFound if no fields at all ?
+        $contentObj-&gt;version-&gt;fields = $this-&gt;backend-&gt;find(
+            &quot;Content\\Field&quot;,
+            array(
+                &quot;_contentId&quot; =&gt; $contentObj-&gt;id,
+                &quot;versionNo&quot; =&gt; $currentVersionNo
+            )
+        );
+
+        return $contentObj;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function load( $id, $version, $translations = null )
+    {
+        $content = $this-&gt;backend-&gt;load( 'Content', $id );
+        if ( !$content )
+            return null;
+
+        $versions = $this-&gt;backend-&gt;find( 'Content\\Version', array( 'contentId' =&gt; $content-&gt;id, 'versionNo' =&gt; $version ) );
+        if ( !isset( $versions[0] ) )
+            throw new NotFound( &quot;Version&quot;, &quot;contentId:{$id}, versionNo:{$version}&quot; );
+
+        $versions[0]-&gt;fields = $this-&gt;backend-&gt;find(
+            'Content\\Field',
+            array(
+                &quot;_contentId&quot; =&gt; $content-&gt;id,
+                &quot;versionNo&quot; =&gt; $version
+            )
+        );
+
+        $content-&gt;version = $versions[0];
+        $content-&gt;locations = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'contentId' =&gt; $content-&gt;id  ) );
+        return $content;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function setStatus( $contentId, $status, $version )
+    {
+        $versions = $this-&gt;backend-&gt;find( 'Content\\Version', array( 'contentId' =&gt; $contentId, 'versionNo' =&gt; $version ) );
+
+        if ( !count( $versions ) )
+        {
+            throw new NotFound( &quot;Version&quot;, &quot;contentId: $contentId, versionNo: $version&quot; );
+        }
+        return $this-&gt;backend-&gt;update( 'Content\\Version', $versions[0]-&gt;id, array( 'status' =&gt; $status ) );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function setObjectState( $contentId, $stateGroup, $state )
+    {
+        throw new RuntimeException( '@TODO: Implement' );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function getObjectState( $contentId, $stateGroup )
+    {
+        throw new RuntimeException( '@TODO: Implement' );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function update( UpdateStruct $content )
+    {
+        // @todo Assume the attached version to Content is the one that should be updated
+        $this-&gt;backend-&gt;update(
+            &quot;Content&quot;,
+            $content-&gt;id,
+            array(
+                &quot;ownerId&quot; =&gt; $content-&gt;ownerId,
+            )
+        );
+
+        $this-&gt;backend-&gt;updateByMatch(
+            'Content\\Version',
+            array( 'contentId' =&gt; $content-&gt;id, 'versionNo' =&gt; $content-&gt;versionNo ),
+            array(
+                &quot;name&quot; =&gt; $content-&gt;name,
+                &quot;creatorId&quot; =&gt; $content-&gt;creatorId,
+                &quot;modified&quot; =&gt; $content-&gt;modified,
+            )
+        );
+        foreach ( $content-&gt;fields as $field )
+        {
+            $this-&gt;backend-&gt;update(
+                'Content\\Field',
+                $field-&gt;id,
+                (array)$field
+            );
+        }
+
+        return $this-&gt;load( $content-&gt;id, $content-&gt;versionNo );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function delete( $contentId )
+    {
+        $this-&gt;backend-&gt;delete( &quot;Content&quot;, $contentId );
+
+        $versions = $this-&gt;backend-&gt;find( 'Content\\Version', array( 'contentId' =&gt; $contentId ) );
+        foreach ( $versions as $version )
+        {
+            $fields = $this-&gt;backend-&gt;find(
+                'Content\\Field',
+                array(
+                    '_contentId' =&gt; $contentId,
+                    'versionNo' =&gt; $version-&gt;versionNo
+                )
+            );
+            foreach ( $fields as $field )
+                $this-&gt;backend-&gt;delete( 'Content\\Field', $field-&gt;id );
+
+            $this-&gt;backend-&gt;delete( 'Content\\Version', $version-&gt;id );
+        }
+
+        // @todo Deleting Locations by content object id should be possible using handler API?
+        $locationHandler = $this-&gt;handler-&gt;locationHandler();
+        $locations = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'contentId' =&gt; $contentId ) );
+        foreach ( $locations as $location )
+        {
+            $locationHandler-&gt;removeSubtree( $location-&gt;id );
+        }
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function trash( $contentId )
+    {
+        throw new RuntimeException( '@TODO: Implement' );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function untrash( $contentId )
+    {
+        throw new RuntimeException( '@TODO: Implement' );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Handler
+     * @throws \ezp\Base\Exception\NotFound If no version found
+     */
+    public function listVersions( $contentId )
+    {
+        $versions = $this-&gt;backend-&gt;find( &quot;Content\\Version&quot;, array( &quot;contentId&quot; =&gt; $contentId ) );
+
+        if ( empty( $versions ) )
+            throw new NotFound( &quot;Content\\Version&quot;, &quot;contentId: $contentId&quot; );
+
+        // cast to RestrictedVersion
+        foreach ( $versions as $key =&gt; $vo )
+        {
+            $restricted = new RestrictedVersion();
+            foreach ( $restricted as $property =&gt; $value )
+            {
+                $restricted-&gt;$property = $vo-&gt;$property;
+            }
+            $versions[$key] = $restricted;
+        }
+
+        return $versions;
+    }
+
+    /**
+     * Creates a relation between $sourceContentId in $sourceContentVersionNo
+     * and $destinationContentId with a specific $type.
+     *
+     * @param  \eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct $relation
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation
+     */
+    public function addRelation( RelationCreateStruct $relation )
+    {
+        // Ensure source content exists
+        $sourceContent = $this-&gt;backend-&gt;find( &quot;Content&quot;, array( &quot;id&quot; =&gt; $relation-&gt;sourceContentId ) );
+
+        if ( empty( $sourceContent ) )
+            throw new NotFound( &quot;Content&quot;, &quot;id: {$relation-&gt;sourceContentId}&quot; );
+
+        // Ensure source content exists if version is specified
+        if ( $relation-&gt;sourceContentVersionNo !== null )
+        {
+            $version = $this-&gt;backend-&gt;find( &quot;Content\\Version&quot;, array( &quot;contentId&quot; =&gt; $relation-&gt;sourceContentId, &quot;versionNo&quot; =&gt; $relation-&gt;sourceContentVersionNo ) );
+
+            if ( empty( $version ) )
+                throw new NotFound( &quot;Content\\Version&quot;, &quot;contentId: {$relation-&gt;sourceContentId}, versionNo: {$relation-&gt;sourceContentVersionNo}&quot; );
+        }
+
+        // Ensure destination content exists
+        $destinationContent = $this-&gt;backend-&gt;find( &quot;Content&quot;, array( &quot;id&quot; =&gt; $relation-&gt;destinationContentId ) );
+
+        if ( empty( $destinationContent ) )
+            throw new NotFound( &quot;Content&quot;, &quot;id: {$relation-&gt;destinationContentId}&quot; );
+
+        return $this-&gt;backend-&gt;create( &quot;Content\\Relation&quot;, (array)$relation );
+    }
+
+    /**
+     * Removes a relation by relation Id.
+     *
+     * @param mixed $relationId
+     * @throws \ezp\Base\Exception\NotFound if relation to be removed is not found.
+     */
+    public function removeRelation( $relationId )
+    {
+        $requestedRelation = $this-&gt;backend-&gt;find( &quot;Content\\Relation&quot;, array( &quot;id&quot; =&gt; $relationId ) );
+        if ( empty( $requestedRelation ) )
+        {
+            throw new NotFound( &quot;Content\\Relation&quot;, &quot;id: &quot; . $relationId );
+        }
+        $this-&gt;backend-&gt;delete( &quot;Content\\Relation&quot;, $relationId );
+    }
+
+    /**
+     * Loads relations from $sourceContentId. Optionally, loads only those with $type and $sourceContentVersionNo.
+     *
+     * @param mixed $sourceContentId Source Content ID
+     * @param mixed|null $sourceContentVersionNo Source Content Version, null if not specified
+     * @param int|null $type {@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation[]
+     */
+    public function loadRelations( $sourceContentId, $sourceContentVersionNo = null, $type = null )
+    {
+        $filter = array( &quot;sourceContentId&quot; =&gt; $sourceContentId );
+        if ( $sourceContentVersionNo !== null )
+            $filter[&quot;sourceContentVersionNo&quot;] = $sourceContentVersionNo;
+
+        $relations = $this-&gt;backend-&gt;find( &quot;Content\\Relation&quot;, $filter );
+
+        if ( $type === null )
+            return $relations;
+
+        foreach ( $relations as $key =&gt; $relation )
+        {
+            // Is there a bit present in $type not appearing in $relation-&gt;type?
+            if ( ~$relation-&gt;type &amp; $type )
+            {
+                // In such case, remove the result from the array
+                unset( $relations[$key] );
+            }
+        }
+
+        return $relations;
+    }
+
+    /**
+     * Loads relations from $contentId. Optionally, loads only those with $type.
+     *
+     * Only loads relations against published versions.
+     *
+     * @param mixed $destinationContentId Destination Content ID
+     * @param int|null $type {@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation[]
+     */
+    public function loadReverseRelations( $destinationContentId, $type = null )
+    {
+        $filter = array( &quot;destinationContentId&quot; =&gt; $destinationContentId );
+        $relations = $this-&gt;backend-&gt;find( &quot;Content\\Relation&quot;, $filter );
+
+        if ( $type === null )
+            return $relations;
+
+        foreach ( $relations as $key =&gt; $relation )
+        {
+            if ( ~$relation-&gt;type &amp; $type )
+            {
+                unset( $relations[$key] );
+            }
+        }
+        return $relations;
+    }
+
+    /**
+     * Performs the publishing operations required to set the version identified by $updateStruct-&gt;versionNo and
+     * $updateStruct-&gt;id as the published one.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\UpdateStruct An UpdateStruct with id and versionNo
+     *
+     * @return \eZ\Publish\SPI\Persistence\Content The published Content
+     */
+    public function publish( UpdateStruct $updateStruct )
+    {
+        // Change the currentVersionNo to the published version
+        $this-&gt;backend-&gt;update(
+            &quot;Content&quot;, $updateStruct-&gt;id,
+            array(
+                'currentVersionNo' =&gt; $updateStruct-&gt;versionNo,
+            )
+        );
+
+        // Change the currentVersionNo to the published version
+        $this-&gt;backend-&gt;updateByMatch(
+            'Content\\Version',
+            array( 'contentId' =&gt; $updateStruct-&gt;id, 'versionNo' =&gt; $updateStruct-&gt;versionNo ),
+            array(
+                &quot;name&quot; =&gt; $updateStruct-&gt;name,
+                &quot;creatorId&quot; =&gt; $updateStruct-&gt;creatorId,
+                &quot;modified&quot; =&gt; $updateStruct-&gt;modified,
+            )
+        );
+
+        return $this-&gt;load( $updateStruct-&gt;id, $updateStruct-&gt;versionNo );
+    }
+
+    /**
+     * Returns last version number for content identified by $contentId
+     *
+     * @param int $contentId
+     * @return int
+     */
+    private function getLastVersionNumber( $contentId )
+    {
+        $versionNumbers = array();
+        $allVersions = $this-&gt;backend-&gt;find(
+            'Content\\Version',
+            array(
+                'contentId' =&gt; $contentId
+            )
+        );
+
+        if ( empty( $allVersions ) )
+            throw new NotFound( &quot;Version&quot;, &quot;contentId: $contentId&quot; );
+
+        foreach ( $allVersions as $version )
+        {
+            $versionNumbers[] = $version-&gt;versionNo;
+        }
+
+        return max( $versionNumbers );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,254 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Utf8Converter class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search;
+use eZ\Publish\SPI\Persistence\Fields\Storage;
+
+/**
+ * Class for converting UTF-8 charecters to their decimal code points and vice
+ * versa.
+ *
+ * The code originates from the eZUTF8Codec class available in lib/ezi18n/classes/ezutf8codec.php
+ */
+class Utf8Converter
+{
+    /**
+     * Convert character code to UTF-8 character
+     *
+     * @param int $charCode
+     * @return string
+     */
+    public static function toUTF8Character( $charCode )
+    {
+        switch ( $charCode )
+        {
+            case 0:
+                $char = chr( 0 );
+                break;
+            case !( $charCode &amp; 0xffffff80 ): // 7 bit
+                $char = chr( $charCode );
+                break;
+            case !( $charCode &amp; 0xfffff800 ): // 11 bit
+                $char = (
+                    chr( 0xc0 | ( ( $charCode &gt;&gt; 6 ) &amp; 0x1f ) ) .
+                    chr( 0x80 | ( $charCode &amp; 0x3f ) )
+                );
+                break;
+            case !( $charCode &amp; 0xffff0000 ): // 16 bit
+                $char = (
+                    chr( 0xe0 | ( ( $charCode &gt;&gt; 12 ) &amp; 0x0f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 6 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( $charCode &amp; 0x3f ) )
+                );
+                break;
+            case !( $charCode &amp; 0xffe00000 ): // 21 bit
+                $char = (
+                    chr( 0xf0 | ( ( $charCode &gt;&gt; 18 ) &amp; 0x07 ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 12 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 6 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( $charCode &amp; 0x3f ) )
+                );
+                break;
+            case !( $charCode &amp; 0xfc000000 ): // 26 bit
+                $char = (
+                    chr( 0xf8 | ( ( $charCode &gt;&gt; 24 ) &amp; 0x03 ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 18 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 12 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 6 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( $charCode &amp; 0x3f ) )
+                );
+                break;
+            default: // 31 bit
+                $char = (
+                    chr( 0xfc | ( ( $charCode &gt;&gt; 30 ) &amp; 0x01 ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 24 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 18 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 12 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( ( $charCode &gt;&gt; 6 ) &amp; 0x3f ) ) .
+                    chr( 0x80 | ( $charCode &amp; 0x3f ) )
+                );
+        }
+
+        return $char;
+    }
+
+    /**
+     * Convert a single UTF-8 character into its decimal code point
+     *
+     * @param string $char
+     * @return int
+     */
+    public static function toUnicodeCodepoint( $char )
+    {
+        $charCode = false;
+        // 7bits, 1 char
+        if ( ( ord( $char[0] ) &amp; 0x80 ) == 0x00 )
+        {
+            $charCode = ord( $char[0] );
+        }
+        // 11 bits, 2 chars
+        else if ( ( ord( $char[0] ) &amp; 0xe0 ) == 0xc0 )
+        {
+            if ( ( ord( $char[1] ) &amp; 0xc0 ) != 0x80 )
+            {
+                return $charCode;
+            }
+
+            $charCode = (
+                ( ( ord( $char[0] ) &amp; 0x1f ) &lt;&lt; 6 ) +
+                ( ( ord( $char[1] ) &amp; 0x3f ) )
+            );
+
+            if ( $charCode &lt; 128 )
+            {
+                throw new \RuntimeException( 'Illegal UTF-8 input character: ' . $char );
+            }
+        }
+        // 16 bits, 3 chars
+        else if ( ( ord( $char[0] ) &amp; 0xf0 ) == 0xe0 )
+        {
+            if ( ( ord( $char[1] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[2] ) &amp; 0xc0 ) != 0x80 )
+            {
+                return $charCode;
+            }
+            $charCode = (
+                ( ( ord( $char[0] ) &amp; 0x0f ) &lt;&lt; 12 ) +
+                ( ( ord( $char[1] ) &amp; 0x3f ) &lt;&lt; 6 ) +
+                ( ( ord( $char[2] ) &amp; 0x3f ) )
+            );
+
+            if ( $charCode &lt; 2048 )
+            {
+                throw new \RuntimeException( 'Illegal UTF-8 input character: ' . $char );
+            }
+        }
+        // 21 bits, 4 chars
+        else if ( ( ord( $char[0] ) &amp; 0xf8 ) == 0xf0 )
+        {
+            if ( ( ord( $char[1] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[2] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[3] ) &amp; 0xc0 ) != 0x80 )
+            {
+                return $charCode;
+            }
+
+            $charCode = (
+                ( ( ord( $char[0] ) &amp; 0x07 ) &lt;&lt; 18 ) +
+                ( ( ord( $char[1] ) &amp; 0x3f ) &lt;&lt; 12 ) +
+                ( ( ord( $char[2] ) &amp; 0x3f ) &lt;&lt; 6 ) +
+                ( ( ord( $char[3] ) &amp; 0x3f ) )
+            );
+
+            if ( $charCode &lt; 65536 )
+            {
+                throw new \RuntimeException( 'Illegal UTF-8 input character: ' . $char );
+            }
+        }
+        // 26 bits, 5 chars
+        else if ( ( ord( $char[0] ) &amp; 0xfc ) == 0xf8 )
+        {
+            if ( ( ord( $char[1] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[2] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[3] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[4] ) &amp; 0xc0 ) != 0x80 )
+            {
+                return $charCode;
+            }
+
+            $charCode = (
+                ( ( ord( $char[0] ) &amp; 0x03 ) &lt;&lt; 24 ) +
+                ( ( ord( $char[1] ) &amp; 0x3f ) &lt;&lt; 18 ) +
+                ( ( ord( $char[2] ) &amp; 0x3f ) &lt;&lt; 12 ) +
+                ( ( ord( $char[3] ) &amp; 0x3f ) &lt;&lt; 6 ) +
+                ( ( ord( $char[4] ) &amp; 0x3f ) )
+            );
+
+            if ( $charCode &lt; 2097152 )
+            {
+                throw new \RuntimeException( 'Illegal UTF-8 input character: ' . $char );
+            }
+        }
+        // 31 bits, 6 chars
+        else if ( ( ord( $char[0] ) &amp; 0xfe ) == 0xfc )
+        {
+            if ( ( ord( $char[1] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[2] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[3] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[4] ) &amp; 0xc0 ) != 0x80 ||
+                 ( ord( $char[5] ) &amp; 0xc0 ) != 0x80 )
+            {
+                return $charCode;
+            }
+
+            $charCode = (
+                ( ( ord( $char[0] ) &amp; 0x01 ) &lt;&lt; 30 ) +
+                ( ( ord( $char[1] ) &amp; 0x3f ) &lt;&lt; 24 ) +
+                ( ( ord( $char[2] ) &amp; 0x3f ) &lt;&lt; 18 ) +
+                ( ( ord( $char[3] ) &amp; 0x3f ) &lt;&lt; 12 ) +
+                ( ( ord( $char[4] ) &amp; 0x3f ) &lt;&lt; 6 ) +
+                ( ( ord( $char[5] ) &amp; 0x3f ) )
+            );
+
+            if ( $charCode &lt; 67108864 )
+            {
+                throw new \RuntimeException( 'Illegal UTF-8 input character: ' . $char );
+            }
+        }
+
+        return $charCode;
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

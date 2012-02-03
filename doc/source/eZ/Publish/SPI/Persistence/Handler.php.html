@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Persistence Handler interface
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\SPI\Persistence;
+
+/**
+ * The main handler for Storage Engine
+ *
+ */
+interface Handler
+{
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    public function contentHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Search\Handler
+     */
+    public function searchHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Type\Handler
+     */
+    public function contentTypeHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Language\Handler
+     */
+    public function contentLanguageHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function locationHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function trashHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\User\Handler
+     */
+    public function userHandler();
+
+    /**
+     * @return \eZ\Publish\SPI\Persistence\Content\Section\Handler
+     */
+    public function sectionHandler();
+
+    /**
+     */
+    public function beginTransaction();
+
+    /**
+     */
+    public function commit();
+
+    /**
+     */
+    public function rollback();
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

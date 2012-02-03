@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+namespace eZ\Publish\API\Repository\Values\Content;
+use eZ\Publish\API\Repository\Values\ValueObject;
+/**
+ *
+ * This class is used for updating location meta data.
+ *
+ */
+class LocationUpdateStruct extends ValueObject
+{
+    /**
+     * If set the location priority is changed to the new value
+     *
+     * @var int
+     */
+    public $priority;
+
+    /**
+     * if set the location gets a new remoteId.
+     *
+     * @var mixed
+     */
+    public $remoteId;
+
+    /**
+     * if set to true this location will set as new main location for the content.
+     * If set to false this parameter is ignored.
+     *
+     * @var mixed|true
+     */
+    public $isMainLocation;
+
+    /**
+     * If set the sortField is changed.
+     * The sort field specifies which property the child locations should be sorted on.
+     * Valid values are found at {@link Location::SORT_FIELD_*}
+     *
+     * @var mixed
+     */
+    public $sortField;
+
+    /**
+     * if set the sortOrder is changed.
+     * The sort order specifies whether the sort order should be ascending or descending.
+     * Valid values are {@link Location::SORT_ORDER_*}
+     *
+     * @var mixed
+     */
+    public $sortOrder;
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

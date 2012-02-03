@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * ez Publish - Public API Prototype
+ */
+namespace ezp\Content;
+use ezp\Base\Configuration,
+    ezp\Base\ServiceContainer,
+    ezp\Content\Concrete as Content,
+    ezp\User\Concrete as User;
+
+// Use bootstrap.php to setup autoload and Configuration
+chdir( '../' );
+require 'bootstrap.php';
+
+
+// Setup ServiceContainer for dependency injection using in-memory storage
+$sc = new ServiceContainer(
+    Configuration::getInstance('service')-&gt;getAll(),
+    array(
+        '@persistence_handler' =&gt; new \ezp\Persistence\Storage\InMemory\Handler(),
+        '@io_handler' =&gt; new \ezp\Io\Storage\InMemory(),
+    )
+);
+
+// Get repository and set 'Admin' as current user ('Anonymous' is default user)
+$repository = $sc-&gt;getRepository();
+$admin = $repository-&gt;getUserService()-&gt;load( 14 );
+$anonymous = $repository-&gt;setUser( $admin );
+
+
+// Get 'Folder' Content Type (Class)
+$contentType = $repository-&gt;getContentTypeService()-&gt;load( 1 );
+
+// Get 'Standard' Section
+$section = $repository-&gt;getSectionService()-&gt;load( 1 );
+
+
+// Create Content object
+$content = new Content( $contentType, $anonymous );
+$content-&gt;setSection( $section );
+$version = $content-&gt;getCurrentVersion();
+$version-&gt;fields['name'] = 'New Folder';
+$version-&gt;fields['description'] = 'This is an empty folder';
+
+//$content = $repository-&gt;getContentService()-&gt;create( $content );
+
+
+echo &quot;Content id: {$content-&gt;id}&lt;br /&gt;&quot;;
+
+echo &quot;Fields:&lt;br /&gt;&quot;;
+foreach ( $version-&gt;fields as $identifier =&gt; $field )
+{
+    echo &quot; &gt; $identifier: {$field}&lt;br /&gt;&quot;;// Using $value __toString()
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

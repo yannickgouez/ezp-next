@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Checkbox Value class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\Checkbox;
+use ezp\Content\FieldType\ValueInterface,
+    ezp\Content\FieldType\Value as BaseValue;
+
+/**
+ * Value for Checkbox field type
+ */
+class Value extends BaseValue implements ValueInterface
+{
+    /**
+     * Boolean value
+     *
+     * @var bool
+     */
+    public $bool;
+
+    /**
+     * Construct a new Value object and initialize it $boolValue
+     *
+     * @param bool $boolValue
+     */
+    public function __construct( $boolValue = false )
+    {
+        $this-&gt;bool = $boolValue;
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     * @return \ezp\Content\FieldType\Checkbox\Value
+     */
+    public static function fromString( $stringValue )
+    {
+        return new static( (bool)$stringValue );
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this-&gt;bool ? '1' : '0';
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

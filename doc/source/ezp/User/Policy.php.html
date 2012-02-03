@@ -1,0 +1,113 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing Policy object
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User;
+use ezp\Base\Model,
+    ezp\Base\Collection\Type as TypeCollection,
+    ezp\Base\Exception\InvalidArgumentType,
+    ezp\Persistence\User\Policy as PolicyValue;
+
+/**
+ * This class represents a Policy item
+ *
+ * @property-read mixed $id
+ * @property string $module
+ * @property string $function
+ * @property array|string $limitations
+ * @property-read \ezp\User\Role|null $role
+ */
+class Policy extends Model
+{
+    /**
+     * @var array Readable of properties on this object
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'module' =&gt; true,
+        'function' =&gt; true,
+        'limitations' =&gt; true,
+        'roleId' =&gt; false,
+    );
+
+    /**
+     * @var array Dynamic properties on this object
+     */
+    protected $dynamicProperties = array(
+        'role' =&gt; false,
+    );
+
+    /**
+     * @var \ezp\User\Role
+     */
+    protected $role;
+
+    /**
+     * Creates and setups User object
+     *
+     * @param \ezp\User\Role $role
+     */
+    public function __construct( Role $role )
+    {
+        $this-&gt;properties = new PolicyValue( array( 'roleId' =&gt; $role-&gt;id ) );
+        $this-&gt;role = $role;
+    }
+
+    /**
+     * @return \ezp\User\Role
+     */
+    public function getRole()
+    {
+        $this-&gt;role;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

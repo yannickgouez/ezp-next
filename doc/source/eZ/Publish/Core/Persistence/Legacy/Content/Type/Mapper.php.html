@@ -1,0 +1,373 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Mapper class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type;
+use eZ\Publish\SPI\Persistence\Content\Type,
+    eZ\Publish\SPI\Persistence\Content\Type\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\Type\Group,
+    eZ\Publish\SPI\Persistence\Content\Type\Group\CreateStruct as GroupCreateStruct,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry as ConverterRegistry;
+
+/**
+ * Mapper for Content Type Handler.
+ *
+ * Performs mapping of Type objects.
+ */
+class Mapper
+{
+    /**
+     * Converter registry
+     *
+     * @var \eZ\Publish\SPI\Persistence\Legacy\Content\FieldValue\Converter\Registry
+     */
+    protected $converterRegistry;
+
+    /**
+     * Creates a new content type mapper
+     *
+     * @param ConverterRegistry $converterRegistry
+     */
+    public function __construct( ConverterRegistry $converterRegistry )
+    {
+        $this-&gt;converterRegistry = $converterRegistry;
+    }
+
+    /**
+     * Creates a Group from its create struct.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\Group\CreateStruct $struct
+     * @return Group
+     * @todo $description is not supported by database, yet
+     */
+    public function createGroupFromCreateStruct( GroupCreateStruct $struct )
+    {
+        $group = new Group();
+
+        $group-&gt;name = $struct-&gt;name;
+
+        // Indentionally left out, since DB structure does not support it, yet
+        // $group-&gt;description = $struct-&gt;description;
+
+        $group-&gt;identifier = $struct-&gt;identifier;
+        $group-&gt;created = $struct-&gt;created;
+        $group-&gt;modified = $struct-&gt;modified;
+        $group-&gt;creatorId = $struct-&gt;creatorId;
+        $group-&gt;modifierId = $struct-&gt;modifierId;
+
+        return $group;
+    }
+
+    /**
+     * Extracts Group objects from theb given $rows.
+     *
+     * @param array $rows
+     * @return \eZ\Publish\SPI\Persistence\Content\Type\Group[]
+     */
+    public function extractGroupsFromRows( array $rows )
+    {
+        $groups = array();
+
+        foreach ( $rows as $row )
+        {
+            $group = new Group();
+            $group-&gt;id = (int)$row['id'];
+            $group-&gt;created = (int)$row['created'];
+            $group-&gt;creatorId = (int)$row['creator_id'];
+            $group-&gt;modified = (int)$row['modified'];
+            $group-&gt;modifierId = (int)$row['modifier_id'];
+            $group-&gt;identifier = $row['name'];
+
+            $groups[] = $group;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Extracts types and related data from the given $rows.
+     *
+     * @param array $rows
+     * @return array(Type)
+     */
+    public function extractTypesFromRows( array $rows )
+    {
+        $types = array();
+        $fields = array();
+
+        foreach ( $rows as $row )
+        {
+            $typeId = (int)$row['ezcontentclass_id'];
+            if ( !isset( $types[$typeId] ) )
+            {
+                $types[$typeId] = $this-&gt;extractTypeFromRow( $row );
+            }
+
+            $fieldId = (int)$row['ezcontentclass_attribute_id'];
+            if ( !isset( $fields[$fieldId] ) )
+            {
+                $field = $this-&gt;extractFieldFromRow( $row );
+                $fields[$fieldId] = $field;
+                $types[$typeId]-&gt;fieldDefinitions[] = $field;
+            }
+
+            $groupId = (int)$row['ezcontentclass_classgroup_group_id'];
+            if ( !in_array( $groupId, $types[$typeId]-&gt;groupIds ) )
+            {
+                $types[$typeId]-&gt;groupIds[] = $groupId;
+            }
+        }
+
+        // Re-index $types to avoid people relying on ID keys
+        return array_values( $types );
+    }
+
+    /**
+     * Creates a Type from the data in $row.
+     *
+     * @param array $row
+     * @return Type
+     */
+    protected function extractTypeFromRow( array $row )
+    {
+        $type = new Type();
+
+        $type-&gt;id = (int)$row['ezcontentclass_id'];
+        $type-&gt;status = (int)$row['ezcontentclass_version'];
+        $type-&gt;name = unserialize( $row['ezcontentclass_serialized_name_list'] );
+        $type-&gt;description = unserialize( $row['ezcontentclass_serialized_description_list'] );
+        $type-&gt;identifier = $row['ezcontentclass_identifier'];
+        $type-&gt;created = (int)$row['ezcontentclass_created'];
+        $type-&gt;modified = (int)$row['ezcontentclass_modified'];
+        $type-&gt;modifierId = (int)$row['ezcontentclass_modifier_id'];
+        $type-&gt;creatorId = (int)$row['ezcontentclass_creator_id'];
+        $type-&gt;remoteId = $row['ezcontentclass_remote_id'];
+        $type-&gt;urlAliasSchema = $row['ezcontentclass_url_alias_name'];
+        $type-&gt;nameSchema = $row['ezcontentclass_contentobject_name'];
+        $type-&gt;isContainer = ( $row['ezcontentclass_is_container'] == 1 );
+        $type-&gt;initialLanguageId = (int)$row['ezcontentclass_initial_language_id'];
+        $type-&gt;defaultAlwaysAvailable = ( $row['ezcontentclass_always_available'] == 1 );
+        $type-&gt;sortField = (int)$row['ezcontentclass_sort_field'];
+        $type-&gt;sortOrder = (int)$row['ezcontentclass_sort_order'];
+
+        $type-&gt;groupIds = array();
+        $type-&gt;fieldDefinitions = array();
+
+        return $type;
+    }
+
+    /**
+     * Creates a FieldDefinition from the data in $row.
+     *
+     * @param array $row
+     * @return \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition
+     * @todo Handle field definition conversion.
+     */
+    protected function extractFieldFromRow( array $row )
+    {
+        $storageFieldDef = $this-&gt;extractStorageFieldFromRow( $row );
+
+        $field = new FieldDefinition();
+
+        $field-&gt;id = (int)$row['ezcontentclass_attribute_id'];
+        $field-&gt;name = unserialize( $row['ezcontentclass_attribute_serialized_name_list'] );
+        $field-&gt;description = unserialize( $row['ezcontentclass_attribute_serialized_description_list'] );
+        $field-&gt;identifier = $row['ezcontentclass_attribute_identifier'];
+        $field-&gt;fieldGroup = $row['ezcontentclass_attribute_category'];
+        $field-&gt;fieldType = $row['ezcontentclass_attribute_data_type_string'];
+        $field-&gt;isTranslatable = ( $row['ezcontentclass_attribute_can_translate'] == 1 );
+        $field-&gt;isRequired = $row['ezcontentclass_attribute_is_required'] == 1;
+        $field-&gt;isInfoCollector = $row['ezcontentclass_attribute_is_information_collector'] == 1;
+
+        $field-&gt;isSearchable = (bool)$row['ezcontentclass_attribute_is_searchable'];
+        $field-&gt;position = (int)$row['ezcontentclass_attribute_placement'];
+
+        $this-&gt;toFieldDefinition( $storageFieldDef, $field );
+
+        return $field;
+    }
+
+    /**
+     * Extracts a StorageFieldDefinition from $row
+     *
+     * @param array $row
+     * @return \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition
+     */
+    protected function extractStorageFieldFromRow( array $row )
+    {
+        $storageFieldDef = new StorageFieldDefinition();
+
+        $storageFieldDef-&gt;dataFloat1 = (float)$row['ezcontentclass_attribute_data_float1'];
+        $storageFieldDef-&gt;dataFloat2 = (float)$row['ezcontentclass_attribute_data_float2'];
+        $storageFieldDef-&gt;dataFloat3 = (float)$row['ezcontentclass_attribute_data_float3'];
+        $storageFieldDef-&gt;dataFloat4 = (float)$row['ezcontentclass_attribute_data_float4'];
+        $storageFieldDef-&gt;dataInt1 = (int)$row['ezcontentclass_attribute_data_int1'];
+        $storageFieldDef-&gt;dataInt2 = (int)$row['ezcontentclass_attribute_data_int2'];
+        $storageFieldDef-&gt;dataInt3 = (int)$row['ezcontentclass_attribute_data_int3'];
+        $storageFieldDef-&gt;dataInt4 = (int)$row['ezcontentclass_attribute_data_int4'];
+        $storageFieldDef-&gt;dataText1 = $row['ezcontentclass_attribute_data_text1'];
+        $storageFieldDef-&gt;dataText2 = $row['ezcontentclass_attribute_data_text2'];
+        $storageFieldDef-&gt;dataText3 = $row['ezcontentclass_attribute_data_text3'];
+        $storageFieldDef-&gt;dataText4 = $row['ezcontentclass_attribute_data_text4'];
+        $storageFieldDef-&gt;dataText5 = $row['ezcontentclass_attribute_data_text5'];
+        $storageFieldDef-&gt;serializedDataText = $row['ezcontentclass_attribute_serialized_data_text'];
+
+        return $storageFieldDef;
+    }
+
+    /**
+     * Maps properties from $struct to $type.
+     *
+     * @param Type $type
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\CreateStruct $struct
+     * @return void
+     */
+    public function createTypeFromCreateStruct( CreateStruct $createStruct )
+    {
+        $type = new Type();
+
+        $type-&gt;name = $createStruct-&gt;name;
+        $type-&gt;status = $createStruct-&gt;status;
+        $type-&gt;description = $createStruct-&gt;description;
+        $type-&gt;identifier = $createStruct-&gt;identifier;
+        $type-&gt;created = $createStruct-&gt;created;
+        $type-&gt;modified = $createStruct-&gt;modified;
+        $type-&gt;creatorId = $createStruct-&gt;creatorId;
+        $type-&gt;modifierId = $createStruct-&gt;modifierId;
+        $type-&gt;remoteId = $createStruct-&gt;remoteId;
+        $type-&gt;urlAliasSchema = $createStruct-&gt;urlAliasSchema;
+        $type-&gt;nameSchema = $createStruct-&gt;nameSchema;
+        $type-&gt;isContainer = $createStruct-&gt;isContainer;
+        $type-&gt;initialLanguageId = $createStruct-&gt;initialLanguageId;
+        $type-&gt;groupIds = $createStruct-&gt;groupIds;
+        $type-&gt;fieldDefinitions = $createStruct-&gt;fieldDefinitions;
+        $type-&gt;defaultAlwaysAvailable = $createStruct-&gt;defaultAlwaysAvailable;
+        $type-&gt;sortField = $createStruct-&gt;sortField;
+        $type-&gt;sortOrder = $createStruct-&gt;sortOrder;
+
+        return $type;
+    }
+
+    /**
+     * Creates a create struct from an existing $type.
+     *
+     * @param Type $type
+     * @return \eZ\Publish\SPI\Persistence\Content\Type\CreateStruct
+     */
+    public function createCreateStructFromType( Type $type )
+    {
+        $createStruct = new CreateStruct();
+
+        $createStruct-&gt;name = $type-&gt;name;
+        $createStruct-&gt;status = $type-&gt;status;
+        $createStruct-&gt;description = $type-&gt;description;
+        $createStruct-&gt;identifier = $type-&gt;identifier;
+        $createStruct-&gt;created = $type-&gt;created;
+        $createStruct-&gt;modified = $type-&gt;modified;
+        $createStruct-&gt;creatorId = $type-&gt;creatorId;
+        $createStruct-&gt;modifierId = $type-&gt;modifierId;
+        $createStruct-&gt;remoteId = $type-&gt;remoteId;
+        $createStruct-&gt;urlAliasSchema = $type-&gt;urlAliasSchema;
+        $createStruct-&gt;nameSchema = $type-&gt;nameSchema;
+        $createStruct-&gt;isContainer = $type-&gt;isContainer;
+        $createStruct-&gt;initialLanguageId = $type-&gt;initialLanguageId;
+        $createStruct-&gt;groupIds = $type-&gt;groupIds;
+        $createStruct-&gt;fieldDefinitions = $type-&gt;fieldDefinitions;
+        $createStruct-&gt;defaultAlwaysAvailable = $type-&gt;defaultAlwaysAvailable;
+        $createStruct-&gt;sortField = $type-&gt;sortField;
+        $createStruct-&gt;sortOrder = $type-&gt;sortOrder;
+
+        return $createStruct;
+    }
+
+    /**
+     * Maps $fieldDef to the legacy storage specific StorageFieldDefinition
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageFieldDef
+     * @return void
+     */
+    public function toStorageFieldDefinition(
+        FieldDefinition $fieldDef, StorageFieldDefinition $storageFieldDef )
+    {
+        $converter = $this-&gt;converterRegistry-&gt;getConverter(
+            $fieldDef-&gt;fieldType
+        );
+        $converter-&gt;toStorageFieldDefinition(
+            $fieldDef,
+            $storageFieldDef
+        );
+    }
+
+    /**
+     * Maps a FieldDefinition from the given $storageFieldDef
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageFieldDef
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     * @return void
+     */
+    public function toFieldDefinition(
+        StorageFieldDefinition $storageFieldDef, FieldDefinition $fieldDef )
+    {
+        $converter = $this-&gt;converterRegistry-&gt;getConverter(
+            $fieldDef-&gt;fieldType
+        );
+        $converter-&gt;toFieldDefinition(
+            $storageFieldDef,
+            $fieldDef
+        );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

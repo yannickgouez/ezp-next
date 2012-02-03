@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Example: moving an existing content to a new location
+ *
+ * @package Examples
+ */
+
+$contentId = 50; // Id of the content we'll be moving
+$targetParentFolderId = 100; // Id of the location we'll be moving it to
+
+/**
+ * @var eZ\Publish\API\Repository\Repository
+ */
+$repository = null;
+
+$contentService = $repository-&gt;getContentService();
+$locationService = $repository-&gt;getLocationService();
+
+$content = $contentService-&gt;loadContentInfo( $contentId );
+$location = $locationService-&gt;loadMainLocation( $content );
+$targetParentLocation = $locationService-&gt;loadLocation( $targetParentFolderId );
+
+// move $content's $location to $targetLocation
+try
+{
+    $locationService-&gt;moveSubtree( $location, $targetParentLocation );
+}
+catch ( \eZ\Publish\API\Repository\Exceptions\UnauthorizedException $e )
+{
+    $currentUser = $repository-&gt;getCurrentUser();
+    echo &quot;Current user &quot; . $currentUser-&gt;login .
+        &quot; isn't allowed to move content &quot; . $content-&gt;name .
+        &quot; to &quot; . $targetParentLocation-&gt;pathString;
+}
+
+echo &quot;Content &quot; . $content-&gt;name .
+    &quot; moved to &quot; . $targetParentLocation-&gt;pathString;</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

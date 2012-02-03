@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the \ezp\Persistence\BinaryFile class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\SPI\Io;
+
+/**
+ * This class provides an abstract access to binary files.
+ *
+ * It allows reading &amp; writing of files in a unified way
+ */
+
+class BinaryFile
+{
+    /**
+     * Relative path to the file
+     * @var string
+     */
+    public $path;
+
+    /**
+     * File size, in bytes
+     * @var int
+     */
+    public $size;
+
+    /**
+     * File modification time
+     * @var \DateTime
+     */
+    public $mtime;
+
+    /**
+     * File creation time
+     * @var \DateTime
+     */
+    public $ctime;
+
+    /**
+     * File contentType (image/jpeg, audio/mp3, etc)
+     * @var \eZ\Publish\SPI\Io\ContentType
+     */
+    public $contentType;
+
+    /**
+     * HTTP URI to the binary file
+     * @var string
+     */
+    public $uri;
+
+    /**
+     * Original file name
+     * @var string
+     */
+    public $originalFile;
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

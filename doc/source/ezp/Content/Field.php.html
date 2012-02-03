@@ -1,0 +1,275 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Field class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content;
+use ezp\Base\Model,
+    ezp\Base\Exception\FieldValidation as FieldValidationException,
+    ezp\Base\Exception\InvalidArgumentType,
+    ezp\Base\Exception\InvalidArgumentValue,
+    ezp\Base\Observer,
+    ezp\Base\Observable,
+    ezp\Base\Repository,
+    ezp\Content\Version,
+    ezp\Content\Type\FieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\Field as FieldVO,
+    ezp\Content\FieldType\Value as FieldValue,
+    ezp\Content\FieldType\OnPublish as OnPublishFieldType,
+    ezp\Content\FieldType\OnCreate as OnCreateFieldType;
+
+/**
+ * This class represents a Content's field
+ *
+ * @property-read mixed $id
+ * @property-ready string $type
+ * @property \ezp\Content\FieldType\Value $value Value for current field
+ * @property string $type
+ * @property mixed $language
+ * @property-read int $versionNo
+ * @property-read mixed $fieldDefinitionId
+ * @property-read \ezp\Content\Version $version
+ * @property-read \ezp\Content\Type\FieldDefinition $fieldDefinition
+ */
+class Field extends Model implements Observer
+{
+    /**
+     * @var array Readable of properties on this object
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'type' =&gt; false,
+        'language' =&gt; true,
+        'versionNo' =&gt; false,
+        'fieldDefinitionId' =&gt; false,
+    );
+
+    /**
+     * @var array Dynamic properties on this object
+     */
+    protected $dynamicProperties = array(
+        'version' =&gt; false,
+        'fieldDefinition' =&gt; false,
+        'value' =&gt; true
+    );
+
+    /**
+     * @var \ezp\Content\Version
+     */
+    protected $version;
+
+    /**
+     * @var \ezp\Content\Type\FieldDefinition
+     */
+    protected $fieldDefinition;
+
+    /**
+     * @var \ezp\Content\FieldType\Value
+     */
+    protected $value;
+
+    /**
+     * Constructor, sets up properties
+     *
+     * @param \ezp\Content\Version $contentVersion
+     * @param \ezp\Content\Type\FieldDefinition $fieldDefinition
+     */
+    public function __construct( Version $contentVersion, FieldDefinition $fieldDefinition )
+    {
+        $this-&gt;version = $contentVersion;
+        $this-&gt;fieldDefinition = $fieldDefinition;
+
+        // Observer setup
+        $fieldType = $this-&gt;fieldDefinition-&gt;getType();
+        $this-&gt;attach( $fieldType, 'field/setValue' );
+
+        if ( $fieldType instanceof OnPublishFieldType )
+        {
+            $this-&gt;attach( $fieldType, 'pre_publish' );
+            $this-&gt;attach( $fieldType, 'post_publish' );
+        }
+
+        if ( $fieldType instanceof OnCreateFieldType )
+        {
+            $this-&gt;attach( $fieldType, 'pre_create' );
+            $this-&gt;attach( $fieldType, 'post_create' );
+        }
+
+        $this-&gt;properties = new FieldVO(
+            array(
+                &quot;type&quot; =&gt; $fieldDefinition-&gt;fieldType,
+                &quot;fieldDefinitionId&quot; =&gt; $fieldDefinition-&gt;id,
+            )
+        );
+        $this-&gt;value = $fieldDefinition-&gt;defaultValue;
+        $this-&gt;notify( 'field/setValue', array( 'value' =&gt; $this-&gt;value ) );
+    }
+
+    /**
+     * Return content version object
+     *
+     * @return \ezp\Content\Version
+     */
+    public function getVersion()
+    {
+        return $this-&gt;version;
+    }
+
+    /**
+     * Return content type object
+     *
+     * @return \ezp\Content\Type\FieldDefinition
+     */
+    public function getFieldDefinition()
+    {
+        return $this-&gt;fieldDefinition;
+    }
+
+    /**
+     * Returns current field value as FieldValue object
+     *
+     * @return \ezp\Content\FieldType\Value
+     */
+    public function getValue()
+    {
+        return $this-&gt;value;
+    }
+
+    /**
+     * Assigns FieldValue object $inputValue to current field
+     *
+     * @param \ezp\Content\FieldType\Value $inputValue
+     * @todo Make validate optional.
+     */
+    public function setValue( FieldValue $inputValue )
+    {
+        $this-&gt;value = $this-&gt;validateValue( $inputValue );
+        $this-&gt;notify( 'field/setValue', array( 'value' =&gt; $inputValue ) );
+    }
+
+    /**
+     * Validates $inputValue against validators registered in field definition.
+     * If $inputValue is valid, it will be returned as is.
+     * If not, a ValidationException will be thrown
+     *
+     * @todo Change so validate does not throw exceptions for logical validation errors.
+     *
+     * @param \ezp\Content\FieldType\FieldValue $inputValue
+     * @return \ezp\Content\FieldType\FieldValue
+     * @throws \ezp\Base\Exception\FieldValidation
+     */
+    protected function validateValue( FieldValue $inputValue )
+    {
+        $hasError = false;
+        $errors = array();
+        foreach ( $this-&gt;getFieldDefinition()-&gt;getValidators() as $validator )
+        {
+            if ( !$validator-&gt;validate( $inputValue ) )
+            {
+                $hasError = true;
+                $errors = array_merge( $errors, $validator-&gt;getMessage() );
+            }
+        }
+
+        if ( $hasError )
+        {
+            throw new FieldValidationException( $this-&gt;getFieldDefinition()-&gt;identifier, $errors );
+        }
+
+        return $inputValue;
+    }
+
+    /**
+     * Called when subject has been updated
+     * Supported events:
+     *   - field/setValue Should be triggered when a field has been set a value. Will inject the value in the field type
+     *
+     * @param \ezp\Base\Observable $subject
+     * @param string $event
+     * @param array $arguments
+     * @throws \ezp\Base\Exception\InvalidArgumentType If an expected observable argument isn't passed
+     */
+    public function update( Observable $subject, $event = 'update', array $arguments = null )
+    {
+        switch ( $event )
+        {
+            case 'pre_create':
+            case 'post_create':
+            case 'pre_publish':
+            case 'post_publish':
+                if ( !$subject instanceof Version )
+                {
+                    throw new InvalidArgumentType( 'version', 'ezp\\Content\\Version', null );
+                }
+
+                if ( !isset( $arguments['repository'] ) || !$arguments['repository'] instanceof Repository )
+                {
+                    throw new InvalidArgumentType( 'repository', 'ezp\\Base\\Repository', null );
+                }
+
+                // notify FieldTypes about the event
+                $this-&gt;notify( $event, array( 'repository' =&gt; $arguments['repository'] ) );
+                break;
+        }
+    }
+
+    /**
+     * Returns a string representation of the field value.
+     * This string representation must be compatible with {@link self::fromString()} supported format
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this-&gt;value-&gt;__toString();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

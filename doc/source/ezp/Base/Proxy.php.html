@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Service based model implementation for Proxy object
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+
+/**
+ * Proxy class for model objects
+ *
+ */
+abstract class Proxy
+{
+    /**
+     * Service used to load the object the proxy represents.
+     *
+     * @var \ezp\Base\Service
+     */
+    protected $service;
+
+    /**
+     * Id of the object
+     *
+     * @var mixed
+     */
+    protected $id;
+
+    /**
+     * Concrete proxied object
+     *
+     * @var \ezp\Base\Model|object
+     */
+    protected $proxiedObject = null;
+
+    /**
+     * Setup proxy object with enough info to be able to perform a load operation on the object it proxies.
+     *
+     * @param mixed $id Primary id
+     * @param \ezp\Base\Service $service
+     */
+    public function __construct( $id, Service $service )
+    {
+        $this-&gt;id = $id;
+        $this-&gt;service = $service;
+    }
+
+    /**
+     * Loads the proxied object in the case it has not happened yet.
+     */
+    protected function lazyLoad()
+    {
+        if ( $this-&gt;proxiedObject === null )
+        {
+            $this-&gt;proxiedObject = $this-&gt;service-&gt;load( $this-&gt;id );
+        }
+    }
+
+    /**
+     * Provides read access to a $property
+     *
+     * @param string $property
+     * @return mixed
+     */
+    public function __get( $property )
+    {
+        if ( $property === &quot;id&quot; )
+            return $this-&gt;id;
+
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;$property;
+    }
+
+    /**
+     * Provides write access to a $property
+     *
+     * @param string $property
+     * @param mixed $value
+     */
+    public function __set( $property, $value )
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;$property = $value;
+    }
+
+    /**
+     * Checks if a public virtual property is set
+     *
+     * @param string $property Property name
+     * @return bool
+     */
+    public function __isset( $property )
+    {
+        $this-&gt;lazyLoad();
+        return isset( $this-&gt;proxiedObject-&gt;$property );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,235 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ContentType class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\SPI\Persistence\Content;
+use eZ\Publish\SPI\Persistence\ValueObject,
+    eZ\Publish\SPI\Persistence\Content\Location;
+
+/**
+ * @todo What about sort_field and sort_order?
+ */
+class Type extends ValueObject
+{
+    /**
+     * @var int Status constant for defined (aka &quot;published&quot;) Type
+     */
+    const STATUS_DEFINED = 0;
+
+    /**
+     * @var int Status constant for draft (aka &quot;temporary&quot;) Type
+     */
+    const STATUS_DRAFT = 1;
+
+    /**
+     * @var int Status constant for modified (aka &quot;deferred for publishing&quot;) Type
+     */
+    const STATUS_MODIFIED = 2;
+
+    /**
+     * Primary key: Content type ID
+     *
+     * @var mixed
+     */
+    public $id;
+
+    /**
+     * Primary key: Status (legacy: &quot;version&quot;)
+     *
+     * @var int One of Type::STATUS_DEFINED|Type::STATUS_DRAFT|Type::STATUS_MODIFIED
+     */
+    public $status = self::STATUS_DRAFT;
+
+    /**
+     * Human readable name of the content type
+     *
+     * The structure of this field is:
+     * &lt;code&gt;
+     * array( 'eng' =&gt; '&lt;name_eng&gt;', 'de' =&gt; '&lt;name_de&gt;' );
+     * &lt;/code&gt;
+     *
+     * @var string[]
+     */
+    public $name;
+
+    /**
+     * Human readable description of the content type
+     *
+     * The structure of this field is:
+     * &lt;code&gt;
+     * array( 'eng' =&gt; '&lt;description_eng&gt;', 'de' =&gt; '&lt;description_de&gt;' );
+     * &lt;/code&gt;
+     *
+     * @var string[]
+     */
+    public $description = array();
+
+    /**
+     * String identifier of a type
+     *
+     * @var string
+     */
+    public $identifier;
+
+    /**
+     * Creation date (timestamp)
+     *
+     * @var int
+     */
+    public $created;
+
+    /**
+     * Modification date (timestamp)
+     *
+     * @var int
+     */
+    public $modified;
+
+    /**
+     * Creator user id
+     *
+     * @var mixed
+     */
+    public $creatorId;
+
+    /**
+     * Modifier user id
+     *
+     * @var mixed
+     *
+     */
+    public $modifierId;
+
+    /**
+     * Unique remote ID
+     *
+     * @var string
+     */
+    public $remoteId;
+
+    /**
+     * URL alias schema
+     * Same as {@link \eZ\Publish\SPI\Persistence\Content\Type::$nameSchema}.
+     * If nothing is provided, $nameSchema will be used instead.
+     *
+     * @var string
+     * @see \eZ\Publish\SPI\Persistence\Content\Type::$nameSchema
+     */
+    public $urlAliasSchema;
+
+    /**
+     * Name schema.
+     * Can be composed of FieldDefinition identifier place holders.
+     * These place holders must comply this pattern : &lt;field_definition_identifier&gt;.
+     * An OR condition can be used :
+     * &lt;field_def|other_field_def&gt;
+     * In this example, field_def will be used if available. If not, other_field_def will be used for content name generation
+     *
+     * @var string
+     */
+    public $nameSchema;
+
+    /**
+     * Determines if the type is a container
+     *
+     * @var bool
+     */
+    public $isContainer;
+
+    /**
+     * Initial language
+     *
+     * @var mixed
+     */
+    public $initialLanguageId;
+
+    /**
+     * Specifies which property the child locations should be sorted on by default when created
+     *
+     * Valid values are found at {@link Location::SORT_FIELD_*}
+     *
+     * @var mixed
+     */
+    public $sortField = Location::SORT_FIELD_PUBLISHED;
+
+    /**
+     * Specifies whether the sort order should be ascending or descending by default when created
+     *
+     * Valid values are {@link Location::SORT_ORDER_*}
+     *
+     * @var mixed
+     */
+    public $sortOrder = Location::SORT_ORDER_DESC;
+
+    /**
+     * Contains an array of type group IDs
+     *
+     * @var mixed[]
+     */
+    public $groupIds = array();
+
+    /**
+     * Content fields in this type
+     *
+     * @var \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition[]
+     */
+    public $fieldDefinitions = array();
+
+    /**
+     * @todo: Document.
+     *
+     * @var boolean
+     */
+    public $defaultAlwaysAvailable = false;
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

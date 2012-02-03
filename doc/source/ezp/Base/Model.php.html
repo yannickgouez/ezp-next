@@ -1,0 +1,417 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing ezp\Content\Base class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+use ezp\Base\Observable,
+    ezp\Base\Observer,
+    ezp\Base\ModelState,
+    ezp\Base\Exception\InvalidArgumentType,
+    ezp\Base\Exception\Logic,
+    ezp\Base\Exception\PropertyNotFound,
+    ezp\Base\Exception\PropertyPermission,
+    Traversable;
+
+/**
+ * Abstract model class for Domain objects
+ *
+ * NOTE: Class is ATM meant for Domain Objects that uses a ValueObject as property backend, in other
+ * words a &quot;Persistent&quot; Object. So instead of using this class in other cases, a base class should be
+ * created that contains the functionality such objects needs, and Model should extend it.
+ *
+ * - Simple class:
+ *
+ *     class Section extends Model
+ *     {
+ *         protected $readWriteProperties = array(
+ *             'id' =&gt; false,
+ *             'identifier' =&gt; true,
+ *             'name' =&gt; true,
+ *         );
+ *
+ *         public function __construct()
+ *         {
+ *             $this-&gt;properties = new SectionValue();
+ *         }
+ *     }
+ *
+ *
+ * - Use when setting up object based on existing value object:
+ *
+ *     $section = new Section();
+ *     $section-&gt;setState( array( 'properties' =&gt; $valueObject ) );
+ *
+ */
+abstract class Model implements Observable, ModelState
+{
+    /**
+     * Value object that serves as the property store
+     *
+     * @var \eZ\Publish\SPI\Persistence\ValueObject
+     */
+    protected $properties;
+
+    /**
+     * Array indicates which properties are readable &amp; writable through
+     * the magic getter and setter.
+     * Key is property name, value is bool indicating if property is writable.
+     *
+     * @todo should mention that no type checking is done internal props.?
+     * @var array
+     */
+    protected $readWriteProperties;
+
+    /**
+     * Array container for virtual properties, handled dynamically by methods
+     * Key is property name, value is a bool, true if member of aggregate, false if not.
+     *
+     * Corresponding get method name must follow pattern get&lt;propertyName&gt;().
+     * The method will be called without any parameter
+     * e.g. : for a dynamic property named &quot;myProperty&quot;, method should be &quot;getMyProperty()&quot;.
+     *
+     * If the dynamic property is writable, a set method should be defined.
+     * Corresponding set method name must follow pattern set&lt;propertyName&gt;( $value ).
+     * The method will be called with only one $value parameter.
+     * e.g. : for a dynamic property named &quot;myProperty&quot;, method should be &quot;setMyProperty( $value )&quot;
+     *
+     * @var array
+     */
+    protected $dynamicProperties = array();
+
+    /**
+     * List of event listeners
+     *
+     * @var \ezp\Base\Observer[]
+     */
+    private $observers = array();
+
+    /**
+     * Return list of properties, where key is properties and value depends on type and is internal so should be ignored for now.
+     *
+     * @return array
+     */
+    public function properties()
+    {
+        return array_keys( $this-&gt;dynamicProperties + $this-&gt;readWriteProperties );
+    }
+
+    /**
+     * Attaches $observer for $event to the Model
+     *
+     * @param \ezp\Base\Observer $observer
+     * @param string $event
+     * @return \ezp\Base\Model
+     */
+    public function attach( Observer $observer, $event = 'update' )
+    {
+        if ( isset( $this-&gt;observers[$event] ) )
+        {
+            $this-&gt;observers[$event][] = $observer;
+        }
+        else
+        {
+            $this-&gt;observers[$event] = array( $observer );
+        }
+        return $this;
+    }
+
+    /**
+     * Detaches $observer for $event from the Model
+     *
+     * @param \ezp\Base\Observer $observer
+     * @param string $event
+     * @return \ezp\Base\Model
+     */
+    public function detach( Observer $observer, $event = 'update' )
+    {
+        if ( !empty( $this-&gt;observers[$event] ) )
+        {
+            foreach ( $this-&gt;observers[$event] as $key =&gt; $obj )
+            {
+                if ( $obj === $observer )
+                    unset( $this-&gt;observers[$event][$key] );
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Notifies registered observers about $event
+     *
+     * @param string $event
+     * @param array|null $arguments
+     * @return \ezp\Base\Model
+     */
+    public function notify( $event = 'update', array $arguments = null )
+    {
+        if ( !empty( $this-&gt;observers[$event] ) )
+        {
+            foreach ( $this-&gt;observers[$event] as $obj )
+            {
+                $obj-&gt;update( $this, $event, $arguments );
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Magic getter
+     *
+     * @param string $property Property name
+     * @return mixed
+     * @throws \ezp\Base\Exception\PropertyNotFound If $property cannot be found
+     */
+    public function __get( $property )
+    {
+        if ( isset( $this-&gt;readWriteProperties[$property] ) )
+        {
+            if ( property_exists( $this-&gt;properties, $property ) )
+            {
+                return $this-&gt;properties-&gt;$property;
+            }
+
+            throw new Logic(
+                '$readWriteProperties',
+                &quot;property '{$property}' could not be found on &quot; . get_class( $this )
+            );
+        }
+
+        if ( !isset( $this-&gt;dynamicProperties[$property] ) )
+            throw new PropertyNotFound( $property, get_class( $this ) );
+
+        $method = &quot;get{$property}&quot;;
+        return $this-&gt;$method();
+    }
+
+    /**
+     * Magic setter
+     *
+     * Avoids to modify read-only properties
+     *
+     * @param string $property
+     * @param mixed $value
+     * @throws \ezp\Base\Exception\PropertyNotFound If $property cannot be found
+     * @throws \ezp\Base\Exception\PropertyPermission When trying to set a value to a read-only property
+     */
+    public function __set( $property, $value )
+    {
+        if ( !isset( $this-&gt;readWriteProperties[$property] ) )
+        {
+            throw new PropertyNotFound( $property, get_class( $this ) );
+        }
+
+        if ( !$this-&gt;readWriteProperties[$property] )
+        {
+            throw new PropertyPermission( $property, PropertyPermission::WRITE, get_class( $this ) );
+        }
+
+        $this-&gt;properties-&gt;$property = $value;
+    }
+
+    /**
+     * Checks if a public virtual property is set
+     *
+     * @param string $property Property name
+     * @return bool
+     */
+    public function __isset( $property )
+    {
+        return ( isset( $this-&gt;readWriteProperties[$property] ) &amp;&amp; isset( $this-&gt;properties-&gt;$property ) )
+            || ( isset( $this-&gt;dynamicProperties[$property] ) &amp;&amp; isset( $this-&gt;$property ) );
+    }
+
+    /**
+     * Sets internal variables on object from array
+     *
+     * Key is property name and value is property value.
+     *
+     * @internal
+     * @param array $state
+     * @return \ezp\Base\Model
+     * @throws \ezp\Base\Exception\PropertyNotFound If one of the properties in $state is not found
+     */
+    public function setState( array $state )
+    {
+        foreach ( $state as $name =&gt; $value )
+        {
+            if ( !property_exists( $this, $name ) )
+                throw new PropertyNotFound( $name, get_class( $this ) );
+
+            $this-&gt;$name = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Gets internal variables on object as array
+     *
+     * Key is property name and value is property value.
+     *
+     * @internal
+     * @param string|null $property Optional, lets you specify to only return one property by name
+     * @return array|mixed Array if $property is null, else value of property
+     * @throws \ezp\Base\Exception\PropertyNotFound If $property is not found (when not null)
+     */
+    public function getState( $property = null )
+    {
+        // $property is provided, return its value if valid
+        if ( $property !== null )
+        {
+            if ( !( is_string( $property ) &amp;&amp; property_exists( $this, $property ) ) )
+                throw new PropertyNotFound( $property, get_class( $this ) );
+
+            return $this-&gt;$property;
+        }
+
+        $arr = array();
+        foreach ( $this as $name =&gt; $value )
+        {
+            $arr[$name] = $value;
+        }
+
+        return $arr;
+    }
+
+    /**
+     * Set properties with hash
+     *
+     * @param array $properties Where key is property name and value if set is value to set on property
+     * @return \ezp\Base\Model Return $this
+     */
+    public function fromHash( array $properties )
+    {
+        foreach ( $this-&gt;readWriteProperties as $property =&gt; $writable )
+        {
+            if ( !$writable || !isset( $properties[$property] ) )
+                continue;
+
+            $this-&gt;properties-&gt;$property = $properties[$property];
+        }
+
+        foreach ( $this-&gt;dynamicProperties as $property =&gt; $member )
+        {
+            if ( !$member || !isset( $properties[$property] ) )
+                continue;
+
+            $value = $this-&gt;__get( $property );
+            if ( $value instanceof self )
+            {
+                $value-&gt;fromHash( $properties[$property] );
+                continue;
+            }
+
+            if ( !$value instanceof Traversable &amp;&amp; !is_array( $value ) )
+                continue;
+
+            foreach ( $value as $key =&gt; $item )
+            {
+                if ( isset( $properties[$property][$key] ) &amp;&amp; $item instanceof self )
+                    $item-&gt;fromHash( $properties[$property][$key] );
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get properties as hash
+     *
+     * @param bool $includeReadOnly Include properties that are readOnly as well.
+     * @return array
+     */
+    public function toHash( $includeReadOnly = false )
+    {
+        $hash = array();
+        foreach ( $this-&gt;readWriteProperties as $property =&gt; $writable )
+        {
+            if ( !$writable &amp;&amp; !$includeReadOnly )
+                continue;
+
+            $hash[$property] = $this-&gt;properties-&gt;$property;
+        }
+
+        foreach ( $this-&gt;dynamicProperties as $property =&gt; $member )
+        {
+            if ( !$member )
+                continue;
+
+            $value = $this-&gt;__get( $property );
+            if ( $value instanceof self )
+            {
+                $hash[$property] = $value-&gt;toHash( $includeReadOnly );
+                continue;
+            }
+
+            if ( !$value instanceof Traversable &amp;&amp; !is_array( $value ) )
+                continue;
+
+            $hash[$property] = array();
+            foreach ( $value as $key =&gt; $item )
+            {
+                if ( $item instanceof self )
+                    $hash[$property][$key] = $item-&gt;toHash( $includeReadOnly );
+            }
+        }
+        return $hash;
+    }
+
+    /**
+     * Clone object
+     *
+     * Objects extending Model should override this to add additional clone logic
+     */
+    public function __clone()
+    {
+        $this-&gt;properties = clone $this-&gt;properties;
+        $this-&gt;properties-&gt;id = false;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

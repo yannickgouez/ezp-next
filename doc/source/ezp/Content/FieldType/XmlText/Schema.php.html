@@ -1,0 +1,497 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the \ezp\Content\FieldType\XmlText\Schema class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\XmlText;
+
+use ezp\Base\Configuration;
+
+/**
+ * @internal
+ */
+class Schema
+{
+    /**
+     * Schema contents
+     * @var array
+     */
+    private $schema = array(
+        'section'   =&gt; array( 'blockChildrenAllowed' =&gt; array( 'header', 'paragraph', 'section' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'xmlns:image', 'xmlns:xhtml', 'xmlns:custom', 'xmlns:tmp' ) ),
+
+        'embed'     =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; null,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'object_id', 'node_id', 'show_path', 'size',
+                                                     'align', 'view', 'xhtml:id', 'class', 'target' ),
+                              'attributesDefaults' =&gt; array( 'align' =&gt; '', 'view' =&gt; 'embed', 'class' =&gt; '' ) ),
+
+        'embed-inline' =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; null,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'object_id', 'node_id', 'show_path', 'size',
+                                                     'align', 'view', 'xhtml:id', 'class', 'target' ),
+                              'attributesDefaults' =&gt; array( 'align' =&gt; '', 'view' =&gt; 'embed-inline', 'class' =&gt; '' ) ),
+
+        'table'     =&gt; array( 'blockChildrenAllowed' =&gt; array( 'tr' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class', 'width', 'border', 'align' ) ),
+
+        'tr'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'td', 'th' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'td'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'header', 'paragraph', 'section', 'table' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class', 'align', 'xhtml:width', 'xhtml:colspan', 'xhtml:rowspan' ) ),
+
+        'th'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'header', 'paragraph', 'section', 'table' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class', 'align', 'xhtml:width', 'xhtml:colspan', 'xhtml:rowspan' ) ),
+
+        'ol'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'li' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'ul'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'li' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'li'        =&gt; array( 'blockChildrenAllowed' =&gt; array( 'paragraph' ),
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'header'    =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class', 'anchor_name', 'align' ) ),
+
+        'paragraph' =&gt; array( 'blockChildrenAllowed' =&gt; array( 'line', 'link', 'embed', 'table', 'ol', 'ul', 'custom', 'literal' ),
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class', 'align' ) ),
+
+        'line'      =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; false ),
+
+        'literal'   =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; array( '#text' ),
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; false,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'strong'    =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'emphasize' =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'class' ) ),
+
+        'link'      =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; true,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'class', 'xhtml:id', 'target', 'xhtml:title',
+                                                     'object_id', 'node_id', 'show_path', 'anchor_name',
+                                                     'url_id', 'id', 'view' ),
+                              'attributesDefaults' =&gt; array( 'target' =&gt; '_self' ) ),
+
+        'anchor'    =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; array( 'name' ) ),
+
+        'custom'    =&gt; array( 'blockChildrenAllowed' =&gt; true,
+                              'inlineChildrenAllowed' =&gt; true,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; null,
+                              'attributes' =&gt; array( 'name', 'align' ) ),
+
+        '#text'     =&gt; array( 'blockChildrenAllowed' =&gt; false,
+                              'inlineChildrenAllowed' =&gt; false,
+                              'childrenRequired' =&gt; false,
+                              'isInline' =&gt; true,
+                              'attributes' =&gt; false )
+    );
+
+    /**
+     * @var \ezp\Content\FieldType\XmlText\Schema
+     */
+    private static $instance;
+
+    function __construct()
+    {
+        $configuration = Configuration::getInstance( 'content' );
+
+        // Get inline custom tags list
+        $this-&gt;schema['custom']['isInline'] = $configuration-&gt;get( 'CustomTagSettings', 'IsInline',
+            array( 'strike' =&gt; 'true', 'sub' =&gt; true, 'sup' =&gt; true )
+        );
+        if ( !is_array( $this-&gt;schema['custom']['isInline'] ) )
+            $this-&gt;schema['custom']['isInline'] = array();
+
+        $this-&gt;schema['custom']['tagList'] = $configuration-&gt;get( 'CustomTagSettings', 'AvailableCustomTags',
+            array( 'factbox', 'quote', 'strike', 'sub', 'sup' )
+        );
+        if ( !is_array( $this-&gt;schema['custom']['tagList'] ) )
+            $this-&gt;schema['custom']['tagList'] = array();
+
+        $eZPublishVersion = 4.6; // eZPublishSDK::majorVersion() + eZPublishSDK::minorVersion() * 0.1;
+
+        // Get all tags available classes list
+        // @todo Implement
+        foreach ( array_keys( $this-&gt;schema ) as $tagName )
+        {
+            if ( $configuration-&gt;has( $tagName, 'AvailableClasses' ) )
+            {
+                $avail = $configuration-&gt;get( $tagName, 'AvailableClasses' );
+                if ( is_array( $avail ) &amp;&amp; count( $avail ) )
+                    $this-&gt;schema[$tagName]['classesList'] = $avail;
+                else
+                    $this-&gt;schema[$tagName]['classesList'] = array();
+            }
+            else
+                $this-&gt;schema[$tagName]['classesList'] = array();
+        }
+
+        // Fix for empty paragraphs setting
+        $allowEmptyParagraph = $configuration-&gt;get( 'paragraph', 'AllowEmpty', 'false' );
+        $this-&gt;schema['paragraph']['childrenRequired'] = $allowEmptyParagraph == 'true' ? false : true;
+
+        // Get all tags custom attributes list
+        // @todo Implement
+        foreach ( array_keys( $this-&gt;schema ) as $tagName )
+        {
+            if ( $tagName == 'custom' )
+            {
+                // Custom attributes of custom tags
+                foreach ( $this-&gt;schema['custom']['tagList'] as $customTagName )
+                {
+                    if ( $configuration-&gt;has( $customTagName, 'CustomAttributes' ) )
+                    {
+                        $avail = $configuration-&gt;get( $customTagName, 'CustomAttributes' );
+                        if ( is_array( $avail ) &amp;&amp; count( $avail ) )
+                            $this-&gt;schema['custom']['customAttributes'][$customTagName] = $avail;
+                        else
+                            $this-&gt;schema['custom']['customAttributes'][$customTagName] = array();
+                    }
+                    else
+                        $this-&gt;schema['custom']['customAttributes'][$customTagName] = array();
+                }
+            }
+            else
+            {
+                // Custom attributes of regular tags
+                if ( $configuration-&gt;has( $tagName, 'CustomAttributes' ) )
+                {
+                    $avail = $configuration-&gt;get( $tagName, 'CustomAttributes' );
+                    if ( is_array( $avail ) &amp;&amp; count( $avail ) )
+                        $this-&gt;schema[$tagName]['customAttributes'] = $avail;
+                    else
+                        $this-&gt;schema[$tagName]['customAttributes'] = array();
+                }
+                else
+                    $this-&gt;schema[$tagName]['customAttributes'] = array();
+            }
+        }
+    }
+
+    /**
+     * Returns a shared instance of the eZXMLSchema class.
+     *
+     * @return eZXMLSchema
+     */
+    public static function getInstance()
+    {
+        if ( !self::$instance instanceof self )
+        {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
+
+    // Determines if the tag is inline
+    function isInline( $element )
+    {
+        if ( is_string( $element ) )
+            $elementName = $element;
+        else
+            $elementName = $element-&gt;nodeName;
+
+        $isInline = $this-&gt;schema[$elementName]['isInline'];
+
+        // Special workaround for custom tags.
+        if ( is_array( $isInline ) &amp;&amp; !is_string( $element ) )
+        {
+            $isInline = false;
+            $name = $element-&gt;getAttribute( 'name' );
+
+            if ( isset( $this-&gt;schema['custom']['isInline'][$name] ) )
+            {
+                if ( $this-&gt;schema['custom']['isInline'][$name] != 'false' )
+                    $isInline = true;
+            }
+        }
+        return $isInline;
+    }
+
+    /**
+     * Checks if one element is allowed to be a child of another
+     *
+     * @param $parent parent element: DOMNode or string
+     * @param $child child element: DOMNode or string
+     *
+     * @return bool|null true if elements match schema, false if elements don't match schema, null  in case of errors
+     * @todo Add exceptions
+    */
+    function check( $parent, $child )
+    {
+        if ( is_string( $parent ) )
+            $parentName = $parent;
+        else
+            $parentName = $parent-&gt;nodeName;
+
+        if ( is_string( $child ) )
+            $childName = $child;
+        else
+            $childName = $child-&gt;nodeName;
+
+        if ( isset( $this-&gt;schema[$childName] ) )
+        {
+            $isInline = $this-&gt;isInline( $child );
+
+            if ( $isInline === true )
+            {
+                $allowed = $this-&gt;schema[$parentName]['inlineChildrenAllowed'];
+            }
+            elseif ( $isInline === false )
+            {
+                // Special workaround for custom tags.
+                if ( $parentName == 'custom' &amp;&amp; !is_string( $parent ) &amp;&amp;
+                     $parent-&gt;getAttribute( 'inline' ) != 'true' )
+                {
+                    $allowed = true;
+                }
+                else
+                    $allowed = $this-&gt;schema[$parentName]['blockChildrenAllowed'];
+            }
+            else
+                return true;
+
+            if ( is_array( $allowed ) )
+                $allowed = in_array( $childName, $allowed );
+
+            if ( !$allowed )
+                return false;
+        }
+        else
+        {
+            return null;
+        }
+        return true;
+    }
+
+    function childrenRequired( $element )
+    {
+        //if ( !isset( $this-&gt;schema[$element-&gt;nodeName] ) )
+        //    return false;
+
+        return $this-&gt;schema[$element-&gt;nodeName]['childrenRequired'];
+    }
+
+    function hasAttributes( $element )
+    {
+        //if ( !isset( $this-&gt;schema[$element-&gt;nodeName] ) )
+        //    return false;
+
+        return ( $this-&gt;schema[$element-&gt;nodeName]['attributes'] != false );
+    }
+
+    function attributes( $element )
+    {
+        return $this-&gt;schema[$element-&gt;nodeName]['attributes'];
+    }
+
+    function customAttributes( $element )
+    {
+        if ( is_string( $element ) )
+        {
+            return $this-&gt;schema[$element]['customAttributes'];
+        }
+        else
+        {
+            if ( $element-&gt;nodeName == 'custom' )
+            {
+                $name = $element-&gt;getAttribute( 'name' );
+                if ( $name )
+                    return $this-&gt;schema['custom']['customAttributes'][$name];
+            }
+            else
+            {
+                return $this-&gt;schema[$element-&gt;nodeName]['customAttributes'];
+            }
+        }
+        return array();
+    }
+
+    function attrDefaultValue( $tagName, $attrName )
+    {
+        if ( isset( $this-&gt;schema[$tagName]['attributesDefaults'][$attrName] ) )
+            return $this-&gt;schema[$tagName]['attributesDefaults'][$attrName];
+        else
+            return array();
+    }
+
+    function attrDefaultValues( $tagName )
+    {
+        if ( isset( $this-&gt;schema[$tagName]['attributesDefaults'] ) )
+            return $this-&gt;schema[$tagName]['attributesDefaults'];
+        else
+            return array();
+    }
+
+    function exists( $element )
+    {
+        if ( is_string( $element ) )
+        {
+            return isset( $this-&gt;schema[$element] );
+        }
+        else
+        {
+            if ( $element-&gt;nodeName == 'custom' )
+            {
+                $name = $element-&gt;getAttribute( 'name' );
+                if ( $name )
+                    return in_array( $name, $this-&gt;schema['custom']['tagList'] );
+            }
+            else
+            {
+                return isset( $this-&gt;schema[$element-&gt;nodeName] );
+            }
+        }
+        return false;
+    }
+
+    function availableElements()
+    {
+        return array_keys( $this-&gt;schema );
+    }
+
+    function getClassesList( $tagName )
+    {
+        if ( isset( $this-&gt;schema[$tagName]['classesList'] ) )
+            return $this-&gt;schema[$tagName]['classesList'];
+        else
+            return array();
+    }
+
+    function addAvailableClass( $tagName, $class )
+    {
+        if ( !isset( $this-&gt;schema[$tagName]['classesList'] ) )
+            $this-&gt;schema[$tagName]['classesList'] = array();
+
+        $this-&gt;schema[$tagName]['classesList'][] = $class;
+    }
+
+    function addCustomAttribute( $element, $attrName )
+    {
+        if ( is_string( $element ) )
+        {
+            $this-&gt;schema[$element]['customAttributes'][] = $attrName;
+        }
+        else
+        {
+            if ( $element-&gt;nodeName == 'custom' )
+            {
+                $name = $element-&gt;getAttribute( 'name' );
+                if ( $name )
+                    $this-&gt;schema['custom']['customAttributes'][$name][] = $attrName;
+            }
+            else
+            {
+                $this-&gt;schema[$element-&gt;nodeName]['customAttributes'][] = $attrName;
+            }
+        }
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

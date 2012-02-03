@@ -1,0 +1,325 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Version\Concrete class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\Version;
+use ezp\Base\Model,
+    ezp\Content,
+    ezp\Content\Version,
+    ezp\Content\Field\StaticCollection as FieldCollection,
+    ezp\Persistence\Content\Version as VersionValue;
+
+/**
+ * This class represents a Concrete Content Version
+ *
+ * @property-read int $id
+ * @property-read int $versionNo
+ * @property-read mixed $contentId
+ * @property-read int $status One of the STATUS_* constants
+ * @property-read \ezp\Content $content
+ * @property-read string[] $name Name in the different languages
+ * @property-read mixed $ownerId Content's Owner id
+ * @property-read bool $alwaysAvailable Content's always available flag
+ * @property-read string $remoteId Content's Remote ID
+ * @property-read mixed $sectionId Content' Section ID
+ * @property-read mixed $typeId Content's Type ID
+ * @property-read int $contentStatus Content' status, as one of the \ezp\Content::STATUS_* constants
+ * @property-read \ezp\Content\Location $mainLocation Content's main location
+ * @property-read \ezp\Content\Section $section Content's Section
+ * @property-read \ezp\User $owner Content's Owner
+ * @property-read \ezp\Content\Type $contentType Content's type
+ * @property-read \ezp\Content\Location[] $locations Content's locations
+ * @property-read \ezp\Content\Relation[] $relations Content's relations
+ * @property-read \ezp\Content\Relation[] $reverseRelations Content's reverse relations
+ * @property-read \ezp\Content\Language $initialLanguage Content's initial language
+ * @property mixed $initialLanguageId
+ * @property int $creatorId
+ * @property int $created
+ * @property int $modified
+ * @property-read \ezp\Content\Field[] $fields An hash structure of fields
+ */
+class Concrete extends Model implements Version
+{
+
+    /**
+     * @var array Readable of properties on this object
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'name' =&gt; false,
+        'versionNo' =&gt; false,
+        'creatorId' =&gt; true,
+        'created' =&gt; true,
+        'modified' =&gt; true,
+        'status' =&gt; false,
+        'contentId' =&gt; false,
+        'initialLanguageId' =&gt; false,
+    );
+
+    /**
+     * @var array Dynamic properties on this object
+     */
+    protected $dynamicProperties = array(
+        'fields' =&gt; true,
+        'content' =&gt; false,
+        'ownerId' =&gt; false,
+        'alwaysAvailable' =&gt; false,
+        'remoteId' =&gt; false,
+        'sectionId' =&gt; false,
+        'typeId' =&gt; false,
+        'contentStatus' =&gt; false,
+        /*
+        @todo: Implement as soon as there is some more info (like @property) in Content\Concrete
+        'contentModified' =&gt; false,
+        'contentPublished' =&gt; false,
+        */
+        'mainLocation' =&gt; false,
+        'section' =&gt; false,
+        'owner' =&gt; false,
+        'contentType' =&gt; false,
+        'locations' =&gt; false,
+        'relations' =&gt; false,
+        'reverseRelations' =&gt; false,
+        'initialLanguage' =&gt; false,
+    );
+
+    /**
+     * @var \ezp\Content\Field[]
+     */
+    protected $fields;
+
+    /**
+     * Content object this version is attached to.
+     *
+     * @var Content
+     */
+    protected $content;
+
+    /**
+     * Create content version based on content and content type fields objects
+     *
+     * @param Content $content
+     */
+    public function __construct( Content $content )
+    {
+        $this-&gt;properties = new VersionValue(
+            array(
+                'contentId' =&gt; $content-&gt;id,
+                'status' =&gt; self::STATUS_DRAFT,
+                'initialLanguageId' =&gt; $content-&gt;initialLanguageId
+            )
+        );
+        $this-&gt;content = $content;
+        $this-&gt;fields = new FieldCollection( $this );
+    }
+
+    /**
+     * Get fields of current version
+     *
+     * @return \ezp\Content\Field[]
+     */
+    public function getFields()
+    {
+        return $this-&gt;fields;
+    }
+
+    /**
+     * Get content that this version is attached to
+     *
+     * @return \ezp\Content
+     */
+    public function getContent()
+    {
+        return $this-&gt;content;
+    }
+
+    /**
+     * Get content's Owner ID that this version is attached to
+     *
+     * @return mixed
+     */
+    public function getOwnerId()
+    {
+        return $this-&gt;content-&gt;ownerId;
+    }
+
+    /**
+     * Get content's &quot;always available&quot; flag that this version is attached to
+     *
+     * @return bool
+     */
+    public function getAlwaysAvailable()
+    {
+        return $this-&gt;content-&gt;alwaysAvailable;
+    }
+
+    /**
+     * Get content's remote ID that this version is attached to
+     *
+     * @return string
+     */
+    public function getRemoteId()
+    {
+        return $this-&gt;content-&gt;remoteId;
+    }
+
+    /**
+     * Get content's section ID that this version is attached to
+     *
+     * @return mixed
+     */
+    public function getSectionId()
+    {
+        return $this-&gt;content-&gt;sectionId;
+    }
+
+    /**
+     * Get content's section ID that this version is attached to
+     *
+     * @return mixed
+     */
+    public function getTypeId()
+    {
+        return $this-&gt;content-&gt;typeId;
+    }
+
+    /**
+     * Get content' status that this version is attached to, as one of the \ezp\Content::STATUS_* constants
+     *
+     * @return int
+     */
+    public function getContentStatus()
+    {
+        return $this-&gt;content-&gt;status;
+    }
+
+    /**
+     * Get content's main location that this version is attached to
+     *
+     * @return \ezp\Content\Location|null
+     */
+    public function getMainLocation()
+    {
+        return $this-&gt;content-&gt;getMainLocation();
+    }
+
+    /**
+     * Get content' section that this version is attached to
+     *
+     * @return \ezp\Content\Section
+     */
+    public function getSection()
+    {
+        return $this-&gt;content-&gt;getSection();
+    }
+
+    /**
+     * Get content's owner that this version is attached to
+     *
+     * @return \ezp\User
+     */
+    public function getOwner()
+    {
+        return $this-&gt;content-&gt;getOwner();
+    }
+
+    /**
+     * Get content's type this version is attached to
+     *
+     * @return \ezp\Content\Type
+     */
+    public function getContentType()
+    {
+        return $this-&gt;content-&gt;getContentType();
+    }
+
+    /**
+     * Get content's locations this version is attached to
+     *
+     * @return \ezp\Content\Location[]
+     */
+    public function getLocations()
+    {
+        return $this-&gt;content-&gt;getLocations();
+    }
+
+    /**
+     * Get content's locations this version is attached to
+     *
+     * @return \ezp\Content\Relation[]
+     */
+    public function getRelations()
+    {
+        return $this-&gt;content-&gt;getRelations();
+    }
+
+    /**
+     * Get content's locations this version is attached to
+     *
+     * @return \ezp\Content\Relation[]
+     */
+    public function getReverseRelations()
+    {
+        return $this-&gt;content-&gt;getReverseRelations();
+    }
+
+    /**
+     * Get content's initial language ID this version is attached to
+     *
+     * @return mixed
+     */
+    public function getInitialLanguage()
+    {
+        return $this-&gt;content-&gt;getInitialLanguage();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

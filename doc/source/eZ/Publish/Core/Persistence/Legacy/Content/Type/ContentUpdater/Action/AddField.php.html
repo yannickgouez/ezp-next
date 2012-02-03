@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the content updater add field action class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type\ContentUpdater\Action;
+use eZ\Publish\Core\Persistence\Legacy\Content\Type\ContentUpdater\Action,
+    eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue,
+    eZ\Publish\Core\Persistence\Legacy\Content\Gateway,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition;
+
+/**
+ * Action to add a field to content objects
+ */
+class AddField extends Action
+{
+    /**
+     * Field definition of the field to add
+     *
+     * @var mixed
+     */
+    protected $fieldDefinition;
+
+    /**
+     * Field value converter
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter
+     */
+    protected $fieldValueConverter;
+
+    /**
+     * Creates a new action
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway $contentGateway
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition
+     */
+    public function __construct(
+        Gateway $contentGateway,
+        FieldDefinition $fieldDef,
+        Converter $converter )
+    {
+        $this-&gt;contentGateway = $contentGateway;
+        $this-&gt;fieldDefinition = $fieldDef;
+        $this-&gt;fieldValueConverter = $converter;
+    }
+
+    /**
+     * Applies the action to the given $content
+     *
+     * @param Content $content
+     * @return void
+     * @todo Handle external field data
+     */
+    public function apply( Content $content )
+    {
+        $field = $this-&gt;createField( $content );
+
+        $storageValue = new StorageFieldValue();
+        $this-&gt;fieldValueConverter-&gt;toStorageValue(
+            $field-&gt;value,
+            $storageValue
+        );
+
+        $field-&gt;id = $this-&gt;contentGateway-&gt;insertNewField(
+            $content,
+            $field,
+            $storageValue
+        );
+
+        $content-&gt;version-&gt;fields[] = $field;
+    }
+
+    /**
+     *
+     *
+     * @param Content $content
+     * @return void
+     */
+    protected function createField( Content $content )
+    {
+        $field = new Content\Field();
+        $field-&gt;fieldDefinitionId = $this-&gt;fieldDefinition-&gt;id;
+        $field-&gt;type = $this-&gt;fieldDefinition-&gt;fieldType;
+        $field-&gt;value = clone $this-&gt;fieldDefinition-&gt;defaultValue;
+        $field-&gt;versionNo = $content-&gt;version-&gt;versionNo;
+        // $field-&gt;language = ...;
+        return $field;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

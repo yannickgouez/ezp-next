@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Storage Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content;
+use eZ\Publish\SPI\Persistence\Content\Field;
+
+/**
+ * Handler for external storages
+ */
+class StorageHandler
+{
+    /**
+     * Storage registry
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\StorageRegistry
+     */
+    protected $storageRegistry;
+
+    /**
+     * Array with database context
+     *
+     * @var array
+     */
+    protected $context;
+
+    /**
+     * Creates a new storage handler
+     *
+     * @param StorageRegistry $storageRegistry
+     * @param array $context
+     */
+    public function __construct( StorageRegistry $storageRegistry, array $context )
+    {
+        $this-&gt;storageRegistry = $storageRegistry;
+        $this-&gt;context = $context;
+    }
+
+    /**
+     * Stores data from $field in its corresponding external storage
+     *
+     * @param Field $field
+     * @return void
+     */
+    public function storeFieldData( Field $field )
+    {
+        $storage = $this-&gt;storageRegistry-&gt;getStorage( $field-&gt;type );
+        return $storage-&gt;storeFieldData( $field, $this-&gt;context );
+    }
+
+    /**
+     * Fetches external data for $field from its corresponding external storage
+     *
+     * @param Field $field
+     * @return void
+     */
+    public function getFieldData( Field $field )
+    {
+        $storage = $this-&gt;storageRegistry-&gt;getStorage( $field-&gt;type );
+        if ( $storage-&gt;hasFieldData() )
+        {
+            $storage-&gt;getFieldData( $field, $this-&gt;context );
+        }
+    }
+
+    /**
+     * Deletes data for field $ids from external storage of $fieldType
+     *
+     * @param string $fieldType
+     * @param mixed[] $ids
+     * @return void
+     */
+    public function deleteFieldData( $fieldType, array $ids )
+    {
+        $this-&gt;storageRegistry-&gt;getStorage( $fieldType )
+            -&gt;deleteFieldData( $ids, $this-&gt;context );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

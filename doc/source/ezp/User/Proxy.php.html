@@ -1,0 +1,139 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\User\Proxy class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User;
+use ezp\Base\Proxy\Model as ModelProxy,
+    ezp\User;
+
+/**
+ * This class represents a Proxy User object
+ *
+ * @property-read mixed $id
+ * @property string $login
+ * @property string $email
+ * @property string $password
+ * @property int $hashAlgorithm
+ * @property \ezp\User\Group[] $groups
+ * @property \ezp\User\Role[] $roles
+ * @property \ezp\User\Policy[] $policies
+ */
+class Proxy extends ModelProxy implements User
+{
+    public function __construct( $id, Service $service )
+    {
+        parent::__construct( $id, $service );
+    }
+
+    /**
+     * Returns definition of the user object, atm: permissions
+     *
+     * @access private
+     * @return array
+     */
+    public static function definition()
+    {
+        return Concrete::definition();
+    }
+
+    /**
+     * List of assigned groups
+     *
+     * @return \ezp\User\Group[]
+     */
+    public function getGroups()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;getGroups();
+    }
+
+    /**
+     * List of assigned Roles
+     *
+     * @return array|User\Role[]
+     */
+    public function getRoles()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;getRoles();
+    }
+
+    /**
+     * List of assigned and inherited policies (via assigned and inherited roles)
+     *
+     * @return array|User\Policy[]
+     */
+    public function getPolicies()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;getPolicies();
+    }
+
+    /**
+     * Checks if user has access to a specific module/function
+     *
+     * Return array of limitations if user has access to a certain function
+     * but limited by the returned limitations.
+     * If you have the model instance you want to check permissions against, then
+     * use {@link \ezp\Base\Repository::canUser()}.
+     *
+     * @param string $module
+     * @param string $function
+     * @return array|bool
+     */
+    public function hasAccessTo( $module, $function )
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;hasAccessTo( $module, $function );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

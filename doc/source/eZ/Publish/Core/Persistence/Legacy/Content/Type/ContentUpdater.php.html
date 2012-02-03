@@ -1,0 +1,191 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the content updater class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type;
+use eZ\Publish\Core\Persistence\Legacy\Content,
+    eZ\Publish\Core\Persistence\Legacy\Content\Search\Handler as SearchHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Gateway as ContentGateway,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry,
+    eZ\Publish\Core\Persistence\Legacy\Content\Type\ContentUpdater,
+    eZ\Publish\SPI\Persistence\Content\Type,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion;
+
+/**
+ * Class to update content objects to a new type version
+ */
+class ContentUpdater
+{
+    /**
+     * Content gateway
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway
+     */
+    protected $contentGateway;
+
+    /**
+     * FieldValue converter registry
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry
+     */
+    protected $converterRegistry;
+
+    /**
+     * Search handler
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Search\Handler
+     */
+    protected $searchHandler;
+
+    /**
+     * Creates a new content updater
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway $contentTypeGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway $contentGateway
+     */
+    public function __construct(
+        SearchHandler $searchHandler,
+        ContentGateway $contentGateway,
+        Registry $converterRegistry )
+    {
+        $this-&gt;searchHandler = $searchHandler;
+        $this-&gt;contentGateway = $contentGateway;
+        $this-&gt;converterRegistry = $converterRegistry;
+    }
+
+    /**
+     * Determines the neccessary update actions
+     *
+     * @param mixed $contentTypeId
+     * @return ContentUpdater\Action[]
+     */
+    public function determineActions( Type $fromType, Type $toType )
+    {
+        $actions = array();
+        foreach ( $fromType-&gt;fieldDefinitions as $fieldDef )
+        {
+            if ( !$this-&gt;hasFieldDefinition( $toType, $fieldDef ) )
+            {
+                $actions[] = new ContentUpdater\Action\RemoveField(
+                    $this-&gt;contentGateway,
+                    $fieldDef
+                );
+            }
+        }
+        foreach ( $toType-&gt;fieldDefinitions as $fieldDef )
+        {
+            if ( !$this-&gt;hasFieldDefinition( $fromType, $fieldDef ) )
+            {
+                $actions[] = new ContentUpdater\Action\AddField(
+                    $this-&gt;contentGateway,
+                    $fieldDef,
+                    $this-&gt;converterRegistry-&gt;getConverter(
+                        $fieldDef-&gt;fieldType
+                    )
+                );
+            }
+        }
+        return $actions;
+    }
+
+    /**
+     * hasFieldDefinition
+     *
+     * @param Content\Type $type
+     * @param Content\Type\FieldDefinition $fieldDef
+     * @return void
+     */
+    protected function hasFieldDefinition( Type $type, FieldDefinition $fieldDef )
+    {
+        foreach ( $type-&gt;fieldDefinitions as $existFieldDef )
+        {
+            if ( $existFieldDef-&gt;id == $fieldDef-&gt;id )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Applies all given updates
+     *
+     * @param mixed $contentTypeId
+     * @param ContentUpdater\Action[] $actions
+     * @return void
+     */
+    public function applyUpdates( $contentTypeId, array $actions )
+    {
+        $contentObjs = $this-&gt;loadContentObjects( $contentTypeId );
+        foreach ( $contentObjs as $content )
+        {
+            foreach ( $actions as $action )
+            {
+                $action-&gt;apply( $content );
+            }
+        }
+    }
+
+    /**
+     * Returns all content objects of $contentTypeId
+     *
+     * @param mixed $contentTypeId
+     * @return Content[]
+     */
+    protected function loadContentObjects( $contentTypeId )
+    {
+        $criterion = new Criterion\ContentTypeId( $contentTypeId );
+        return $this-&gt;searchHandler-&gt;find( $criterion );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

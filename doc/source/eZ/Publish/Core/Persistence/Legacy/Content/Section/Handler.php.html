@@ -1,0 +1,229 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Section Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Section;
+use eZ\Publish\SPI\Persistence\Content\Section\Handler as BaseSectionHandler,
+    eZ\Publish\SPI\Persistence\Content\Section,
+    ezp\Base\Exception\NotFound;
+
+/**
+ * Section Handler
+ */
+class Handler implements BaseSectionHandler
+{
+    /**
+     * Section Gateway
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Section\Gateway $sectionGateway
+     */
+    protected $sectionGateway;
+
+    /**
+     * Creates a new Section Handler
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Section\Gateway $sectionGateway
+     */
+    public function __construct( Gateway $sectionGateway  )
+    {
+        $this-&gt;sectionGateway = $sectionGateway;
+    }
+
+    /**
+     * Creat a new section
+     *
+     * @param string $name
+     * @param string $identifier
+     * @return \eZ\Publish\SPI\Persistence\Content\Section
+     */
+    public function create( $name, $identifier )
+    {
+        $section = new Section();
+
+        $section-&gt;name = $name;
+        $section-&gt;identifier = $identifier;
+
+        $section-&gt;id = $this-&gt;sectionGateway-&gt;insertSection( $name, $identifier );
+
+        return $section;
+    }
+
+    /**
+     * Update name and identifier of a section
+     *
+     * @param mixed $id
+     * @param string $name
+     * @param string $identifier
+     * @return \eZ\Publish\SPI\Persistence\Content\Section
+     */
+    public function update( $id, $name, $identifier )
+    {
+        $this-&gt;sectionGateway-&gt;updateSection( $id, $name, $identifier );
+
+        $section = new Section();
+        $section-&gt;id = $id;
+        $section-&gt;name = $name;
+        $section-&gt;identifier = $identifier;
+
+        return $section;
+    }
+
+    /**
+     * Get section data
+     *
+     * @param mixed $id
+     * @return \eZ\Publish\SPI\Persistence\Content\Section
+     * @throws \ezp\Base\Exception\NotFound If section is not found
+     */
+    public function load( $id )
+    {
+        $rows = $this-&gt;sectionGateway-&gt;loadSectionData( $id );
+
+        if ( empty( $rows ) )
+        {
+            throw new NotFound( &quot;Section&quot;, $id );
+        }
+        return $this-&gt;createSectionFromArray( reset( $rows ) );
+    }
+
+    /**
+     * Get all section data
+     *
+     * @return \eZ\Publish\SPI\Persistence\Content\Section[]
+     */
+    public function loadAll()
+    {
+        $rows = $this-&gt;sectionGateway-&gt;loadAllSectionData();
+        return $this-&gt;createSectionFromArray( reset( $rows ) );
+    }
+
+    /**
+     * Get section data by identifier
+     *
+     * @param string $identifier
+     * @return \eZ\Publish\SPI\Persistence\Content\Section
+     * @throws \ezp\Base\Exception\NotFound If section is not found
+     */
+    public function loadByIdentifier( $identifier )
+    {
+        $rows = $this-&gt;sectionGateway-&gt;loadSectionDataByIdentifier( $identifier );
+
+        if ( empty( $rows ) )
+        {
+            throw new NotFound( &quot;Section&quot;, $identifier );
+        }
+        return $this-&gt;createSectionFromArray( reset( $rows ) );
+    }
+
+    /**
+     * Creates a Section from the given $data
+     *
+     * @param array $data
+     * @return \eZ\Publish\SPI\Persistence\Content\Section
+     */
+    protected function createSectionFromArray( array $data )
+    {
+        $section = new Section();
+
+        $section-&gt;id = (int)$data['id'];
+        $section-&gt;name = $data['name'];
+        $section-&gt;identifier = $data['identifier'];
+
+        return $section;
+    }
+
+    /**
+     * Delete a section
+     *
+     * Might throw an exception if the section is still associated with some
+     * content objects. Make sure that no content objects are associated with
+     * the section any more *before* calling this method.
+     *
+     * @param mixed $id
+     */
+    public function delete( $id )
+    {
+        $contentCount = $this-&gt;sectionGateway-&gt;countContentObjectsInSection( $id );
+
+        if ( $contentCount &gt; 0 )
+        {
+            throw new \RuntimeException(
+                &quot;Section with ID '{$id}' still has content assigned.&quot;
+            );
+        }
+        $this-&gt;sectionGateway-&gt;deleteSection( $id );
+    }
+
+    /**
+     * Assign section to single content object
+     *
+     * @param mixed $sectionId
+     * @param mixed $contentId
+     */
+    public function assign( $sectionId, $contentId )
+    {
+        $this-&gt;sectionGateway-&gt;assignSectionToContent( $sectionId, $contentId );
+    }
+
+    /**
+     * Number of content assignments a Section has
+     *
+     * @param mixed $sectionId
+     * @return int
+     */
+    public function assignmentsCount( $sectionId )
+    {
+        return $this-&gt;sectionGateway-&gt;countContentObjectsInSection( $sectionId );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,118 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Keyword Value class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\Keyword;
+use ezp\Content\FieldType\ValueInterface,
+    ezp\Content\FieldType\Value as BaseValue;
+
+/**
+ * Value for Keyword field type
+ */
+class Value extends BaseValue implements ValueInterface
+{
+    /**
+     * Content of the value
+     *
+     * @var string[]
+     */
+    public $values = array();
+
+    /**
+     * Construct a new Value object and initialize with $values
+     *
+     * @param string[]|string $values
+     */
+    public function __construct( $values = null )
+    {
+        if ( $values !== null )
+        {
+            if ( !is_array( $values ) )
+            {
+                $tags = array();
+                foreach ( explode( ',', $values ) as $tag )
+                {
+                    $tag = trim( $tag );
+                    if ( $tag )
+                        $tags[] = $tag;
+                }
+                $values = $tags;
+            }
+
+            $this-&gt;values = array_unique( $values );
+        }
+    }
+
+    /**
+     * Initializes the keyword value with a simple string.
+     *
+     * @param string $stringValue A comma separated list of tags, eg: &quot;php, eZ Publish, html5&quot;
+     *                            Space after comma is optional, each tag is trimmed to remove it.
+     * @return \ezp\Content\FieldType\Keyword\Value Instance of the keyword value
+     * @throws \ezp\Base\Exception\InvalidArgumentValue
+     */
+    public static function fromString( $stringValue )
+    {
+        return new static( $stringValue );
+    }
+
+    /**
+     * Returns a string representation of the keyword value.
+     *
+     * @return string A comma separated list of tags, eg: &quot;php, eZ Publish, html5&quot;
+     */
+    public function __toString()
+    {
+        return implode( ', ', $this-&gt;values );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,205 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase query builder class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Gateway\EzcDatabase;
+use eZ\Publish\Core\Persistence\Legacy\EzcDbHandler;
+
+class QueryBuilder
+{
+    /**
+     * Database handler
+     *
+     * @var EzcDbHandler
+     */
+    protected $dbHandler;
+
+    /**
+     * Creates a new query builder.
+     *
+     * @param EzcDbHandler $dbHandler
+     */
+    public function __construct( ezcDbHandler $dbHandler )
+    {
+        $this-&gt;dbHandler = $dbHandler;
+    }
+
+    /**
+     * Creates a select query for content objects
+     *
+     * Creates a select query with all necessary joins to fetch a complete
+     * content object. Does not apply any WHERE conditions.
+     *
+     * @param string[] $translations
+     * @return ezcQuerySelect
+     */
+    public function createFindQuery( array $translations = null )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            // Content object
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentclass_id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'section_id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'owner_id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'remote_id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'current_version', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'initial_language_id', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'modified', 'ezcontentobject' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'published', 'ezcontentobject' ),
+            // Content object version
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'id', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'version', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'modified', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'creator_id', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'created', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'status', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentobject_id', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'language_mask', 'ezcontentobject_version' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'initial_language_id', 'ezcontentobject_version' ),
+            // Content object fields
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'id', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentclassattribute_id', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'data_type_string', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'language_code', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'version', 'ezcontentobject_attribute' ),
+            // Content object field data
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'data_float', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'data_int', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'data_text', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'sort_key_int', 'ezcontentobject_attribute' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'sort_key_string', 'ezcontentobject_attribute' ),
+            // Content object locations
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentobject_id', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentobject_is_published', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'contentobject_version', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'depth', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'is_hidden', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'is_invisible', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'main_node_id', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'modified_subnode', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'node_id', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'parent_node_id', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'path_identification_string', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'path_string', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'priority', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'remote_id', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'sort_field', 'ezcontentobject_tree' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'sort_order', 'ezcontentobject_tree' ),
+            // Content object names
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'name', 'ezcontentobject_name' ),
+            $this-&gt;dbHandler-&gt;aliasedColumn( $query, 'content_translation', 'ezcontentobject_name' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject' )
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject_version' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_version' ),
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id', 'ezcontentobject' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject_attribute' ),
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_attribute' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_version' )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentobject_attribute' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentobject_version' )
+                )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject_tree' ),
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_tree' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_version' )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_version', 'ezcontentobject_tree' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentobject_version' )
+                )
+            )
+        // @todo: Joining with ezcontentobject_name is probably a VERY bad way to gather that information
+        // since it creates an additional cartesian product with translations.
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject_name' ),
+            $query-&gt;expr-&gt;lAnd(
+                // ezcontentobject_name.content_translation is also part of the PK but can't be
+                // easily joined with something at this level
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_name' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_version' )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'content_version', 'ezcontentobject_name' ),
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentobject_version' )
+                )
+            )
+        );
+
+        if ( $translations !== null )
+        {
+            $query-&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'language_code', 'ezcontentobject_attribute' ),
+                    $translations
+                )
+            );
+        }
+
+        return $query;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

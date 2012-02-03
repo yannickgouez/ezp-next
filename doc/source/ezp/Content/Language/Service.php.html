@@ -1,0 +1,181 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\Language\Service class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\Language;
+use ezp\Base\Exception\Forbidden,
+    ezp\Base\Exception\NotFound,
+    ezp\Base\Exception\Logic,
+    ezp\Base\Service as BaseService,
+    ezp\Content,
+    ezp\Content\Language,
+    eZ\Publish\SPI\Persistence\Content\Language as LanguageValueObject,
+    eZ\Publish\SPI\Persistence\Content\Language\CreateStruct as LanguageCreateStruct;
+
+/**
+ * Language service, used for language operations
+ */
+class Service extends BaseService
+{
+    /**
+     * Creates the a new Language in the content repository
+     *
+     * @param string $locale
+     * @param string $name
+     * @param bool $isEnabled
+     * @return \ezp\Content\Language
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to content translations
+     */
+    public function create( $locale, $name, $isEnabled = true )
+    {
+        if ( $this-&gt;repository-&gt;getUser()-&gt;hasAccessTo( 'content', 'translations' ) !== true )
+            throw new Forbidden( 'Language', 'translations' );
+
+        $struct = new LanguageCreateStruct();
+        $struct-&gt;locale = $locale;
+        $struct-&gt;name = $name;
+        $struct-&gt;isEnabled = $isEnabled;
+        $valueObject = $this-&gt;handler-&gt;contentLanguageHandler()-&gt;create( $struct );
+        return $this-&gt;buildDomainObject( $valueObject );
+    }
+
+    /**
+     * Updates $language in the content repository
+     *
+     * @param \ezp\Content\Language $language
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to content translations
+     */
+    public function update( Language $language )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'translations', $language ) )
+            throw new Forbidden( 'Language', 'translations' );
+
+        $this-&gt;handler-&gt;contentLanguageHandler()-&gt;update( $language-&gt;getState( 'properties' ) );
+    }
+
+    /**
+     * Loads a Language from its id ($languageId)
+     *
+     * @param int $languageId
+     * @return \ezp\Content\Language
+     * @throws \ezp\Base\Exception\NotFound if language could not be found
+     */
+    public function load( $languageId )
+    {
+        $valueObject = $this-&gt;handler-&gt;contentLanguageHandler()-&gt;load( $languageId );
+        if ( !$valueObject )
+            throw new NotFound( 'language', $languageId );
+        return $this-&gt;buildDomainObject( $valueObject );
+    }
+
+    /**
+     * Loads all Languages
+     *
+     * @return \ezp\Content\Language[]
+     */
+    public function loadAll()
+    {
+        $list = $this-&gt;handler-&gt;contentLanguageHandler()-&gt;loadAll();
+        foreach ( $list as $key =&gt; $item )
+            $list[$key] = $this-&gt;buildDomainObject( $item );
+        return $list;
+    }
+
+    /**
+     * Loads a Language by its locale ($localeCode)
+     *
+     * @param string $localeCode
+     * @return \ezp\Content\Language
+     * @throws \ezp\Base\Exception\NotFound if language could not be found
+     */
+    public function loadByLocale( $localeCode )
+    {
+        $list = $this-&gt;handler-&gt;contentLanguageHandler()-&gt;loadAll();
+        if ( !isset( $list[ $localeCode ] ) )
+            throw new NotFound( 'language', $localeCode );
+
+        return $this-&gt;buildDomainObject( $list[ $localeCode ] );
+    }
+
+    /**
+     * Deletes $language from content repository
+     *
+     * @param \ezp\Content\Language $language
+     * @throws \ezp\Base\Exception\Logic
+     *         if language can not be deleted
+     *         because it is still assigned to some content / type / (...).
+     * @throws \ezp\Base\Exception\NotFound If the specified language is not found
+     * @todo Add exception if still assigned to some content (needs handler support)
+     * @throws \ezp\Base\Exception\Forbidden If user does not have access to content translations
+     */
+    public function delete( Language $language )
+    {
+        if ( !$this-&gt;repository-&gt;canUser( 'translations', $language ) )
+            throw new Forbidden( 'Language', 'translations' );
+
+        $this-&gt;handler-&gt;contentLanguageHandler()-&gt;delete( $language-&gt;id );
+    }
+
+    /**
+     * Build DO based on VO
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Language $vo
+     * @return \ezp\Content\Language
+     */
+    protected function buildDomainObject( LanguageValueObject $vo )
+    {
+        $language = new Language();
+        return $language-&gt;setState( array( 'properties' =&gt; $vo ) );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

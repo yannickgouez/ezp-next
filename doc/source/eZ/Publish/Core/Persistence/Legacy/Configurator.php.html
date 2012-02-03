@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Configurator class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy;
+use eZ\Publish\Core\Persistence\Legacy\Content\StorageRegistry,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry,
+    eZ\Publish\Core\Persistence\Legacy\Content\Search\TransformationProcessor;
+
+/**
+ * Configurator for the Handler
+ */
+class Configurator
+{
+    /**
+     * Configuration array
+     *
+     * as described in
+     * {@link \eZ\Publish\Core\Persistence\Legacy\Handler}.
+     *
+     * @var string[][]
+     */
+    protected $config;
+
+    /**
+     * Creates a new configurator
+     *
+     * @param string[][] $config
+     */
+    public function __construct( array $config )
+    {
+        $this-&gt;config = $config;
+    }
+
+    /**
+     * Returns the data source name
+     *
+     * @return string
+     */
+    public function getDsn()
+    {
+        if ( !isset( $this-&gt;config['dsn'] ) )
+        {
+            throw new \RuntimeException( 'Missing &quot;dsn&quot; config value.' );
+        }
+        return $this-&gt;config['dsn'];
+    }
+
+    /**
+     * Returns if the updating of types should be deferred
+     *
+     * @return bool
+     */
+    public function shouldDeferTypeUpdates()
+    {
+        return ( isset( $this-&gt;config['defer_type_update'] )
+            &amp;&amp; $this-&gt;config['defer_type_update'] );
+    }
+
+    /**
+     * Configurs the storage registry
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\StorageRegistry $registry
+     * @return void
+     */
+    public function configureExternalStorages( StorageRegistry $registry )
+    {
+        if ( isset( $this-&gt;config['external_storages'] ) )
+        {
+            foreach ( $this-&gt;config['external_storages'] as $typeName =&gt; $class )
+            {
+                $registry-&gt;register( $typeName, new $class() );
+            }
+        }
+    }
+
+    /**
+     * Configures the field value converter registry
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\FieldValue\Converter\Registry $registry
+     * @return void
+     */
+    public function configureFieldConverter( Registry $registry )
+    {
+        if ( isset( $this-&gt;config['field_converter'] ) )
+        {
+            foreach ( $this-&gt;config['field_converter'] as $typeName =&gt; $class )
+            {
+                $registry-&gt;register( $typeName, new $class() );
+            }
+        }
+    }
+
+    /**
+     * Configures the search transformation processor
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Search\TransformationProcessor $processor
+     * @return void
+     */
+    public function configureTransformationRules( TransformationProcessor $processor )
+    {
+        if ( isset( $this-&gt;config['transformation_rule_files'] ) )
+        {
+            foreach ( $this-&gt;config['transformation_rule_files'] as $ruleFile )
+            {
+                $processor-&gt;loadRules( $ruleFile );
+            }
+        }
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

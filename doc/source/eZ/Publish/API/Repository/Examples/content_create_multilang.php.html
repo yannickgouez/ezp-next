@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * @example Create a content in multiple languages at once
+ */
+
+use eZ\Publish\API\Repository\Repository;
+
+/**
+ * Assumed as injected
+ * @var eZ\Publish\API\Repository\Repository
+ */
+$repository = new Repository;
+
+$contentService = $repository-&gt;getContentService();
+$locationService = $repository-&gt;getLocationService();
+$contentTypeService = $repository-&gt;getContentTypeService();
+
+$createStruct = $contentService-&gt;newContentCreateStruct(
+    $contentTypeService-&gt;loadContentTypeByIdentifier( 'article' ),
+    'eng-GB'
+);
+$createStruct-&gt;fields['title']['eng-GB'] = 'This is my title';
+$createStruct-&gt;fields['content']['eng-GB'] = '&lt;p&gt;What a &lt;strong&gt;wonderful&lt;/strong&gt; world !&lt;/p&gt;';
+$createStruct-&gt;fields['title']['fre-FR'] = 'Ceci est mon titre';
+$createStruct-&gt;fields['content']['fre-FR'] = '&lt;p&gt;Quel monde &lt;strong&gt;merveilleux&lt;/strong&gt; !&lt;/p&gt;';
+// Non translatable field
+$createStruct-&gt;fields['show_comments'] = true;
+
+$draft = $contentService-&gt;createContentDraft(
+    $createStruct,
+    array(
+        $locationService-&gt;newLocationCreateStruct( 123 )
+    )
+);
+$publishedVersion = $contentService-&gt;publishDraft( $draft-&gt;versionInfo );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

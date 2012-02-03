@@ -1,0 +1,188 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * assumed as injected
+ * @var eZ\Publish\API\Repository\Repository $repository
+ */
+$repository = null;
+
+$contentTypeService = $repository-&gt;getContentTypeService();
+
+// create a new content type group
+
+// make a new instance of a ContentTypeGroupCreate class
+$contentTypeGroupCreate = $contentTypeService-&gt;newContentTypeGroupCreateStruct( &quot;newgroup&quot; )
+;
+// create the group
+// 5.x only - add human readable names and descriptions in multi languages
+$contentTypeGroupCreate-&gt;setName( &quot;NameOfMyNewContentTypeGroup&quot;, &quot;eng-US&quot; );
+$contentTypeGroupCreate-&gt;setName( &quot;NameMeinerContentTypeGruppe&quot;, &quot;ger-DE&quot; );
+$contentTypeGroupCreate-&gt;setDescription( &quot;This is the description of my new content type group&quot;, &quot;eng-US&quot; );
+$contentTypeGroupCreate-&gt;setDescription( &quot;Das ist die Bescreibung meiner neuen Content Typ Gruppe&quot;, &quot;ger-DE&quot; );
+$contentTypeGroupCreate-&gt;initialLanguageCode = &quot;eng-US&quot;;
+
+// create the content type group in the repository
+$contentTypeGroup = $contentTypeService-&gt;createContentTypeGroup( $contentTypeGroupCreate );
+
+// create a new content type
+// make a new instance of a ContentTypeCreate class
+$contentTypeCreate =  $contentTypeService-&gt;newContentTypeCreateStruct( &quot;newtype&quot; );
+
+$contentTypeCreate-&gt;remoteId = &quot;myRemoteId-1234567890&quot;;
+$contentTypeCreate-&gt;defaultAlwaysAvailable = true;
+
+$contentTypeCreate-&gt;setName( &quot;englishNameOfMyNewContentType&quot;, &quot;eng-US&quot; );
+$contentTypeCreate-&gt;setDescription( &quot;this is a description of my new content type&quot;, &quot;eng-US&quot; );
+$contentTypeCreate-&gt;setName( &quot;deutscherNameMeinesNeuenContentTypes&quot;, &quot;ger-DE&quot; );
+$contentTypeCreate-&gt;setDescription( &quot;Das ist die Bescreibung meines neuen Content Typs&quot;, &quot;ger-DE&quot; );
+$contentTypeCreate-&gt;isContainer = false;
+$contentTypeCreate-&gt;nameSchema = &quot;&lt;name&gt;&quot;;
+$contentTypeCreate-&gt;urlAliasSchema = &quot;&lt;name&gt;&quot;;
+$contentTypeCreate-&gt;initialLanguageId = &quot;eng-US&quot;;
+
+// add field definitions
+// make a new instance of a FieldDefinitionCreate class
+$fieldDefinitionCreate = $contentTypeService-&gt;newFieldDefinitionCreateStruct( &quot;ezstring&quot;, &quot;name&quot; );
+$fieldDefinitionCreate-&gt;setDefaultValue(
+   new \ezp\Content\FieldType\TextLine\Value( &quot;New Name&quot; )
+);
+$fieldDefinitionCreate-&gt;setName( &quot;englishNameOfMyNewField&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;this is a description of my new field&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setName( &quot;deutscherNameMeinesNeuenFeldes&quot;, &quot;ger-DE&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;Das ist die Bescreibung meines neuen Feldes&quot;, &quot;ger-DE&quot; );
+
+$fieldDefinitionCreate-&gt;isRequired = true;
+$fieldDefinitionCreate-&gt;isSearchable = true;
+$fieldDefinitionCreate-&gt;fieldGroup = &quot;TestCategory&quot;;
+$fieldDefinitionCreate-&gt;isTranslatable = true;
+$fieldDefinitionCreate-&gt;position = 1;
+
+// add a string length validator
+$strLenValidator = new StringLengthValidator();
+$strLenValidator-&gt;initializeWithConstraints(
+       array( 'maxStringLength' =&gt; 20, 'minStringLength' =&gt; 4 )
+);
+$fieldDefinitionCreate-&gt;setValidator( $strLenValidator );
+
+$contentTypeCreate-&gt;addFieldDefinition( $fieldDefinitionCreate );
+
+// add second field definitions
+
+// make a new instance of a FieldDefinitionCreate class
+$fieldDefinitionCreate = $contentTypeService-&gt;newFieldDefinitionCreateStruct( &quot;ezinteger&quot;, &quot;number&quot; );
+
+$fieldDefinitionCreate-&gt;setDefaultValue(
+   new \ezp\Content\FieldType\Integer\Value( 2 )
+);
+$fieldDefinitionCreate-&gt;setName( &quot;englishNameOfMyNewField2&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;this is a description of my new field 2&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setName( &quot;deutscherNameMeinesNeuenFeldes2&quot;, &quot;ger-DE&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;Das ist die Bescreibung meines zweiten neuen Feldes&quot;, &quot;ger-DE&quot; );
+
+$fieldDefinitionCreate-&gt;isRequired = false;
+$fieldDefinitionCreate-&gt;isSearchable = true;
+$fieldDefinitionCreate-&gt;fieldGroup = &quot;TestCategory&quot;;
+$fieldDefinitionCreate-&gt;isTranslatable = false;
+$fieldDefinitionCreate-&gt;position = 2;
+
+// add a int range validator
+$intValidator = new IntegerValueValidator();
+$intValidator-&gt;initializeWithConstraints(
+       array( 'maxIntegerValue' =&gt; 20, 'minIntegerValue' =&gt; 0 )
+);
+$fieldDefinitionCreate-&gt;setValidator( $intValidator );
+
+$contentTypeCreate-&gt;addFieldDefinition( $fieldDefinitionCreate );
+
+// creates the content type in the given group and fields and publishes it
+$contentTypeDraft = $contentTypeService-&gt;createContentType(
+   $contentTypeCreate, array( $contentTypeGroup )
+);
+
+$contentTypeService-&gt;publishContentTypeDraft( $contentTypeDraft );
+
+// update a content tyoe
+
+// create a new draft
+$contentTypeDraft = $contentTypeService-&gt;createContentTypeDraft( $contentType );
+
+$contentTypeUpdate = $contentTypeService-&gt;newContentTypeUpdateStruct();
+$contentTypeUpdate-&gt;isContainer = true;
+$contentTypeService-&gt;updateContentTypeDraft( $contentTypeDraft, $contentTypeUpdate );
+// after this call the content type has still status draft
+
+// add a third fielddefinition
+$fieldDefinitionCreate = $contentTypeService-&gt;newFieldDefinitionCreateStruct( &quot;ezboolean&quot;, &quot;checkbox&quot; );
+$fieldDefinitionCreate-&gt;setName( &quot;englishNameOfMyNewField3&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;this is a description of my new field 3&quot;, &quot;eng-US&quot; );
+$fieldDefinitionCreate-&gt;setName( &quot;deutscherNameMeinesNeuenFeldes3&quot;,&quot;ger-DE&quot; );
+$fieldDefinitionCreate-&gt;setDescription( &quot;Das ist die Bescreibung meines dritten neuen Feldes&quot;,&quot;ger-DE&quot; );
+$fieldDefinitionCreate-&gt;isRequired = false;
+$fieldDefinitionCreate-&gt;isSearchable = false;
+$fieldDefinitionCreate-&gt;fieldGroup = &quot;TestCategory&quot;;
+$fieldDefinitionCreate-&gt;isTranslatable = false;
+$fieldDefinitionCreate-&gt;position = 3;
+
+// add the new field definition
+$contentTypeService-&gt;addFieldDefinition( $contentTypeDraft, $fieldDefinitionCreate );
+// after this call the content type has still status draft
+
+// update an existing field
+$fieldDefinition = $contentTypeDraft-&gt;getFieldDefinition( 'number' );
+$fieldDefinitionUpdate = $contentTypeService-&gt;newFieldDefinitionUpdate();
+$fieldDefinitionUpdate-&gt;identifier = &quot;newIdentifier&quot;;
+// replace the integer validator with new contraints
+$intValidator = new IntegerValueValidator();
+$intValidator-&gt;initializeWithConstraints(
+       array( 'maxIntegerValue' =&gt; 100, 'minIntegerValue' =&gt; 0 )
+);
+$fieldDefinitionUpdate-&gt;setValidator( $intValidator );
+
+$contentTypeService-&gt;updateFieldDefinition( $contentType, $fieldDefinition, $fieldDefinitionUpdate );
+
+// now publish the made changes
+$contentTypeService-&gt;publishContentTypeDraft( $contentType );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

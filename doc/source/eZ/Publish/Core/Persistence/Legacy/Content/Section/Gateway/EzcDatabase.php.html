@@ -1,0 +1,299 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Section ezcDatabase Gateway class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Section\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\Content\Section\Gateway,
+    eZ\Publish\SPI\Persistence\Content\Section,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler;
+
+/**
+ * Section Handler
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Database handler
+     *
+     * @param eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     */
+    protected $dbHandler;
+
+    /**
+     * Creates a new EzcDatabase Section Gateway
+     *
+     * @param eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     */
+    public function __construct ( EzcDbHandler $dbHandler )
+    {
+        $this-&gt;dbHandler = $dbHandler;
+    }
+
+    /**
+     * Inserts a new section with $name and $identifier
+     *
+     * @param string $name
+     * @param string $identifier
+     * @return int The ID of the new section
+     */
+    public function insertSection( $name, $identifier )
+    {
+        $query = $this-&gt;dbHandler-&gt;createInsertQuery();
+        $query-&gt;insertInto(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;getAutoIncrementValue( 'ezsection', 'id' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' ),
+            $query-&gt;bindValue( $name )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $query-&gt;bindValue( $identifier )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $this-&gt;dbHandler-&gt;lastInsertId(
+            $this-&gt;dbHandler-&gt;getSequenceName( 'ezsection', 'id' )
+        );
+    }
+
+    /**
+     * Updates section with $id to have $name and $identifier
+     *
+     * @param int $id
+     * @param string $name
+     * @param string $identifier
+     * @return void
+     */
+    public function updateSection( $id, $name, $identifier )
+    {
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' ),
+            $query-&gt;bindValue( $name )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $query-&gt;bindValue( $identifier )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $query-&gt;bindValue( $id, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+    }
+
+    /**
+     * Loads data for section with $id
+     *
+     * @param int $id
+     * @return string[][]
+     */
+    public function loadSectionData( $id )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $query-&gt;bindValue( $id, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Loads data for all sections
+     *
+     * @return string[][]
+     */
+    public function loadAllSectionData()
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Loads data for section with $identifier
+     *
+     * @param int $identifier
+     * @return string[][]
+     */
+    public function loadSectionDataByIdentifier( $identifier )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+                $query-&gt;bindValue( $identifier, null, \PDO::PARAM_STR )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Counts the number of content objects assigned to section with $id
+     *
+     * @param int $id
+     * @return int
+     */
+    public function countContentObjectsInSection( $id )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $query-&gt;alias(
+                $query-&gt;expr-&gt;count(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' )
+                ),
+                'content_count'
+            )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'section_id' ),
+                $query-&gt;bindValue( $id, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return (int)$statement-&gt;fetchColumn();
+    }
+
+    /**
+     * Deletes the Section with $id
+     *
+     * @param int $id
+     * @return void
+     */
+    public function deleteSection( $id )
+    {
+        $query = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $query-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezsection' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $query-&gt;bindValue( $id, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+    }
+
+    /**
+     * Inserts the assignment of $contentId to $sectionId
+     *
+     * @param int $sectionId
+     * @param int $contentId
+     * @return void
+     */
+    public function assignSectionToContent( $sectionId, $contentId )
+    {
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'section_id' ),
+            $query-&gt;bindValue( $sectionId, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $query-&gt;bindValue( $contentId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the XmlText Value class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\XmlText;
+use ezp\Content\FieldType\ValueInterface,
+    ezp\Content\FieldType\Value as BaseValue,
+    eZ\Publish\SPI\Persistence\Content\FieldValue as PersistenceFieldValue,
+    ezp\Content\FieldType\XmlText\Input\Handler as InputHandler,
+    ezp\Content\FieldType\XmlText\Input\Parser\Simplified as SimplifiedInputParser,
+    ezp\Content\FieldType\XmlText\Input\Parser\OnlineEditor as OnlineEditorParser,
+    ezp\Content\FieldType\XmlText\Input\Parser\Raw as RawInputParser;
+
+/**
+ * Basic, raw value for TextLine field type
+ */
+class Value extends BaseValue implements ValueInterface
+{
+    /**
+     * Text content
+     *
+     * @var string
+     */
+    public $text;
+
+    /**
+     * Text content, as RAW format (self::INPUT_FORMAT_RAW)
+     * @var string
+     */
+    public $rawText;
+
+    /**
+     * Text input format
+     * @type string One of the INPUT_FORMAT_* class constants
+     */
+    private $inputFormat;
+
+    /**
+     * Input handler
+     * @var \ezp\Content\FieldType\XmlText\Input\Handler
+     */
+    private $inputHandler;
+
+    /**
+     * Input parser
+     * \ezp\Content\FieldType\XmlText\Input\Parser
+     */
+    private $inputParser;
+
+    /**
+     * HTML input format constant
+     */
+    // const INPUT_FORMAT_HTML = 'html';
+
+    /**
+     * Plain text input format constant
+     */
+    const INPUT_FORMAT_PLAIN = 'plain';
+
+    /**
+     * RAW input format constant
+     * Internal storage format
+     */
+    const INPUT_FORMAT_RAW = 'raw';
+
+    /**
+     * Input parsing classes mapping
+     * @var array(string=&gt;string)
+     */
+    private $parserClasses = array(
+        'raw'   =&gt; 'ezp\\Content\\FieldType\\XmlText\\Input\\Parser\\Raw',
+        'plain' =&gt; 'ezp\\Content\\FieldType\\XmlText\\Input\\Parser\\Simplified',
+        // 'html'  =&gt; 'ezp\\Content\\FieldType\\XmlText\\Input\\Parser\\OnlineEditor',
+    );
+
+    /**
+     * Initializes a new XmlText Value object with $text in
+     *
+     * @param string $text
+     * @param string $type Which format the input is provided as. Expects one of the FORMAT_* class constants
+     */
+    public function __construct( $text = '', $inputFormat = self::INPUT_FORMAT_PLAIN )
+    {
+        $this-&gt;text = $text;
+        if ( $inputFormat === self::INPUT_FORMAT_RAW )
+            $this-&gt;rawText = $text;
+        $this-&gt;inputFormat = $inputFormat;
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     */
+    public static function fromString( $stringValue )
+    {
+        return new static( $stringValue );
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     */
+    public function __toString()
+    {
+        return (string)$this-&gt;text;
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\ValueInterface::getTitle()
+     */
+    public function getTitle()
+    {
+        throw new \RuntimeException( 'Implement this method' );
+    }
+
+    /**
+     * Returns the input handler depending on the input value type
+     * @return \ezp\Content\FieldType\XmlText\Input\Handler
+     */
+    public function getInputHandler()
+    {
+        if ( $this-&gt;inputHandler === null )
+        {
+            $this-&gt;inputHandler = new InputHandler( $this-&gt;getInputParser() );
+        }
+        return $this-&gt;inputHandler;
+    }
+
+    /**
+     * Returns the XML Input Parser for an XmlText Value
+     * @param \ezp\Content\FieldType\XmlText\Value $value
+     * @return \ezp\Content\FieldType\XmlText\Input\Parser
+     */
+    protected function getInputParser()
+    {
+        if ( $this-&gt;inputParser === null )
+        {
+            // @todo Load from configuration
+            if ( !isset( $this-&gt;parserClasses[$this-&gt;inputFormat] ) )
+            {
+                // @todo Use dedicated exception
+                throw new \Exception( &quot;No parser found for input format '{$this-&gt;inputFormat}'&quot; );
+            }
+
+            $this-&gt;inputParser = new $this-&gt;parserClasses[$this-&gt;inputFormat];
+        }
+        return $this-&gt;inputParser;
+    }
+
+    /**
+     * Sets the raw value for the XmlText to $rawText
+     * @var text
+     */
+    public function setRawText( $rawText )
+    {
+        $this-&gt;rawText = $rawText;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

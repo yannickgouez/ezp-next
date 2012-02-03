@@ -1,0 +1,341 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase location gateway class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\User\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\User\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\SPI\Persistence\User;
+
+/**
+ * User gateway implementation using the zeta database component.
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Database handler
+     *
+     * @var EzcDbHandler
+     */
+    protected $handler;
+
+    /**
+     * Construct from database handler
+     *
+     * @param EzcDbHandler $handler
+     * @return void
+     */
+    public function __construct( EzcDbHandler $handler )
+    {
+        $this-&gt;handler = $handler;
+    }
+
+    /**
+     * Create user
+     *
+     * @param user $user
+     * @return mixed
+     */
+    public function createUser( User $user )
+    {
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezuser' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                $query-&gt;bindValue( $user-&gt;id, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'login' ),
+                $query-&gt;bindValue( $user-&gt;login )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'email' ),
+                $query-&gt;bindValue( $user-&gt;email )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'password_hash' ),
+                $query-&gt;bindValue( $user-&gt;passwordHash )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'password_hash_type' ),
+                $query-&gt;bindValue( $user-&gt;hashAlgorithm, null, \PDO::PARAM_INT )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezuser_setting' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'user_id' ),
+                $query-&gt;bindValue( $user-&gt;id, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_enabled' ),
+                $query-&gt;bindValue( $user-&gt;isEnabled, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'max_login' ),
+                $query-&gt;bindValue( $user-&gt;maxLogin, null, \PDO::PARAM_INT )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Delete user with the given ID.
+     *
+     * @param mixed $userId
+     */
+    public function deleteUser( $userId )
+    {
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezuser' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                    $query-&gt;bindValue( $userId, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Load user with user ID.
+     *
+     * @param mixed $userId
+     * @return array
+     */
+    public function load( $userId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'login', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'email', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'password_hash', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'password_hash_type', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'is_enabled', 'ezuser_setting' ),
+            $this-&gt;handler-&gt;quoteColumn( 'max_login', 'ezuser_setting' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser' )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser_setting' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'user_id', 'ezuser_setting' ),
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser' )
+            )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser' ),
+                $query-&gt;bindValue( $userId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Load user with user ID.
+     *
+     * @param mixed $userId
+     * @return array
+     */
+    public function loadByLoginOrMail( $login, $email = null )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'login', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'email', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'password_hash', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'password_hash_type', 'ezuser' ),
+            $this-&gt;handler-&gt;quoteColumn( 'is_enabled', 'ezuser_setting' ),
+            $this-&gt;handler-&gt;quoteColumn( 'max_login', 'ezuser_setting' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser' )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser_setting' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'user_id', 'ezuser_setting' ),
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser' )
+            )
+        )-&gt;where(
+            empty( $email ) ?
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'login', 'ezuser' ),
+                    $query-&gt;bindValue( $login )
+                ) :
+                $query-&gt;expr-&gt;lOr(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'login', 'ezuser' ),
+                        $query-&gt;bindValue( $login )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'email', 'ezuser' ),
+                        $query-&gt;bindValue( $email )
+                    )
+                )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Update the user information specified by the user struct
+     *
+     * @param User $user
+     */
+    public function updateUser( User $user )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezuser' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'login' ),
+                $query-&gt;bindValue( $user-&gt;login )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'email' ),
+                $query-&gt;bindValue( $user-&gt;email )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'password_hash' ),
+                $query-&gt;bindValue( $user-&gt;passwordHash )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'password_hash_type' ),
+                $query-&gt;bindValue( $user-&gt;hashAlgorithm )
+            )-&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                    $query-&gt;bindValue( $user-&gt;id, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezuser_setting' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_enabled' ),
+                $query-&gt;bindValue( $user-&gt;isEnabled, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'max_login' ),
+                $query-&gt;bindValue( $user-&gt;maxLogin, null, \PDO::PARAM_INT )
+            )-&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'user_id' ),
+                    $query-&gt;bindValue( $user-&gt;id, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Assign role to user with given limitation
+     *
+     * @param mixed $contentId
+     * @param mixed $roleId
+     * @param array $limitation
+     */
+    public function assignRole( $contentId, $roleId, array $limitation )
+    {
+        foreach ( $limitation as $identifier =&gt; $values )
+        {
+            foreach ( $values as $value )
+            {
+                $query = $this-&gt;handler-&gt;createInsertQuery();
+                $query
+                    -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezuser_role' ) )
+                    -&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                        $query-&gt;bindValue( $contentId, null, \PDO::PARAM_INT )
+                    )-&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'role_id' ),
+                        $query-&gt;bindValue( $roleId, null, \PDO::PARAM_INT )
+                    )-&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'limit_identifier' ),
+                        $query-&gt;bindValue( $identifier )
+                    )-&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'limit_value' ),
+                        $query-&gt;bindValue( $value )
+                    );
+                $query-&gt;prepare()-&gt;execute();
+            }
+        }
+    }
+
+    /**
+     * Remove role from user
+     *
+     * @param mixed $contentId
+     * @param mixed $roleId
+     */
+    public function removeRole( $contentId, $roleId )
+    {
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezuser_role' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                        $query-&gt;bindValue( $contentId, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'role_id' ),
+                        $query-&gt;bindValue( $roleId, null, \PDO::PARAM_INT )
+                    )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

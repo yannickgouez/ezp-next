@@ -1,0 +1,171 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Image Value class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\Image;
+use ezp\Content\FieldType\Value as BaseValue,
+    ezp\Content\FieldType\ValueInterface,
+    ezp\Base\BinaryRepository;
+
+/**
+ * Value for Image field type
+ */
+class Value extends BaseValue implements ValueInterface
+{
+    /**
+     * The alternative image text (for example &quot;Picture of an apple.&quot;).
+     *
+     * @var string
+     */
+    public $alternativeText;
+
+    /**
+     * Original file name
+     *
+     * @var string
+     */
+    public $originalFilename;
+
+    /**
+     *
+     * @var bool
+     */
+    public $isValid;
+
+    /**
+     * Image alias list, indexed by alias name
+     *
+     * @var \ezp\Content\FieldType\Image\AliasCollection
+     */
+    public $aliasList;
+
+    protected $properties = array(
+        'fieldId' =&gt; null,
+        'contentId' =&gt; null,
+        'versionNo' =&gt; null,
+        // Publication status (one of \ezp\Content\Version::STATUS_*)
+        'status' =&gt; null,
+        'languageCode' =&gt; null,
+    );
+
+    /**
+     * Construct a new Value object.
+     */
+    public function __construct( $imagePath = null, $alternativeText = '' )
+    {
+        $this-&gt;alternativeText = $alternativeText;
+        $this-&gt;aliasList = new AliasCollection( $this, new BinaryRepository );
+        $this-&gt;aliasList-&gt;initializeFromLocalImage( $imagePath );
+    }
+
+    /**
+     * @param string $stringValue Image path (can be real path or relative to eZ Publish root).
+     *
+     * @return \ezp\Content\FieldType\Media\Value
+     */
+    public static function fromString( $stringValue )
+    {
+        return new static( $stringValue );
+    }
+
+    /**
+     * @see \ezp\Content\FieldType\Value
+     */
+    public function __toString()
+    {
+        $string = $this-&gt;aliasList['original']-&gt;url;
+        if ( isset( $this-&gt;alternativeText ) )
+            $string .= &quot;|$this-&gt;alternativeText&quot;;
+
+        return $string;
+    }
+
+    /**
+     * Magic getter
+     *
+     * @param string $name
+     */
+    public function __get( $name )
+    {
+        switch ( $name )
+        {
+            case 'filename':
+                return basename( $this-&gt;file-&gt;path );
+
+            case 'mimeType':
+                return $this-&gt;file-&gt;contentType-&gt;__toString();
+
+            case 'mimeTypeCategory':
+                return $this-&gt;file-&gt;contentType-&gt;type;
+
+            case 'mimeTypePart':
+                return $this-&gt;file-&gt;contentType-&gt;subType;
+
+            case 'filesize':
+                return $this-&gt;file-&gt;size;
+
+            case 'filepath':
+                return $this-&gt;file-&gt;path;
+
+            default:
+                throw new PropertyNotFound( $name, get_class() );
+        }
+    }
+    /**
+     * @see \ezp\Content\FieldType\ValueInterface::getTitle()
+     */
+    public function getTitle()
+    {
+        return !empty( $this-&gt;alternativeText ) ? $this-&gt;alternativeText : $this-&gt;originalFilename;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

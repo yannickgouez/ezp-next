@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing ModelDefinition interface
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+
+/**
+ * Interface for model definition
+ *
+ */
+interface ModelDefinition
+{
+    /**
+     * Returns definition of the model object, eg: permissions(, properties)...
+     *
+     * Return value example:
+     * array(
+     *     'module' =&gt; 'content',
+     *     'functions' =&gt; array(
+     *         'read' =&gt; array(
+     *             'Class' =&gt; array(
+     *                 'options' =&gt; function( Repository $repository )
+     *                 {
+     *                     return $repository-&gt;getContentTypeService()-&gt;loadAll( $idNamePair = true );
+     *                 },
+     *                 'compare' =&gt; function( Model $content, array $limitationsValues[, Repository $repository[, Model $assignment = null]] )
+     *                 {
+     *                     return in_array( $content-&gt;typeId, $limitationsValues );
+     *                 },
+     *                 'query' =&gt; function( array $limitationsValues[, Repository $repository] )
+     *                 {
+     *                     if ( !isset( $limitationsValues[1] ) )
+     *                         return new Criterion\ContentTypeId( $limitationsValues[0] );
+     *
+     *                     return new Criterion\ContentTypeId( $limitationsValues );
+     *                 },
+     *             )
+     *         )
+     *     )
+     * );
+     *
+     * Where 'read' is function and 'Class' is limitation identifier.
+     *
+     * Bellow that are three possible keys: 'options', a callback returning a list of options,
+     * where key is scalar value identifying limitation and value is human readable name.
+     * The second key is 'compare', a callback comparing instance of an object against limitation values.
+     * The third possible key is 'query', a callback that modifies criterion object to include filtering rules
+     * for the limitation.
+     *
+     * @access private
+     * @return array
+     */
+    public static function definition();
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

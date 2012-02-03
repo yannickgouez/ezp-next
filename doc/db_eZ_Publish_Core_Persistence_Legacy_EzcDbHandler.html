@@ -77,7 +77,8 @@
       });
 
       
-    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/EzcDbHandler.php</h1>
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/EzcDbHandler.php<a href="source/eZ/Publish/Core/Persistence/Legacy/EzcDbHandler.php.html"><img src="images/icons/view_source.png" border="0"></a>
+</h1>
 <div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
 <div id="file-nav-options">
               Show:
@@ -132,7 +133,7 @@ method dispatching.</p></div>
           )
         </span>
         :
-          void</code><div class="description"><p class="short_description">Proxy methods to the aggregated DB handler</p></div>
+          mixed</code><div class="description"><p class="short_description">Proxy methods to the aggregated DB handler</p></div>
 <div class="code-tabs">
 <div class="long-description"></div>
 <strong>Parameters</strong><table class="argument-info">
@@ -150,6 +151,16 @@ method dispatching.</p></div>
 <th>$parameters</th>
 <td>array</td>
 <td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
 </tr>
 </table>
 </div>
@@ -181,7 +192,7 @@ method dispatching.</p></div>
 </div>
 <a id="\eZ\Publish\Core\Persistence\Legacy\EzcDbHandler::aliasedColumn()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">aliasedColumn</span><span class="nb-faded-text">(
-          \eZ\Publish\Core\Persistence\Legacy\ezcDbQuery $query, string $columnName, string $tableName
+          \ezcQuerySelect $query, string $columnName, string | null $tableName
               =
               null
           )
@@ -198,7 +209,7 @@ method dispatching.</p></div>
 </tr></thead>
 <tr>
 <th>$query</th>
-<td>\eZ\Publish\Core\Persistence\Legacy\ezcDbQuery</td>
+<td>\ezcQuerySelect</td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -208,7 +219,7 @@ method dispatching.</p></div>
 </tr>
 <tr>
 <th>$tableName</th>
-<td>string</td>
+<td>string | null</td>
 <td><em></em></td>
 </tr>
 </table>
@@ -227,7 +238,7 @@ method dispatching.</p></div>
 </div>
 <a id="\eZ\Publish\Core\Persistence\Legacy\EzcDbHandler::getAutoIncrementValue()" class="anchor"></a><div class="method public">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAutoIncrementValue</span><span class="nb-faded-text">(
-           $table,  $column
+          string $table, string $column
           )
         </span>
         :
@@ -244,12 +255,12 @@ proper value for the given column.</p></div>
 </tr></thead>
 <tr>
 <th>$table</th>
-<td></td>
+<td>string</td>
 <td><em></em></td>
 </tr>
 <tr>
 <th>$column</th>
-<td></td>
+<td>string</td>
 <td><em></em></td>
 </tr>
 </table>

@@ -1,0 +1,275 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the eZ\Publish\SPI\Io\Handler interface
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Io\Dispatcher;
+
+use ezp\Base\Exception\InvalidArgumentType,
+    eZ\Publish\SPI\Io\Handler as IoHandlerInterface,
+    eZ\Publish\SPI\Io\BinaryFileUpdateStruct,
+    eZ\Publish\SPI\Io\BinaryFileCreateStruct,
+    DateTime;
+
+/**
+ * Handler interface for handling of binary files I/O
+ */
+
+class Handler implements IoHandlerInterface
+{
+    /**
+     * Io\Storage handler instances, {@see __construct()}
+     *
+     * @var array
+     */
+    private $config = array();
+
+    /**
+     * Creates new object and validates $config param
+     *
+     * @param array $config Structure of handlers that follows the following format:
+     *     array( 'handlers' =&gt; array( 'handler' =&gt; Handler, .. ), 'default' =&gt; Handler )
+     *     ie:
+     *               array(
+     *                   'default' =&gt; $handler1,
+     *                   'handlers' =&gt; array(
+     *                       array(
+     *                           'handler' =&gt; $handler2,
+     *                           // match conditions:
+     *                           'prefix' =&gt; 'var/original/',
+     *                           'suffix' =&gt; '.gif,.jpg',
+     *                           'contains' =&gt; 'image-versioned'
+     *                       )
+     *                   )
+     *               )
+     *
+     * @throws \ezp\Base\Exception\InvalidArgumentType If $config does not contain default handler that implements
+     *         Handler, handlers is unset or empty (hence you could have used default directly), one of the 'patterns'
+     *         is unset or empty (hence it could have been default) or a 'handler' item does not implement Handler
+     */
+    public function __construct( array $config = array() )
+    {
+        if ( empty( $config['default'] ) || !$config['default'] instanceof IoHandlerInterface )
+        {
+            throw new InvalidArgumentType( &quot;\$config['default']&quot;, &quot;eZ\\Publish\\SPI\\Io\\Handler&quot; );
+        }
+        else if ( empty( $config['handlers'] ) )
+        {
+            throw new InvalidArgumentType( &quot;\$config['handlers']&quot;, &quot;array&quot; );
+        }
+
+        // Validate handlers so it does not need to be done on every call to getHandler()
+        foreach ( $config['handlers'] as $key =&gt; $handler )
+        {
+            if ( empty( $handler['contains'] ) &amp;&amp; empty( $handler['prefix'] ) &amp;&amp; empty( $handler['suffix'] ) )
+            {
+                throw new InvalidArgumentType( &quot;\$config['handlers'][$key][contains|prefix|suffix]&quot;, &quot;string&quot; );
+            }
+            else if ( empty( $handler['handler'] ) || !$handler['handler'] instanceof IoHandlerInterface )
+            {
+                throw new InvalidArgumentType( &quot;\$config['handlers'][$key]['handler']&quot;, &quot;eZ\\Publish\\SPI\\Io\\Handler&quot; );
+            }
+        }
+
+        $this-&gt;config = $config;
+    }
+
+    /**
+     * Creates and stores a new BinaryFile based on the BinaryFileCreateStruct $file
+     *
+     * @param \eZ\Publish\SPI\Io\BinaryFileCreateStruct $file
+     * @return \eZ\Publish\SPI\Io\BinaryFile The newly created BinaryFile object
+     * @uses \eZ\Publish\SPI\Io\Handler::create() To create the binary file in handler
+     */
+    public function create( BinaryFileCreateStruct $file )
+    {
+        return $this-&gt;getHandler( $file-&gt;path )-&gt;create( $file );
+    }
+
+    /**
+     * Deletes the existing BinaryFile with path $path
+     *
+     * @param string $path
+     * @uses \eZ\Publish\SPI\Io\Handler::delete() To delete the binary file in handler
+     */
+    public function delete( $path )
+    {
+        return $this-&gt;getHandler( $path )-&gt;delete( $path );
+    }
+
+    /**
+     * Updates the file identified by $path with data from $updateFile
+     *
+     * @param string $path
+     * @param \eZ\Publish\SPI\Io\BinaryFileUpdateStruct $updateFile
+     * @return \eZ\Publish\SPI\Io\BinaryFile The updated BinaryFile
+     * @uses \eZ\Publish\SPI\Io\Handler::update() To update the binary file in handler
+     */
+    public function update( $path, BinaryFileUpdateStruct $updateFile )
+    {
+        if ( $path === $updateFile-&gt;path )
+            return $this-&gt;getHandler( $path )-&gt;update( $path, $updateFile );
+
+        // When file path has changed, check if we should move from one handler to another
+        $oldHandler = $this-&gt;getHandler( $path );
+        $newHandler = $this-&gt;getHandler( $updateFile-&gt;path);
+        if ( $oldHandler === $newHandler )
+            return $oldHandler-&gt;update( $path, $updateFile );
+
+        // Move file from old to new handler
+        throw new \Exception( '@TODO: Moving from one io handler to another one is not implemented!' );
+        /*$newHandler-&gt;create( $updateFile );
+        try
+        {
+            $oldHandler-&gt;delete( $path );
+        }
+        catch ( \Exception $e )
+        {
+            $newHandler-&gt;delete( $updateFile-&gt;path );
+            throw $e;
+        }*/
+    }
+
+    /**
+     * Checks if the BinaryFile with path $path exists
+     *
+     * @param string $path
+     * @return bool
+     * @uses \eZ\Publish\SPI\Io\Handler::exists() To see if file exists in handler
+     */
+    public function exists( $path )
+    {
+        return $this-&gt;getHandler( $path )-&gt;exists( $path );
+    }
+
+    /**
+     * Loads the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return \eZ\Publish\SPI\Io\BinaryFile
+     * @uses \eZ\Publish\SPI\Io\Handler::load() To load the binary file from handler
+     */
+    public function load( $path )
+    {
+        return $this-&gt;getHandler( $path )-&gt;load( $path );
+    }
+
+    /**
+     * Returns a file resource to the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return resource
+     * @uses \eZ\Publish\SPI\Io\Handler::getFileResource() To get the binary file resource from handler
+     */
+    public function getFileResource( $path )
+    {
+        return $this-&gt;getHandler( $path )-&gt;getFileResource( $path );
+    }
+
+    /**
+     * Returns the contents of the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return string
+     * @uses \eZ\Publish\SPI\Io\Handler::getFileContents() To get the binary file content from handler
+     */
+    public function getFileContents( $path )
+    {
+        return $this-&gt;getHandler( $path )-&gt;getFileContents( $path );
+    }
+
+    /**
+     * Returns the appropriate handler for $path
+     *
+     * @internal Depends on {@link $config} being validated by {@link __construct()}!
+     *
+     * @param string $path
+     * @return \eZ\Publish\SPI\Io\Handler
+     */
+    private function getHandler( $path )
+    {
+        if ( empty( $this-&gt;config['handlers'] ) )
+            return $this-&gt;config['default'];
+
+        foreach ( $this-&gt;config['handlers'] as $handler )
+        {
+            // Match handler using strpos &amp; strstr for speed, and to avoid having regex in ini files
+            if ( !empty( $handler['contains'] ) &amp;&amp; strpos( $path, $handler['contains'] ) === false )
+            {
+                continue;
+            }
+            else if ( !empty( $handler['prefix'] ) &amp;&amp; strpos( $path, $handler['prefix'] ) !== 0 )
+            {
+                continue;
+            }
+            else if ( !empty( $handler['suffix'] ) )
+            {
+                $suffixMatch = false;
+                foreach ( explode( ',', $handler['suffix'] ) as $suffix )
+                {
+                    if ( strstr( $path, $suffix ) === $suffix )
+                    {
+                        $suffixMatch = true;
+                        break;
+                    }
+                }
+
+                if ( !$suffixMatch )
+                    continue;
+            }
+            // Everything matched (incl one of suffixes), and since __construct made sure not all where empty
+            // it should be fairly safe to return this handler
+            return $handler['handler'];
+        }
+
+        return $this-&gt;config['default'];
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

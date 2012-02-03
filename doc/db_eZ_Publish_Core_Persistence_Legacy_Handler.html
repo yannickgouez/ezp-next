@@ -77,7 +77,8 @@
       });
 
       
-    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/Handler.php</h1>
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/Handler.php<a href="source/eZ/Publish/Core/Persistence/Legacy/Handler.php.html"><img src="images/icons/view_source.png" border="0"></a>
+</h1>
 <div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
 <div id="file-nav-options">
               Show:
@@ -442,7 +443,7 @@ for a SQLite in memory database (used e.g. for unit tests)</li>
 
 <p>The flag 'defer_type_update' defines if content types should be
 published immediatly (false), when the
-{@link \eZ\Publish\SPI\Persistence\Content\Type\Handler::publish()} method is
+<a href="\eZ\Publish\SPI\Persistence\Content\Type\Handler::publish()">\eZ\Publish\SPI\Persistence\Content\Type\Handler::publish()</a> method is
 called, or if a background process should be triggered (true), which is
 then executed by the old eZ Publish core.</p>
 
@@ -450,7 +451,7 @@ then executed by the old eZ Publish core.</p>
 expected. The referred class is instantiated and the resulting object is
 used to store/restore/delete/… data in external storages (e.g. another
 database or a web service). The classes must comply to the
-{@link \eZ\Publish\SPI\Persistence\Fields\Storage} interface. Note that due to the
+<a href="\eZ\Publish\SPI\Persistence\Fields\Storage">\eZ\Publish\SPI\Persistence\Fields\Storage</a> interface. Note that due to the
 configuration mechanism and missing proper DI, the classes may not
 expect any constructor parameters!</p>
 
@@ -458,14 +459,14 @@ expect any constructor parameters!</p>
 field type names to classes. Each of the classes is instantiated and
 used to convert content fields and content type field definitions to the
 legacy storage engine. The given class names must derive the
-{@link \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter}
+<a href="\eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter">\eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter</a>
 class. As for 'external_storage' classes, none of the classes may expect
 parameters in its constructor, due to missing proper DI.</p>
 
 <p>Through the 'transformation_rule_files' array, a list of files with
 full text transformation rules is given. These files are read by an
 instance of
-{@link \eZ\Publish\Core\Persistence\Legacy\Converter\Search\TransformationProcessor}
+<a href="\eZ\Publish\Core\Persistence\Legacy\Converter\Search\TransformationProcessor">\eZ\Publish\Core\Persistence\Legacy\Converter\Search\TransformationProcessor</a>
 and then used for normalization in the full text search.</p></div>
 <strong>Parameters</strong><table class="argument-info">
 <thead><tr>

@@ -1,0 +1,228 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the UrlStorage Converter class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\SPI\Persistence\Fields\Storage,
+    eZ\Publish\SPI\Persistence\Content\Field,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    ezp\Content\FieldType\Url\Value as UrlValue,
+    ezp\Io\ContentType;
+
+/**
+ * Converter for Url field type external storage
+ */
+class UrlStorage implements Storage
+{
+    const URL_TABLE = &quot;ezurl&quot;;
+
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Fields\Storage
+     */
+    public function storeFieldData( Field $field, array $context )
+    {
+        $dbHandler = $context[&quot;connection&quot;];
+        if ( ( $row = $this-&gt;fetchByLink( $field-&gt;value-&gt;data-&gt;link, $dbHandler ) ) !== false )
+            $urlId = $row[&quot;id&quot;];
+        else
+            $urlId = $this-&gt;insert( $field-&gt;value-&gt;data-&gt;link, $dbHandler );
+
+        $field-&gt;value-&gt;data-&gt;setState( array( &quot;urlId&quot; =&gt; $urlId ) );
+
+        // Signals that the Value has been modified and that an update is to be performed
+        return true;
+    }
+
+    /**
+     * Populates $field value property based on the external data.
+     * $field-&gt;value is a {@link eZ\Publish\SPI\Persistence\Content\FieldValue} object.
+     * This value holds the data as a {@link ezp\Content\FieldType\Value} based object,
+     * according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     * @return void
+     */
+    public function getFieldData( Field $field, array $context )
+    {
+        $url = $this-&gt;fetchById( $field-&gt;value-&gt;data-&gt;getState( &quot;urlId&quot; ), $context[&quot;connection&quot;] );
+
+        $field-&gt;value-&gt;data-&gt;link = $url[&quot;link&quot;];
+    }
+
+    /**
+     * @param array $fieldId
+     * @param array $context
+     * @return bool
+     */
+    public function deleteFieldData( array $fieldId, array $context )
+    {
+    }
+
+    /**
+     * Checks if field type has external data to deal with
+     *
+     * @return bool
+     */
+    public function hasFieldData()
+    {
+        return true;
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function copyFieldData( Field $field, array $context )
+    {
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function getIndexData( Field $field, array $context )
+    {
+    }
+
+    /**
+     * Fetches a row in ezurl table referenced by its $id
+     *
+     * @param mixed $id
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return null|array Hash with columns as keys or null if no entry can be found
+     */
+    private function fetchById( $id, EzcDbHandler $dbHandler )
+    {
+        $q = $dbHandler-&gt;createSelectQuery();
+        $e = $q-&gt;expr;
+        $q-&gt;select( &quot;*&quot; )
+            -&gt;from( $dbHandler-&gt;quoteTable( self::URL_TABLE ) )
+            -&gt;where(
+                $e-&gt;eq( &quot;id&quot;, $q-&gt;bindValue( $id, null, \PDO::PARAM_INT ) )
+            );
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+        $rows = $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+        if ( !empty( $rows ) )
+        {
+            return $rows[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetches a row in ezurl table referenced by $link
+     *
+     * @param string $link
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return null|array Hash with columns as keys or null if no entry can be found
+     */
+    private function fetchByLink( $link, EzcDbHandler $dbHandler )
+    {
+        $q = $dbHandler-&gt;createSelectQuery();
+        $e = $q-&gt;expr;
+        $q-&gt;select( &quot;*&quot; )
+            -&gt;from( $dbHandler-&gt;quoteTable( self::URL_TABLE ) )
+            -&gt;where(
+                $e-&gt;eq( &quot;link&quot;, $q-&gt;bindValue( $link ) )
+            );
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+        $rows = $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+        if ( !empty( $rows ) )
+        {
+            return $rows[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Inserts a new entry in ezurl table with $field value data
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param \eZ\Publish\Core\Persistence\Legacy\EzcDbHandler $dbHandler
+     * @return mixed
+     */
+    private function insert( Field $field, EzcDbHandler $dbHandler )
+    {
+        $data = $field-&gt;value-&gt;data;
+        $time = time();
+        $q = $dbHandler-&gt;createInsertQuery();
+
+        $q-&gt;insertInto(
+            $dbHandler-&gt;quoteTable( self::URL_TABLE )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;created&quot; ),
+            $q-&gt;bindValue( $time, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;modified&quot; ),
+            $q-&gt;bindValue( $time, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;original_url_md5&quot; ),
+            $q-&gt;bindValue( md5( $data-&gt;link ) )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;url&quot; ),
+            $q-&gt;bindValue( $data-&gt;link )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $dbHandler-&gt;lastInsertId(
+            $dbHandler-&gt;getSequenceName( self::URL_TABLE, &quot;id&quot; )
+        );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

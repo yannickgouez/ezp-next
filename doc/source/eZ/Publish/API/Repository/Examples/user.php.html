@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * assumed as injected
+ * @var eZ\Publish\API\Repository\Repository $repository
+ */
+$repository = null;
+
+$userService = $repository-&gt;getUserService();
+$contentService = $repository-&gt;getContentService();
+
+/**
+ * 1. Create a new user
+ */
+
+// load Members Group in default installation
+$userGroup = $userService-&gt;loadUserGroup( 12 );
+
+// in 4.x the content type is take from configuration - will be changed in the future
+// this is
+$userCreate = $userService-&gt;newUserCreateStruct( &quot;jdoe&quot;, &quot;john.doe@example.org&quot;, &quot;newpassword&quot;, &quot;eng-US&quot;, /*content type*/null );
+$userCreate-&gt;fields['first_name'] = 'John';
+$userCreate-&gt;fields['last_name'] = 'Doe';
+
+$user = $userService-&gt;createUser( $userCreate, array( $userGroup ) );
+
+
+/**
+ * 2. Create a new user group
+ */
+
+// get struct
+$userGroupCreate = $userService-&gt;newUserGroupCreateStruct( &quot;eng-US&quot; );
+
+// set fields
+$userGroupCreate-&gt;fields['name'] = 'NomNom Users';
+$userGroupCreate-&gt;fields['description'] = 'User group for users to like to NomNom';
+
+// create (and publish)
+$newUserGroup = $userService-&gt;createUserGroup( $userGroupCreate, $userGroup );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

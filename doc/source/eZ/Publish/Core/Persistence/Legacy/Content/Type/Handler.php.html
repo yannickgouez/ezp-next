@@ -1,0 +1,489 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Content Type Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type;
+use eZ\Publish\SPI\Persistence\Content\Type,
+    eZ\Publish\SPI\Persistence\Content\Type\Handler as BaseContentTypeHandler,
+    eZ\Publish\SPI\Persistence\Content\Type\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\Type\Group,
+    eZ\Publish\SPI\Persistence\Content\Type\Group\CreateStruct as GroupCreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\Group\UpdateStruct as GroupUpdateStruct,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    eZ\Publish\Core\Persistence\Legacy\Content\Type\Update\Handler as UpdateHandler,
+    eZ\Publish\Core\Persistence\Legacy\Exception;
+
+/**
+ */
+class Handler implements BaseContentTypeHandler
+{
+    /**
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway
+     */
+    protected $contentTypeGateway;
+
+    /**
+     * Mappper for Type objects.
+     *
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
+     * Content Type update handler
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Type\Update\Handler
+     */
+    protected $updateHandler;
+
+    /**
+     * Creates a new content type handler.
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway $contentTypeGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Mapper $mapper
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Update\Handler $updateHandler
+     */
+    public function __construct(
+        Gateway $contentTypeGateway,
+        Mapper $mapper,
+        UpdateHandler $updateHandler )
+    {
+        $this-&gt;contentTypeGateway = $contentTypeGateway;
+        $this-&gt;mapper = $mapper;
+        $this-&gt;updateHandler = $updateHandler;
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\Group\CreateStruct $createStruct
+     * @return Group
+     */
+    public function createGroup( GroupCreateStruct $createStruct )
+    {
+        $group = $this-&gt;mapper-&gt;createGroupFromCreateStruct(
+            $createStruct
+        );
+
+        $group-&gt;id = $this-&gt;contentTypeGateway-&gt;insertGroup(
+            $group
+        );
+
+        return $group;
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\Group\UpdateStruct $struct
+     * @return \eZ\Publish\SPI\Persistence\Content\Type\Group
+     */
+    public function updateGroup( GroupUpdateStruct $struct )
+    {
+        $this-&gt;contentTypeGateway-&gt;updateGroup(
+            $struct
+        );
+        return $this-&gt;loadGroup( $struct-&gt;id );
+    }
+
+    /**
+     * @param mixed $groupId
+     * @throws \eZ\Publish\Core\Persistence\Legacy\Exception\GroupNotEmpty
+     *         if a non-empty group is to be deleted.
+     */
+    public function deleteGroup( $groupId )
+    {
+        if ( $this-&gt;contentTypeGateway-&gt;countTypesInGroup( $groupId ) !== 0 )
+        {
+            throw new Exception\GroupNotEmpty( $groupId );
+        }
+        $this-&gt;contentTypeGateway-&gt;deleteGroup( $groupId );
+    }
+
+    /**
+     * @param int $groupId
+     * @return Group
+     */
+    public function loadGroup( $groupId )
+    {
+        $rows = $this-&gt;contentTypeGateway-&gt;loadGroupData( $groupId );
+        $groups = $this-&gt;mapper-&gt;extractGroupsFromRows( $rows );
+
+        return $groups[0];
+    }
+
+    /**
+     * @return Group[]
+     */
+    public function loadAllGroups()
+    {
+        $rows = $this-&gt;contentTypeGateway-&gt;loadAllGroupsData();
+        return $this-&gt;mapper-&gt;extractGroupsFromRows( $rows );
+    }
+
+    /**
+     * @param mixed $groupId
+     * @param int $status
+     * @return Type[]
+     */
+    public function loadContentTypes( $groupId, $status = 0 )
+    {
+        $rows = $this-&gt;contentTypeGateway-&gt;loadTypesDataForGroup( $groupId, $status );
+        return $this-&gt;mapper-&gt;extractTypesFromRows( $rows );
+    }
+
+    /**
+     * @param int $contentTypeId
+     * @param int $status
+     * @return \eZ\Publish\SPI\Persistence\Content\Type
+     */
+    public function load( $contentTypeId, $status = Type::STATUS_DEFINED )
+    {
+        $rows = $this-&gt;contentTypeGateway-&gt;loadTypeData(
+            $contentTypeId, $status
+        );
+        return $this-&gt;loadFromRows( $rows, $contentTypeId, $status );
+    }
+
+    /**
+     * Load a (defined) content type by identifier
+     *
+     * @param string $identifier
+     * @return \eZ\Publish\SPI\Persistence\Content\Type
+     * @throws \ezp\Base\Exception\NotFound If defined type is not found
+     */
+    public function loadByIdentifier( $identifier )
+    {
+        $rows = $this-&gt;contentTypeGateway-&gt;loadTypeDataByIdentifier(
+            $identifier, Type::STATUS_DEFINED
+        );
+        return $this-&gt;loadFromRows( $rows, $identifier, Type::STATUS_DEFINED );
+    }
+
+    /**
+     * Loads a single Type from $rows
+     *
+     * @param array $rows
+     * @param mixed $typeIdentifier
+     * @param int $status
+     * @return \eZ\Publish\SPI\Persistence\Content\Type
+     */
+    protected function loadFromRows( array $rows, $typeIdentifier, $status )
+    {
+        $types = $this-&gt;mapper-&gt;extractTypesFromRows( $rows );
+
+        if ( count( $types ) !== 1 )
+        {
+            throw new Exception\TypeNotFound( $typeIdentifier, $status );
+        }
+
+        return $types[0];
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\CreateStruct $createStruct
+     * @return \eZ\Publish\SPI\Persistence\Content\Type
+     */
+    public function create( CreateStruct $createStruct )
+    {
+        $createStruct = clone $createStruct;
+        $contentType = $this-&gt;mapper-&gt;createTypeFromCreateStruct(
+            $createStruct
+        );
+
+        $contentType-&gt;id = $this-&gt;contentTypeGateway-&gt;insertType(
+            $contentType
+        );
+        foreach ( $contentType-&gt;groupIds as $groupId )
+        {
+            $this-&gt;contentTypeGateway-&gt;insertGroupAssignement(
+                $groupId,
+                $contentType-&gt;id,
+                $contentType-&gt;status
+            );
+        }
+        foreach ( $contentType-&gt;fieldDefinitions as $fieldDef )
+        {
+            $storageFieldDef = new StorageFieldDefinition();
+            $this-&gt;mapper-&gt;toStorageFieldDefinition( $fieldDef, $storageFieldDef );
+            $fieldDef-&gt;id = $this-&gt;contentTypeGateway-&gt;insertFieldDefinition(
+                $contentType-&gt;id,
+                $contentType-&gt;status,
+                $fieldDef,
+                $storageFieldDef
+            );
+        }
+        return $contentType;
+    }
+
+    /**
+     * @param mixed $typeId
+     * @param int $status
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\UpdateStruct $contentType
+     * @return Type
+     * @todo Maintain contentclass_name
+     */
+    public function update( $typeId, $status, UpdateStruct $contentType )
+    {
+        $this-&gt;contentTypeGateway-&gt;updateType(
+            $typeId, $status, $contentType
+        );
+        return $this-&gt;load(
+            $typeId, $status
+        );
+    }
+
+    /**
+     * @param mixed $contentTypeId
+     * @todo Maintain contentclass_name
+     */
+    public function delete( $contentTypeId, $status )
+    {
+        $count = $this-&gt;contentTypeGateway-&gt;countInstancesOfType(
+            $contentTypeId, $status
+        );
+        if ( $count &gt; 0 )
+        {
+            throw new Exception\TypeStillHasContent( $contentTypeId, $status );
+        }
+
+        $this-&gt;contentTypeGateway-&gt;deleteGroupAssignementsForType(
+            $contentTypeId, $status
+        );
+        $this-&gt;contentTypeGateway-&gt;deleteFieldDefinitionsForType(
+            $contentTypeId, $status
+        );
+        $this-&gt;contentTypeGateway-&gt;deleteType(
+            $contentTypeId, $status
+        );
+
+        // FIXME: Return true only if deletion happened
+        return true;
+    }
+
+    /**
+     * Creates a draft of existing defined content type
+     *
+     * Updates modified date, sets $modifierId and status to Type::STATUS_DRAFT on the new returned draft.
+     *
+     * @param mixed $modifierId
+     * @param mixed $contentTypeId
+     * @return \eZ\Publish\SPI\Persistence\Content\Type
+     * @throws \ezp\Base\Exception\NotFound If type with defined status is not found
+     */
+    public function createDraft( $modifierId, $contentTypeId )
+    {
+        $createStruct = $this-&gt;mapper-&gt;createCreateStructFromType(
+            $this-&gt;load( $contentTypeId, Type::STATUS_DEFINED )
+        );
+        $createStruct-&gt;status = Type::STATUS_DRAFT;
+        $createStruct-&gt;modifierId = $modifierId;
+        $createStruct-&gt;modified = time();
+
+        return $this-&gt;create( $createStruct );
+    }
+
+    /**
+     * @param mixed $userId
+     * @param mixed $contentTypeId
+     * @param int $status One of Type::STATUS_DEFINED|Type::STATUS_DRAFT|Type::STATUS_MODIFIED
+     * @return Type
+     */
+    public function copy( $userId, $contentTypeId, $status )
+    {
+        $createStruct = $this-&gt;mapper-&gt;createCreateStructFromType(
+            $this-&gt;load( $contentTypeId, $status )
+        );
+        $createStruct-&gt;modifierId = $userId;
+        $createStruct-&gt;created = $createStruct-&gt;modified = time();
+        $createStruct-&gt;creatorId = $userId;
+
+        return $this-&gt;create( $createStruct );
+    }
+
+    /**
+     * Unlink a content type group from a content type
+     *
+     * @param mixed $groupId
+     * @param mixed $contentTypeId
+     * @param int $status
+     */
+    public function unlink( $groupId, $contentTypeId, $status )
+    {
+        $groupCount = $this-&gt;contentTypeGateway-&gt;countGroupsForType(
+            $contentTypeId, $status
+        );
+        if ( $groupCount &lt; 2 )
+        {
+            throw new Exception\RemoveLastGroupFromType(
+                $contentTypeId, $status
+            );
+        }
+
+        $this-&gt;contentTypeGateway-&gt;deleteGroupAssignement(
+            $groupId, $contentTypeId, $status
+        );
+        // FIXME: What is to be returned?
+        return true;
+    }
+
+    /**
+     * Link a content type group with a content type
+     *
+     * @param mixed $groupId
+     * @param mixed $contentTypeId
+     */
+    public function link( $groupId, $contentTypeId, $status )
+    {
+        $this-&gt;contentTypeGateway-&gt;insertGroupAssignement(
+            $groupId, $contentTypeId, $status
+        );
+        // FIXME: What is to be returned?
+        return true;
+    }
+
+    /**
+     * Adds a new field definition to an existing Type.
+     *
+     * This method creates a new status of the Type with the $fieldDefinition
+     * added. It does not update existing content objects depending on the
+     * field (default) values.
+     *
+     * @param mixed $contentTypeId
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDefinition
+     * @return void
+     */
+    public function addFieldDefinition( $contentTypeId, $status, FieldDefinition $fieldDefinition )
+    {
+        $storageFieldDef = new StorageFieldDefinition();
+        $this-&gt;mapper-&gt;toStorageFieldDefinition(
+            $fieldDefinition, $storageFieldDef
+        );
+        $fieldDefinition-&gt;id = $this-&gt;contentTypeGateway-&gt;insertFieldDefinition(
+            $contentTypeId, $status, $fieldDefinition, $storageFieldDef
+        );
+    }
+
+    /**
+     * Removes a field definition from an existing Type.
+     *
+     * This method creates a new status of the Type with the field definition
+     * referred to by $fieldDefinitionId removed. It does not update existing
+     * content objects depending on the field (default) values.
+     *
+     * @param mixed $contentTypeId
+     * @param mixed $fieldDefinitionId
+     * @return boolean
+     */
+    public function removeFieldDefinition( $contentTypeId, $status, $fieldDefinitionId )
+    {
+        $this-&gt;contentTypeGateway-&gt;deleteFieldDefinition(
+            $contentTypeId, $status, $fieldDefinitionId
+        );
+        // FIXME: Return true only if deletion happened
+        return true;
+    }
+
+    /**
+     * This method updates the given $fieldDefinition on a Type.
+     *
+     * This method creates a new status of the Type with the updated
+     * $fieldDefinition. It does not update existing content objects depending
+     * on the
+     * field (default) values.
+     *
+     * @param mixed $contentTypeId
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDefinition
+     * @return void
+     */
+    public function updateFieldDefinition( $contentTypeId, $status, FieldDefinition $fieldDefinition )
+    {
+        $storageFieldDef = new StorageFieldDefinition();
+        $this-&gt;mapper-&gt;toStorageFieldDefinition(
+            $fieldDefinition, $storageFieldDef
+        );
+        $this-&gt;contentTypeGateway-&gt;updateFieldDefinition(
+            $contentTypeId, $status, $fieldDefinition, $storageFieldDef
+        );
+    }
+
+    /**
+     * Update content objects
+     *
+     * Updates content objects, depending on the changed field definitions.
+     *
+     * A content type has a state which tells if its content objects yet have
+     * been adapted.
+     *
+     * Flags the content type as updated.
+     *
+     * @param mixed $contentTypeId
+     * @return void
+     */
+    public function publish( $contentTypeId )
+    {
+        $toType = $this-&gt;load( $contentTypeId, 1 );
+
+        try
+        {
+            $fromType = $this-&gt;load( $contentTypeId, 0 );
+            $this-&gt;updateHandler-&gt;updateContentObjects( $fromType, $toType );
+            $this-&gt;updateHandler-&gt;deleteOldType( $fromType );
+        }
+        // If no old type is found, no updates are necessary to it
+        catch ( Exception\TypeNotFound $e )
+        {
+        }
+
+        $this-&gt;updateHandler-&gt;publishNewType( $toType, 0 );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

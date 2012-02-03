@@ -1,0 +1,551 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ContentTypeGateway class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\User\Role\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\User\Role\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\SPI\Persistence\User\Policy,
+    eZ\Publish\SPI\Persistence\User\RoleUpdateStruct,
+    eZ\Publish\SPI\Persistence\User\Role;
+
+/**
+ * Base class for content type gateways.
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Database handler
+     *
+     * @var EzcDbHandler
+     */
+    protected $handler;
+
+    /**
+     * Internal type ID for user groups
+     */
+    const GROUP_TYPE_ID = 3;
+
+    /**
+     * Construct from database handler
+     *
+     * @param EzcDbHandler $handler
+     * @return void
+     */
+    public function __construct( EzcDbHandler $handler )
+    {
+        $this-&gt;handler = $handler;
+    }
+
+    /**
+     * Create new role
+     *
+     * @param Role $role
+     * @return Role
+     */
+    public function createRole( Role $role )
+    {
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezrole' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                $this-&gt;handler-&gt;getAutoIncrementValue( 'ezrole', 'id' )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_new' ),
+                0
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'name' ),
+                $query-&gt;bindValue( $role-&gt;name )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'value' ),
+                0
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'version' ),
+                0
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $role-&gt;id = $this-&gt;handler-&gt;lastInsertId(
+            $this-&gt;handler-&gt;getSequenceName( 'ezrole', 'id' )
+        );
+    }
+
+    /**
+     * Load a specified role by id
+     *
+     * @param mixed $roleId
+     * @return array
+     */
+    public function loadRole( $roleId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezrole' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'name', 'ezrole' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'contentobject_id', 'ezuser_role' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'function_name', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'module_name', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'identifier', 'ezpolicy_limitation' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'value', 'ezpolicy_limitation_value' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezrole' )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser_role' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'role_id', 'ezuser_role' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'role_id', 'ezpolicy' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'policy_id', 'ezpolicy_limitation' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation_value' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'limitation_id', 'ezpolicy_limitation_value' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy_limitation' )
+            )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' ),
+                $query-&gt;bindValue( $roleId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Load all roles associated with the given content objects
+     *
+     * @param array $contentIds
+     * @return array
+     */
+    public function loadRolesForContentObjects( $contentIds )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'contentobject_id', 'ezuser_role' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezrole' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'name', 'ezrole' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'function_name', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'module_name', 'ezpolicy' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'identifier', 'ezpolicy_limitation' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'value', 'ezpolicy_limitation_value' )
+        )-&gt;from(
+            $query-&gt;alias(
+                $this-&gt;handler-&gt;quoteTable( 'ezuser_role' ),
+                $this-&gt;handler-&gt;quoteIdentifier( 'ezuser_role_search' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezrole' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' ),
+                $this-&gt;handler-&gt;quoteColumn( 'role_id', 'ezuser_role_search' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezuser_role' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'role_id', 'ezuser_role' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'role_id', 'ezpolicy' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezrole' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'policy_id', 'ezpolicy_limitation' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation_value' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'limitation_id', 'ezpolicy_limitation_value' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy_limitation' )
+            )
+        )-&gt;where(
+            $query-&gt;expr-&gt;in(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezuser_role_search' ),
+                $contentIds
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Returns the user policies associated with the user
+     *
+     * @param mixed $userId
+     * @return UserPolicy[]
+     */
+    public function loadPoliciesByUserId( $userId )
+    {
+        $groupIds = $this-&gt;fetchUserGroups( $userId );
+        $groupIds[] = $userId;
+
+        return $this-&gt;loadRolesForContentObjects( $groupIds );
+    }
+
+    /**
+     * Fetch all group IDs the user belongs to
+     *
+     * @param int $userId
+     * @return array
+     */
+    protected function fetchUserGroups( $userId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'path_string', 'ezcontentobject_tree' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_tree' ),
+                $query-&gt;bindValue( $userId )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $paths = $statement-&gt;fetchAll( \PDO::FETCH_COLUMN );
+        $nodeIDs = array_unique(
+            array_reduce(
+                array_map(
+                    function ( $pathString )
+                    {
+                        return array_filter( explode( '/', $pathString ) );
+                    },
+                    $paths
+                ),
+                'array_merge_recursive',
+                array()
+            )
+        );
+
+        // Limit nodes to groups only
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'id', 'ezcontentobject' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' )
+        )-&gt;rightJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezcontentobject' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezcontentobject' ),
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id', 'ezcontentobject_tree' )
+            )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id', 'ezcontentobject_tree' ),
+                    $nodeIDs
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'contentclass_id', 'ezcontentobject' ),
+                    // We use the integer type ID here, to minimize joins and
+                    // make use of existing keys. One might want to make this
+                    // &quot;injectable&quot;.
+                    $query-&gt;bindValue( self::GROUP_TYPE_ID, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_COLUMN );
+    }
+
+    /**
+     * Update role
+     *
+     * @param RoleUpdateStruct $role
+     */
+    public function updateRole( RoleUpdateStruct $role )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezrole' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'name' ),
+                $query-&gt;bindValue( $role-&gt;name )
+            )-&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                    $query-&gt;bindValue( $role-&gt;id, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Delete the specified role
+     *
+     * @param mixed $roleId
+     */
+    public function deleteRole( $roleId )
+    {
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezrole' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                    $query-&gt;bindValue( $roleId, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Adds a policy to a role
+     *
+     * @param mixed $roleId
+     * @param Policy $policy
+     * @return void
+     */
+    public function addPolicy( $roleId, Policy $policy )
+    {
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezpolicy' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                $this-&gt;handler-&gt;getAutoIncrementValue( 'ezpolicy', 'id' )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'function_name' ),
+                $query-&gt;bindValue( $policy-&gt;function )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'module_name' ),
+                $query-&gt;bindValue( $policy-&gt;module )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'original_id' ),
+                0
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'role_id' ),
+                $query-&gt;bindValue( $roleId, null, \PDO::PARAM_INT )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $policy-&gt;id = $this-&gt;handler-&gt;lastInsertId(
+            $this-&gt;handler-&gt;getSequenceName( 'ezpolicy', 'id' )
+        );
+
+        // Handle the only valid non-array value &quot;*&quot; by not inserting
+        // anything. Still has not been documented by eZ Systems. So we
+        // assume this is the right way to handle it.
+        if ( is_array( $policy-&gt;limitations ) )
+        {
+            $this-&gt;addPolicyLimitations( $policy-&gt;id, $policy-&gt;limitations );
+        }
+
+        return $policy;
+    }
+
+    /**
+     * Add limitations to an existing policy
+     *
+     * @param int $policyId
+     * @param array $limitations
+     * @return void
+     */
+    public function addPolicyLimitations( $policyId, array $limitations )
+    {
+        foreach ( $limitations as $identifier =&gt; $values )
+        {
+            $query = $this-&gt;handler-&gt;createInsertQuery();
+            $query
+                -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation' ) )
+                -&gt;set(
+                    $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                    $this-&gt;handler-&gt;getAutoIncrementValue( 'ezpolicy_limitation', 'id' )
+                )-&gt;set(
+                    $this-&gt;handler-&gt;quoteColumn( 'identifier' ),
+                    $query-&gt;bindValue( $identifier )
+                )-&gt;set(
+                    $this-&gt;handler-&gt;quoteColumn( 'policy_id' ),
+                    $query-&gt;bindValue( $policyId, null, \PDO::PARAM_INT )
+                );
+            $query-&gt;prepare()-&gt;execute();
+
+            $limitationId = $this-&gt;handler-&gt;lastInsertId(
+                $this-&gt;handler-&gt;getSequenceName( 'ezpolicy_limitation', 'id' )
+            );
+
+            foreach ( $values as $value )
+            {
+                $query = $this-&gt;handler-&gt;createInsertQuery();
+                $query
+                    -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation_value' ) )
+                    -&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                        $this-&gt;handler-&gt;getAutoIncrementValue( 'ezpolicy_limitation_value', 'id' )
+                    )-&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'value' ),
+                        $query-&gt;bindValue( $value )
+                    )-&gt;set(
+                        $this-&gt;handler-&gt;quoteColumn( 'limitation_id' ),
+                        $query-&gt;bindValue( $limitationId, null, \PDO::PARAM_INT )
+                    );
+                $query-&gt;prepare()-&gt;execute();
+            }
+        }
+    }
+
+    /**
+     * Removes a policy from a role
+     *
+     * @param mixed $policyId
+     * @return void
+     */
+    public function removePolicy( $policyId )
+    {
+        $this-&gt;removePolicyLimitations( $policyId );
+
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezpolicy' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                    $query-&gt;bindValue( $policyId, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Remove all limitations for a policy
+     *
+     * @param mixed $policyId
+     * @return void
+     */
+    public function removePolicyLimitations( $policyId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezpolicy_limitation' ),
+            $this-&gt;handler-&gt;aliasedColumn( $query, 'id', 'ezpolicy_limitation_value' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy' )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'policy_id', 'ezpolicy_limitation' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy' )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation_value' ),
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'limitation_id', 'ezpolicy_limitation_value' ),
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy_limitation' )
+            )
+        )-&gt;where(
+            $query-&gt;expr-&gt;eq(
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezpolicy' ),
+                $query-&gt;bindValue( $policyId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $limitations = array();
+        $values = array();
+        while ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            $limitations[] = $row['ezpolicy_limitation_id'];
+            $values[] = $row['ezpolicy_limitation_value_id'];
+        }
+
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;in( $this-&gt;handler-&gt;quoteColumn( 'id' ), array_unique( $limitations ) )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( $this-&gt;handler-&gt;quoteTable( 'ezpolicy_limitation_value' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;in( $this-&gt;handler-&gt;quoteColumn( 'id' ), array_unique( $values ) )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

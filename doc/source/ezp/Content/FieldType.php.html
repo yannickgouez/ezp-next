@@ -1,0 +1,392 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the FieldType class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content;
+use ezp\Content\Version,
+    ezp\Content\Field,
+    ezp\Content\FieldType\FieldSettings,
+    ezp\Content\FieldType\Value,
+    ezp\Content\FieldType\Validator,
+    eZ\Publish\SPI\Persistence\Content\FieldValue as PersistenceFieldValue,
+    eZ\Publish\SPI\Persistence\Content\FieldTypeConstraints,
+    ezp\Base\Observer,
+    ezp\Base\Observable,
+    ezp\Base\Repository,
+    ezp\Base\Exception\InvalidArgumentValue,
+    ezp\Base\Exception\InvalidArgumentType;
+
+/**
+ * Base class for field types, the most basic storage unit of data inside eZ Publish.
+ *
+ * All other field types extend FieldType providing the specific functionality
+ * desired in each case.
+ *
+ * The capabilities supported by each individual field type is decided by which
+ * interfaces the field type implements support for. These individual
+ * capabilities can also be checked via the supports*() methods.
+ *
+ * A field type are the base building blocks of Content Types, and serve as
+ * data containers for Content objects. Therefore, while field types can be used
+ * independently, they are designed to be used as a part of a Content object.
+ *
+ * Field types are primed and pre-configured with the Field Definitions found in
+ * Content Types.
+ *
+ * @todo Merge and optimize concepts for settings, validator data and field type properties.
+ */
+abstract class FieldType implements Observer
+{
+    /**
+     * @var \ezp\Content\FieldType\FieldSettings Custom properties which are specific to the field
+     *                                           type. Typically these properties are used to
+     *                                           configure behaviour of field types and normally set
+     *                                           in the FieldDefinition on ContentTypes
+     */
+    protected $fieldSettings;
+
+    /**
+     * The setting keys which are available on this field type.
+     *
+     * The key is the setting name, and the value is the default value for given
+     * setting, set to null if no particular default should be set.
+     *
+     * @var array
+     */
+    protected $allowedSettings = array();
+
+    /**
+     * Validators which are supported for this field type.
+     * Full Qualified Class Name should be registered here.
+     * Example:
+     * &lt;code&gt;
+     * protected $allowedValidators = array(
+     *     &quot;ezp\\Content\\FieldType\\BinaryFile\\FileSizeValidator&quot;
+     * );
+     * &lt;/code&gt;
+     *
+     * @var array
+     */
+    protected $allowedValidators = array();
+
+    /**
+     * Value of field type.
+     *
+     * @var \ezp\Content\FieldType\Value
+     */
+    private $value;
+
+    /**
+     * Constructs field type object, initializing internal data structures.
+     */
+    public function __construct()
+    {
+        $this-&gt;fieldSettings = new FieldSettings( $this-&gt;allowedSettings );
+    }
+
+    /**
+     * Sets $value for $settingName on field type.
+     * Allowed options are in {@link \ezp\Content\FieldType::$allowedSettings}
+     *
+     * @see \ezp\Content\FieldType::$fieldSettings
+     * @param string $settingName
+     * @param mixed $value
+     * @return void
+     */
+    public function setFieldSetting( $settingName, $value )
+    {
+        $this-&gt;fieldSettings[$settingName] = $value;
+    }
+
+    /**
+     * Gets field setting identified by $settingName
+     *
+     * @see \ezp\Content\FieldType::$fieldSettings
+     * @param string $settingName
+     * @return mixed
+     */
+    public function getFieldSetting( $settingName )
+    {
+        return $this-&gt;fieldSettings[$settingName];
+    }
+
+    /**
+     * Set all settings on field type.
+     *
+     * Useful to initialize field type from a field definition.
+     *
+     * @param array $values
+     * @return void
+     */
+    public function initializeSettings( array $values )
+    {
+        $this-&gt;fieldSettings-&gt;exchangeArray( $values );
+    }
+
+    /**
+     * Return a copy of the array of fieldSettings.
+     *
+     * @return array
+     */
+    public function getFieldTypeSettings()
+    {
+        return $this-&gt;fieldSettings;
+    }
+
+    /**
+     * Keys of settings which are available on this fieldtype.
+     * @return array
+     */
+    public function allowedSettings()
+    {
+        return array_keys( $this-&gt;allowedSettings );
+    }
+
+    /**
+     * Return an array of allowed validators to operate on this field type.
+     *
+     * @return array
+     */
+    public function allowedValidators()
+    {
+        return $this-&gt;allowedValidators;
+    }
+
+    /**
+     * Checks if $inputValue can be parsed.
+     * If the $inputValue actually can be parsed, the value is returned.
+     * Otherwise, an \ezp\Base\Exception\BadFieldTypeInput exception is thrown
+     *
+     * @abstract
+     * @throws \ezp\Base\Exception\BadFieldTypeInput Thrown when $inputValue is not understood.
+     * @param \ezp\Content\FieldType\Value $inputValue
+     * @return \ezp\Content\FieldType\Value
+     */
+    abstract protected function canParseValue( Value $inputValue );
+
+    /**
+     * Injects the value of a field in the field type.
+     *
+     * @param \ezp\Content\FieldType\Value $inputValue
+     * @return void
+     */
+    public function setValue( Value $inputValue )
+    {
+        $this-&gt;value = $this-&gt;canParseValue( $inputValue );
+    }
+
+    /**
+     * Returns the value of associated field.
+     *
+     * If no value has yet been set, the default value of that field type is
+     * returned.
+     *
+     * @return \ezp\Content\FieldType\Value|null
+     */
+    public function getValue()
+    {
+        return $this-&gt;value ?: $this-&gt;getDefaultValue();
+    }
+
+    /**
+     * Returns the fallback default value of field type when no such default
+     * value is provided in the field definition in content types.
+     *
+     * @return \ezp\Content\FieldType\Value
+     */
+    abstract protected function getDefaultValue();
+
+    /**
+     * Method to populate the FieldValue struct for field types
+     *
+     * @internal
+     * @return void
+     */
+    public final function toFieldValue()
+    {
+        // @todo Evaluate if creating the sortKey in every case is really needed
+        //       Couldn't this be retrieved with a method, which would initialize
+        //       that info on request only?
+        return new PersistenceFieldValue(
+            array(
+                &quot;data&quot; =&gt; $this-&gt;getValue(),
+                &quot;sortKey&quot; =&gt; $this-&gt;getSortInfo(),
+                &quot;fieldSettings&quot; =&gt; $this-&gt;getFieldTypeSettings()
+            )
+        );
+    }
+
+    /**
+     * Returns information for PersistenceFieldValue-&gt;$sortKey relevant to the field type.
+     * Return value is an array where key is the sort type, value is field value to be used for sorting.
+     * Sort type can be :
+     *  - sort_key_string (sorting will be made with a string algorithm)
+     *  - sort_key_int (sorting will be made with an integer algorithm)
+     *
+     * &lt;code&gt;
+     * protected function getSortInfo()
+     * {
+     *     // Example for a text line type:
+     *     return array( 'sort_key_string' =&gt; $this-&gt;getValue()-&gt;text );
+     *
+     *     // Example for an int:
+     *     // return array( 'sort_key_int' =&gt; 123 );
+     *
+     *     // Non sortable:
+     *     // return false;
+     * }
+     * &lt;/code&gt;
+     *
+     * @abstract
+     * @return array|bool Array with sortInfo, or false if the Type doesn't support sorting
+     */
+    abstract protected function getSortInfo();
+
+    /**
+     * Used by the FieldDefinition to populate the $fieldTypeConstraints-&gt;validators field.
+     *
+     * If validator is not allowed for a given field type, no data from that
+     * validator is populated to $constraints.
+     *
+     * @internal
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldTypeConstraints $fieldTypeConstraints
+     * @param \ezp\Content\FieldType\Validator $validator
+     * @return void
+     */
+    public final function fillConstraintsFromValidator( FieldTypeConstraints $fieldTypeConstraints, Validator $validator )
+     {
+         $validatorClass = get_class( $validator );
+         if ( !in_array( $validatorClass, $this-&gt;allowedValidators() ) )
+             throw new InvalidArgumentType( '$validator', implode( ', ', $this-&gt;allowedValidators() ) );
+
+         $fieldTypeConstraints-&gt;validators = array(
+             $validatorClass =&gt; $validator-&gt;getValidatorConstraints()
+         ) + $fieldTypeConstraints-&gt;validators;
+     }
+
+    /**
+      * Called when subject has been updated
+      * Supported events:
+      *   - field/setValue Should be triggered when a field has been set a value. Will inject the value in the field type
+      *
+      * @param \ezp\Base\Observable $subject
+      * @param string $event
+      * @param array $arguments
+      * @throws \ezp\Base\Exception\InvalidArgumentValue
+      */
+    public function update( Observable $subject, $event = 'update', array $arguments = null )
+    {
+        switch ( $event )
+        {
+            case 'field/setValue':
+                if ( $arguments === null || !isset( $arguments['value'] ) )
+                throw new InvalidArgumentValue( 'arguments', $arguments, get_class( $this ) );
+
+                $this-&gt;onFieldSetValue( $subject, $arguments['value'] );
+                break;
+
+            case 'pre_publish':
+                if ( !$subject instanceof Field )
+                    throw new InvalidArgumentType( 'subject', 'ezp\\Content\\Field', $subject );
+                if ( !isset( $arguments['repository'] ) || !$arguments['repository'] instanceof Repository )
+                    throw new InvalidArgumentType( 'repository', 'ezp\\Base\\Repository', null );
+                $this-&gt;onPrePublish( $arguments['repository'], $subject );
+                break;
+
+            case 'post_publish':
+                if ( !$subject instanceof Field )
+                    throw new InvalidArgumentType( 'subject', 'ezp\\Content\\Field', $subject );
+                if ( !isset( $arguments['repository'] ) || !$arguments['repository'] instanceof Repository )
+                    throw new InvalidArgumentType( 'repository', 'ezp\\Base\\Repository', null );
+                $this-&gt;onPostPublish( $arguments['repository'], $subject );
+                break;
+
+            case 'pre_create':
+                if ( !$subject instanceof Field )
+                    throw new InvalidArgumentType( 'subject', 'ezp\\Content\\Field', $subject );
+                if ( !isset( $arguments['repository'] ) || !$arguments['repository'] instanceof Repository )
+                    throw new InvalidArgumentType( 'repository', 'ezp\\Base\\Repository', null );
+                $this-&gt;onPreCreate( $arguments['repository'], $subject );
+                break;
+
+            case 'post_create':
+                if ( !$subject instanceof Field )
+                    throw new InvalidArgumentType( 'subject', 'ezp\\Content\\Field', $subject );
+                if ( !isset( $arguments['repository'] ) || !$arguments['repository'] instanceof Repository )
+                    throw new InvalidArgumentType( 'repository', 'ezp\\Base\\Repository', null );
+                $this-&gt;onPostCreate( $arguments['repository'], $subject );
+                break;
+        }
+    }
+
+     /**
+      * This method is called when a &quot;field/setValue&quot; event is triggered by $subject.
+      * Override this method if you need to manipulate $value when &quot;field/setValue&quot; event is triggered.
+      * By default, it injects $value in the field type, without any manipulation.
+      * When overriding this method, the parent must always be called:
+      * &lt;code&gt;
+      * protected function onFieldSetValue( Observable $subject, Value $value )
+      * {
+      *     parent::onFieldSetValue( $subject, $value );
+      *     // Do something with $value and $subject
+      * }
+      * &lt;/code&gt;
+      *
+      * @param \ezp\Base\Observable $subject
+      * @param \ezp\Content\FieldType\Value $value
+      */
+     protected function onFieldSetValue( Observable $subject, Value $value )
+     {
+         $this-&gt;setValue( $value );
+     }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

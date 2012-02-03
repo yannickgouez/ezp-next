@@ -1,0 +1,204 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Language Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Language;
+use eZ\Publish\SPI\Persistence\Content\Language,
+    eZ\Publish\SPI\Persistence\Content\Language\Handler as BaseLanguageHandler,
+    eZ\Publish\SPI\Persistence\Content\Language\CreateStruct;
+
+/**
+ * Language Handler
+ */
+class CachingHandler implements BaseLanguageHandler, Lookup
+{
+    /**
+     * Inner Language handler
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\Handler
+     */
+    protected $innerHandler;
+
+    /**
+     * Language cache
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\Cache
+     */
+    protected $languageCache;
+
+    /**
+     * If the cache has already been initialized
+     *
+     * @var bool
+     */
+    protected $isCacheInitialized = false;
+
+    /**
+     * Creates a caching handler around $innerHandler
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Language\Handler $innerHandler
+     */
+    public function __construct( BaseLanguageHandler $innerHandler, Cache $languageCache )
+    {
+        $this-&gt;innerHandler = $innerHandler;
+        $this-&gt;languageCache = $languageCache;
+    }
+
+    /**
+     * Initializes the cache if necessary
+     *
+     * @return void
+     */
+    protected function initializeCache()
+    {
+        if ( false === $this-&gt;isCacheInitialized )
+        {
+            $languages = $this-&gt;innerHandler-&gt;loadAll();
+            foreach ( $languages as $language )
+            {
+                $this-&gt;languageCache-&gt;store( $language );
+            }
+            $this-&gt;isCacheInitialized = true;
+        }
+    }
+
+    /**
+     * Returns the Language with $id from the cache
+     *
+     * @param mixed $id
+     * @return \eZ\Publish\SPI\Persistence\Content\Language
+     * @throws \ezp\Base\Exception\NotFound
+     *         if the Language could not be found
+     */
+    public function getById( $id )
+    {
+        $this-&gt;initializeCache();
+        return $this-&gt;languageCache-&gt;getById( $id );
+    }
+
+    /**
+     * Returns the Language with $locale from the cache
+     *
+     * @param string $locale
+     * @return \eZ\Publish\SPI\Persistence\Content\Language
+     * @throws \ezp\Base\Exception\NotFound
+     *         if the Language could not be found
+     */
+    public function getByLocale( $locale )
+    {
+        $this-&gt;initializeCache();
+        return $this-&gt;languageCache-&gt;getByLocale( $locale );
+    }
+
+    /**
+     * Create a new language
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Language\CreateStruct $struct
+     * @return \eZ\Publish\SPI\Persistence\Content\Language
+     */
+    public function create( CreateStruct $struct )
+    {
+        $this-&gt;initializeCache();
+        $language = $this-&gt;innerHandler-&gt;create( $struct );
+        $this-&gt;languageCache-&gt;store( $language );
+        return $language;
+    }
+
+    /**
+     * Update language
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Language $language
+     */
+    public function update( Language $language )
+    {
+        $this-&gt;initializeCache();
+        $this-&gt;innerHandler-&gt;update( $language );
+        $this-&gt;languageCache-&gt;store( $language );
+    }
+
+    /**
+     * Get language by id
+     *
+     * @param mixed $id
+     * @return \eZ\Publish\SPI\Persistence\Content\Language
+     * @throws \ezp\Base\Exception\NotFound If language could not be found by $id
+     */
+    public function load( $id )
+    {
+        $this-&gt;initializeCache();
+        return $this-&gt;languageCache-&gt;getById( $id );
+    }
+
+    /**
+     * Get all languages
+     *
+     * @return \eZ\Publish\SPI\Persistence\Content\Language[]
+     */
+    public function loadAll()
+    {
+        $this-&gt;initializeCache();
+        return $this-&gt;languageCache-&gt;getAll();
+    }
+
+    /**
+     * Delete a language
+     *
+     * @param mixed $id
+     */
+    public function delete( $id )
+    {
+        $this-&gt;initializeCache();
+        $this-&gt;innerHandler-&gt;delete( $id );
+        $this-&gt;languageCache-&gt;remove( $id );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

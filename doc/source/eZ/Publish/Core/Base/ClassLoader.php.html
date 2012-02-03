@@ -1,0 +1,146 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Contains: PSR-0 ClassLoader Class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Base;
+
+/**
+ * Provides PSR-0 ClassLoader
+ *
+ * Use:
+ * require 'eZ/Publish/Core/Base/ClassLoader.php'
+ * spl_autoload_register( array( new eZ\Publish\Core\Base\ClassLoader(
+ *     array(
+ *         'Vendor\\Module' =&gt; 'Vendor/Module'
+ *     )[,
+ *     eZ\Publish\Core\Base\ClassLoader::MODE_PSR_0_STRICT] // optional strict mode where underscore is ignored
+ * ), 'load' ) );
+ */
+class ClassLoader
+{
+    /**
+     * Mode for &quot;PSR-0 strict&quot;, where underscore is ignored
+     * @var int
+     */
+    const MODE_PSR_0_STRICT = 1;
+
+    /**
+     * Skip doing a file_exists() check on matching namespaces
+     * @var int
+     */
+    const MODE_SKIP_FILE_CHECK = 2;
+
+    /**
+     * @var array
+     */
+    protected $repositories;
+
+    /**
+     * @var int
+     */
+    protected $mode;
+
+    /**
+     * Construct a autoload instance
+     *
+     * @param array $repositories containing namespace as key and path as value
+     * @param int $mode One or more of of the MODE constance, these are opt-in to make class loader stricter
+     */
+    public function __construct( array $repositories, $mode = 0 )
+    {
+        $this-&gt;repositories = $repositories;
+        $this-&gt;mode = $mode;
+    }
+
+    /**
+     * Autoload classes following PSR-0 naming
+     *
+     * @param  $className
+     * @return boolean
+     */
+    public function load( $className )
+    {
+        $className = ltrim( $className, '\\' );// PHP 5.3.1 issue
+        foreach ( $this-&gt;repositories as $namespace =&gt; $subPath )
+        {
+            if ( stripos( $className, $namespace . '\\' ) !== 0 )
+                continue;
+
+            if ( $this-&gt;mode &amp; self::MODE_PSR_0_STRICT )
+            {
+                // only replace namespace part to slash, but replace namespace with sub path if different
+                if ( $namespace !== $subPath )
+                    $file = $subPath . '/' . substr( strtr( $className, '\\', '/' ), strlen( $namespace ) +1 ) . '.php';
+                else
+                    $file = strtr( $className, '\\', '/' ) . '.php';
+            }
+            else // PSR-0
+            {
+                $classNamePos = strripos( $className, '\\' );
+                $file = &quot;$subPath/&quot; .
+                    // Replacing '\' to '/' in namespace part
+                    substr( strtr( substr( $className, 0, $classNamePos ), '\\', '/' ), strlen( $namespace ) +1 ) .
+                    // Appending class name + .php which corresponds to the filename
+                    '/' . str_replace( '_', '/', substr( $className, $classNamePos + 1 ) ) . '.php';
+            }
+
+            if ( !($this-&gt;mode &amp; self::MODE_SKIP_FILE_CHECK) &amp;&amp; !file_exists( $file ) )
+            {
+                return false;
+            }
+
+            require $file;
+            return true;
+        }
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

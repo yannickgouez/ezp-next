@@ -1,0 +1,369 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+use eZ\Publish\API\Repository\Values\Content\VersionInfo,
+    eZ\Publish\API\Repository\Repository;
+
+/**
+ * assumed as injected
+ * @var eZ\Publish\API\Repository\Repository $repository
+ */
+$repository = null;
+
+$contentService = $repository-&gt;getContentService();
+$locationService = $repository-&gt;getLocationService();
+$contentTypeService = $repository-&gt;getContentTypeService();
+
+/**
+ * create a new instance of a content object of type article
+ */
+
+$contentType = $contentTypeService-&gt;loadContentTypeByIdentifier( 'article' );
+// $contentType is read only output value
+
+// construct the creation structure with the content type and the main language of the content
+// the main language is also the default language for the fields
+$contentCreateStruct = $contentService-&gt;newContentCreateStruct( $contentType, 'eng-US' );
+
+// set title field in the main language
+$contentCreateStruct-&gt;setField( 'title', 'Title' );
+
+// set summary field in php array style
+$contentCreateStruct-&gt;fields['summary'] = &quot;&lt;p&gt;this is a summary&lt;/p&gt;&quot;;
+
+// set authors field of the article
+$contentCreateStruct-&gt;setField(
+    'author',
+    new \ezp\Content\FieldType\Author\Value(
+        array(
+            new \ezp\Content\FieldType\Author\Author( 'John Doe', 'john.doe@example.net' ),
+            new \ezp\Content\FieldType\Author\Author( 'Bud Spencer', 'bud.spencer@example.net' ),
+        )
+    )
+);
+
+// set image for the article
+$contentCreateStruct-&gt;setField( 'image', new \ezp\Content\FieldType\Image\Value( &quot;/tmp/myimage.jpg&quot;,&quot;my alternative text&quot; ) );
+
+// set a remote id for the content
+$contentCreateStruct-&gt;remoteId = &quot;12345&quot;;
+
+// create the content instance with a default location create structure
+$parentLocationId = 123;
+
+
+// demonstrating transactions 
+
+$repository-&gt;beginTransaction();
+try {
+    $content = $contentService-&gt;createContent( $contentCreateStruct, array( $locationService-&gt;newLocationCreateStruct( $parentLocationId ) ) );
+    // print the new created info data
+    $contentId = $content-&gt;contentId;
+    echo $contentId;
+
+    // 4.x. the location array is empty because the location are created on publish for the first time
+    // this method will throw an exception
+    try
+    {
+        $locations = $locationService-&gt;getLocations( $content-&gt;contentInfo );
+    }
+    catch ( BadStateException $e )
+    {
+        echo &quot;yes this content object has no location by now&quot;;
+    }
+    // publish the content
+    $contentService-&gt;publishContent( $content-&gt;versionInfo );
+    
+    // now there is one location with parentId 123 in the returned array
+    $locations = $locationService-&gt;getLocations( $content-&gt;contentInfo );
+    
+    // print the fields
+    foreach ( $content-&gt;getFields() as $field )
+    {
+        echo &quot;Field '{$field-&gt;identifier}','{$field-&gt;language}': {$field-&gt;value}\n&quot;;
+    }
+    $repository-&gt;commit();
+    
+}
+catch(UnauthorizedException $e) {
+    echo &quot;permission denied\n&quot; . $e.getMessage();
+    $repository-&gt;rollback();
+}
+catch(IllegalArgumentException $e) {
+    echo &quot;you did something wrong in the create struct: &quot; . $e.getMessage() .&quot;\n&quot;;
+    $repository-&gt;rollback();
+}
+catch(RuntimeException $e) {
+    echo &quot;something serious went wrong&quot; . $e-&gt;getMessage();
+    $repository-&gt;rollback();
+}
+
+
+
+/**
+ * translate the article
+ */
+
+// translating the content object (4.x)
+// load the content info object (note this info object differes from the one in the draft after publishing)
+$contentInfo = $contentService-&gt;loadContentInfo( $content-&gt;contentId );
+
+// create a draft from the before published content
+$content = $contentService-&gt;createDraftFromContent( $contentInfo );
+
+// instantiate a version update value object
+$contentUpdate = $contentService-&gt;newVersionUpdateStruct();
+$contentUpdate-&gt;initialLanguageId = 'ger-DE';
+$contentUpdate-&gt;fields['title'] = 'Titel';
+// .... as with creation see above
+
+// update the draft
+$content = $contentService-&gt;updateContent( $versionInfo, $contentUpdate );
+
+// read the fields of the version
+
+foreach ( $content-&gt;getFields() as $field )
+{
+    echo &quot;Field '{$field-&gt;identifier}','{$field-&gt;language}': {$field-&gt;value}\n&quot;;
+}
+
+/**
+ * Update the content meta data
+ */
+
+// Create the content update struct
+$contentMetadataUpdateStruct = $contentService-&gt;newContentMetadataUpdateStruct();
+
+// Change the main language and alwaysAvailableFlag
+$contentMetadataUpdateStruct-&gt;mainLanguageCode = 'ger-DE';
+$contentMetadataUpdateStruct-&gt;alwaysAvailable = false;
+
+// Update the content
+$contentService-&gt;updateContentMetadata( $contentInfo, $contentMetadataUpdateStruct );
+
+
+/**
+ * deleting the version and content
+ */
+
+// delete the version (draft)
+$contentService-&gt;deleteVersion( $content-&gt;versionInfo );
+
+// delete the content object
+$contentService-&gt;deleteContent( $content-&gt;contentInfo );
+
+/**
+ * Load all drafts of the current user
+ */
+
+foreach ( $contentService-&gt;loadContentDrafts() as $versionInfo )
+{
+    foreach ( $versionInfo-&gt;names as $language =&gt; $name )
+    {
+        echo 'In language &quot;', $language, '&quot; is name &quot;', $name, '&quot;', PHP_EOL;
+    }
+}
+
+/**
+ * Load the latest version info for a given remote id
+ */
+
+// Load the content info by it's remote id
+$contentInfo = $contentService-&gt;loadContentInfoByRemoteId( 'remote-id' );
+
+// Load the version info instance
+$versionInfo = $contentService-&gt;loadVersionInfo( $contentInfo );
+
+
+/**
+ * Load a specific version info for a content info object.
+ */
+
+// Load a content instance
+$content = $contentService-&gt;loadContent( 42 );
+
+// Load a specific version
+$versionInfo = $contentService-&gt;loadVersionInfo( $content, 3 );
+
+
+/**
+ * Load the latest version with all languages.
+ */
+
+// Load a content instance
+$content = $contentService-&gt;loadContent( 42 );
+
+
+
+/**
+ * Load the latest version in german and english
+ */
+
+$languages = array( 'eng-US', 'ger-DE' );
+
+// Load the latest version for this content object
+$content = $contentService-&gt;loadContent( 42, $languages );
+
+var_dump( $content-&gt;contentInfo-&gt;mainLanguageCode );
+
+
+/**
+ * Load a specific version in german
+ */
+
+$language = array( 'ger-DE' );
+
+// Load this version
+$content = $contentService-&gt;loadContent( 42, $language, 17 );
+
+
+/**
+ * Remove all archived versions from a content object.
+ */
+
+// Load a content info for a specific content id
+$contentInfo = $contentService-&gt;loadContentInfo( 23 );
+
+// List of content versions
+$versionInfos = $contentService-&gt;loadVersions( $contentInfo );
+foreach ( $versionInfos as $versionInfo )
+{
+    if ( $versionInfo-&gt;status == VersionInfo::STATUS_ARCHIVED )
+    {
+       $contentService-&gt;deleteVersion( $versionInfo );
+    }
+}
+
+/**
+ * Copy content object only with latest version
+ */
+
+// load the latest version
+$versionInfo = $contentService-&gt;loadVersionInfoById( 23 );
+
+// Instantiate a location create struct
+$locationCreate = $locationService-&gt;newLocationCreateStruct( 123 );
+
+// Copy content in latest version
+$version = $contentService-&gt;copyContent( $versionInfo-&gt;contentInfo, $locationCreate, $versionInfo );
+
+
+/**
+ * Find a set of matching versions
+ */
+
+// Create a simple search query
+$query = new \eZ\Publish\API\Repository\Values\Content\Query();
+$query-&gt;criterion = new \eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalAnd(
+    array(
+        new \eZ\Publish\API\Repository\Values\Content\Query\Criterion\Field( 'title', \eZ\Publish\API\Repository\Values\Content\Query\Criterion\Operator::LIKE, '*foo*' ),
+        new \eZ\Publish\API\Repository\Values\Content\Query\Criterion\Field( 'abstract', \eZ\Publish\API\Repository\Values\Content\Query\Criterion\Operator::LIKE, '*foo*' )
+    )
+);
+
+// Search for matching versions
+$searchResult = $contentService-&gt;findContent( $query, array() );
+
+// Dump version number for all found versions
+foreach ( $searchResult-&gt;items as $content )
+{
+    echo $content-&gt;getVersionInfo()-&gt;versionNo, PHP_EOL;
+}
+
+/**
+ * Add a relation
+ */
+
+// Load specific version info
+$versionInfo = $contentService-&gt;loadVersionInfoById( 42 );
+
+// Add a relation
+$contentService-&gt;addRelation( $versionInfo, 23 );
+
+
+/**
+ * Load all outgoing relations
+ */
+
+// Load the content info instance
+$contentInfo = $contentService-&gt;loadContentInfoByRemoteId( 'remote' );
+
+// Load the latest version info for the content object
+$versionInfo = $contentService-&gt;loadVersionInfo( $contentInfo );
+
+// Now load all outgoing relations
+foreach ( $contentService-&gt;loadRelations( $versionInfo ) as $relation )
+{
+    var_dump( $relation-&gt;type );
+}
+
+
+/**
+ * Load all incoming relations
+ */
+
+// Load the used content info object
+$contentInfo = $contentService-&gt;loadContentInfo( 17 );
+
+// Load the incoming relations for the content info object
+foreach ( $contentService-&gt;loadReverseRelations( $content ) as $relation )
+{
+    echo $relation-&gt;sourceContentId, ' --&gt; ', $relation-&gt;destinationContentId, PHP_EOL;
+}
+
+
+/**
+ * Remove a relation
+ */
+
+// Load the content info instance
+$contentInfo = $contentService-&gt;loadContentInfo( 42 );
+
+// Load specific version info
+$versionInfo = $contentService-&gt;loadVersionInfo( $contentInfo );
+
+// Remove a relation
+$contentService-&gt;deleteRelation( $versionInfo, 23 );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

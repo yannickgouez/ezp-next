@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ValueObject class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\SPI\Persistence;
+use ezp\Base\Exception\PropertyNotFound;
+
+/**
+ */
+abstract class ValueObject
+{
+    /**
+     * Construct object optionally with set of properties
+     *
+     * @param array $properties
+     */
+    public function __construct( array $properties = array() )
+    {
+        foreach ( $properties as $property =&gt; $value )
+            $this-&gt;$property = $value;
+    }
+
+    /**
+     * Throws exception on all writes to undefined properties so typos are not silently accepted.
+     *
+     * @throws PropertyNotFound
+     * @param string $name
+     * @param string $value
+     * @return void
+     */
+    public function __set( $name, $value )
+    {
+        throw new PropertyNotFound( $name, get_class( $this ) );
+    }
+
+    /**
+     * Throws exception on all reads to undefined properties so typos are not silently accepted.
+     *
+     * @throws PropertyNotFound
+     * @param string $name
+     * @return void
+     */
+    public function __get( $name )
+    {
+        throw new PropertyNotFound( $name, get_class( $this ) );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,242 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the KeywordStorage Converter class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\SPI\Persistence\Fields\Storage,
+    eZ\Publish\SPI\Persistence\Content\Field,
+    ezp\Base\Exception\Logic,
+    PDO;
+
+/**
+ * Converter for Keyword field type external storage
+ */
+class KeywordStorage implements Storage
+{
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Fields\Storage
+     */
+    public function storeFieldData( Field $field, array $context )
+    {
+        // If there is no keywords, there is nothing to store.
+        if ( empty( $field-&gt;value-&gt;data-&gt;values ) )
+            return;
+
+        $dbHandler = $context[&quot;connection&quot;];
+
+        // Retrieving the Content Type ID which is required in ezkeyword table
+        // but that isn't (and probably shouldn't be) available directly from
+        // $field.
+        $q = $dbHandler-&gt;createSelectQuery();
+        $q-&gt;select( &quot;contentclass_id&quot; )
+            -&gt;from( $dbHandler-&gt;quoteTable( &quot;ezcontentclass_attribute&quot; ) )
+            -&gt;where(
+                $q-&gt;expr-&gt;eq( &quot;id&quot;, $field-&gt;fieldDefinitionId )
+            );
+
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+
+        $row = $statement-&gt;fetch( PDO::FETCH_ASSOC );
+
+        if ( $row === false )
+            throw new Logic( &quot;Content Type ID can't be retrieved based on the field definition ID&quot; );
+
+        $contentTypeID = $row[&quot;contentclass_id&quot;];
+
+        // Retrieving potentially existing keywords
+        $q = $dbHandler-&gt;createSelectQuery();
+        $q-&gt;select( &quot;id&quot;, &quot;keyword&quot; )
+            -&gt;from( $dbHandler-&gt;quoteTable( &quot;ezkeyword&quot; ) )
+            -&gt;where(
+                $q-&gt;expr-&gt;lAnd(
+                    $q-&gt;expr-&gt;in(
+                        &quot;keyword&quot;,
+                        $field-&gt;value-&gt;data-&gt;values
+                    ),
+                    $q-&gt;expr-&gt;eq( &quot;class_id&quot;, $contentTypeID )
+                )
+            );
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+
+        // Hash of keyword IDs, indexed by the keyword
+        $keywordsIds = array_fill_keys( $field-&gt;value-&gt;data-&gt;values, true );
+        // Set of keywords that will have to be inserted
+        $keywordsToInsert = $keywordsIds;
+        foreach ( $statement-&gt;fetchAll( PDO::FETCH_ASSOC ) as $row )
+        {
+            $keywordsIds[$row[&quot;keyword&quot;]] = $row[&quot;id&quot;];
+            unset( $keywordsToInsert[$row[&quot;keyword&quot;]] );
+        }
+
+        // Inserting keywords not yet registered
+        if ( !empty( $keywordsToInsert ) )
+        {
+            $insertQuery = $dbHandler-&gt;createInsertQuery();
+            $insertQuery-&gt;insertInto(
+                $dbHandler-&gt;quoteTable( &quot;ezkeyword&quot; )
+            )-&gt;set(
+                $dbHandler-&gt;quoteColumn( &quot;class_id&quot; ),
+                $insertQuery-&gt;bindValue( $contentTypeID, null, PDO::PARAM_INT )
+            )-&gt;set(
+                $dbHandler-&gt;quoteColumn( &quot;keyword&quot; ),
+                $insertQuery-&gt;bindParam( $keyword )
+            );
+
+            $statement = $insertQuery-&gt;prepare();
+
+            foreach ( array_keys( $keywordsToInsert ) as $keyword )
+            {
+                $statement-&gt;execute();
+                $keywordsIds[$keyword] = $dbHandler-&gt;lastInsertId();
+            }
+            unset( $keyword );
+        }
+
+        // Linking keywords to the field
+        $insertQuery = $dbHandler-&gt;createInsertQuery();
+        $insertQuery-&gt;insertInto(
+            $dbHandler-&gt;quoteTable( &quot;ezkeyword_attribute_link&quot; )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;keyword_id&quot; ),
+            $insertQuery-&gt;bindParam( $keywordId )
+        )-&gt;set(
+            $dbHandler-&gt;quoteColumn( &quot;objectattribute_id&quot; ),
+            $insertQuery-&gt;bindValue( $field-&gt;id )
+        );
+
+        $statement = $insertQuery-&gt;prepare();
+
+        foreach ( $field-&gt;value-&gt;data-&gt;values as $keyword ) {
+            $keywordId = $keywordsIds[$keyword];
+            $statement-&gt;execute();
+        }
+    }
+
+    /**
+     * Populates $field value property based on the external data.
+     * $field-&gt;value is a {@link eZ\Publish\SPI\Persistence\Content\FieldValue} object.
+     * This value holds the data as a {@link ezp\Content\FieldType\Value} based object,
+     * according to the field type (e.g. for TextLine, it will be a {@link ezp\Content\FieldType\TextLine\Value} object).
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     * @return void
+     */
+    public function getFieldData( Field $field, array $context )
+    {
+        $dbHandler = $context[&quot;connection&quot;];
+
+        $q = $dbHandler-&gt;createSelectQuery();
+        $q-&gt;select( &quot;keyword&quot; )
+            -&gt;from( $dbHandler-&gt;quoteTable( &quot;ezkeyword&quot; ) )
+            -&gt;innerJoin(
+                $dbHandler-&gt;quoteTable( &quot;ezkeyword_attribute_link&quot; ),
+                $q-&gt;expr-&gt;eq(
+                    $dbHandler-&gt;quoteColumn( &quot;id&quot;, &quot;ezkeyword&quot; ),
+                    $dbHandler-&gt;quoteColumn( &quot;keyword_id&quot;, &quot;ezkeyword_attribute_link&quot; )
+                )
+            )
+            -&gt;where(
+                $q-&gt;expr-&gt;eq(
+                    $dbHandler-&gt;quoteColumn( &quot;objectattribute_id&quot;, &quot;ezkeyword_attribute_link&quot; ),
+                    $field-&gt;id
+                )
+            );
+
+        $statement = $q-&gt;prepare();
+        $statement-&gt;execute();
+
+        $keywords = $statement-&gt;fetchAll( PDO::FETCH_COLUMN, 0 );
+        if ( $keywords === false )
+            throw new Logic( &quot;Fetching keywords data failed&quot; );
+
+        $field-&gt;value-&gt;data-&gt;values = $keywords;
+    }
+
+    /**
+     * @param array $fieldId
+     * @param array $context
+     * @return bool
+     */
+    public function deleteFieldData( array $fieldId, array $context )
+    {
+    }
+
+    /**
+     * Checks if field type has external data to deal with
+     *
+     * @return bool
+     */
+    public function hasFieldData()
+    {
+        return true;
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function copyFieldData( Field $field, array $context )
+    {
+    }
+
+    /**
+     * @param \eZ\Publish\SPI\Persistence\Content\Field $field
+     * @param array $context
+     */
+    public function getIndexData( Field $field, array $context )
+    {
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

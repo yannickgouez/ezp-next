@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing Proxy Group class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User\Group;
+use ezp\Base\Proxy\Model as ModelProxy,
+    ezp\Base\ModelState,
+    ezp\Base\Observable,
+    ezp\Base\Observer,
+    ezp\User\Group,
+    ezp\User\Service;
+
+/**
+ * This class represents a Proxy Group item
+ *
+ * Group is currently a facade for content objects of User Group type.
+ * It requires that the User Group Content Type used has two attributes: name &amp; description, both ezstring field types
+ *
+ * @property-read mixed $id
+ * @property string $name
+ * @property string description
+ */
+class Proxy extends ModelProxy implements Group, Observable
+{
+    public function __construct( $id, Service $service )
+    {
+        parent::__construct( $id, $service );
+    }
+
+    protected function lazyLoad()
+    {
+        if ( $this-&gt;proxiedObject === null )
+        {
+            $this-&gt;proxiedObject = $this-&gt;service-&gt;loadGroup( $this-&gt;proxiedObjectId );
+            $this-&gt;moveObservers();
+        }
+    }
+
+    /**
+     * @return \ezp\User\Group|null
+     */
+    public function getParent()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;getParent();
+    }
+
+    /**
+     * Roles assigned to Group
+     *
+     * Use {@link \ezp\User\Service::assignRole} &amp; {@link \ezp\User\Service::unassignRole} to change
+     *
+     * @return \ezp\User\Role[]
+     */
+    public function getRoles()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;getRoles();
+    }
+
+    /**
+     * Return list of properties, where key is properties and value depends on type and is internal so should be ignored for now.
+     *
+     * @return array
+     */
+    public function properties()
+    {
+        $this-&gt;lazyLoad();
+        return $this-&gt;proxiedObject-&gt;properties();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

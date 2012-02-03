@@ -1,0 +1,224 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Content FieldHandler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content;
+use eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\Field,
+    eZ\Publish\SPI\Persistence\Content\Version,
+    eZ\Publish\SPI\Persistence\Content\UpdateStruct,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Mapper,
+    eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway as TypeGateway,
+    eZ\Publish\Core\Persistence\Legacy\Content\Gateway;
+
+/**
+ * Field Handler.
+ */
+class FieldHandler
+{
+    /**
+     * Content Gateway
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Gateway
+     */
+    protected $contentGateway;
+
+    /**
+     * Content Type Gateway
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway
+     */
+    protected $typeGateway;
+
+    /**
+     * Content Mapper
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Mapper
+     */
+    protected $mapper;
+
+    /**
+     * Storage Handler
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\StorageHandler
+     */
+    protected $storageHandler;
+
+    /**
+     * Creates a new Field Handler
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway $contentGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway $typeGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Mapper $mapper
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageHandler $storageHandler
+     */
+    public function __construct(
+        Gateway $contentGateway,
+        TypeGateway $typeGateway,
+        Mapper $mapper,
+        StorageHandler $storageHandler )
+    {
+        $this-&gt;contentGateway = $contentGateway;
+        $this-&gt;typeGateway = $typeGateway;
+        $this-&gt;mapper = $mapper;
+        $this-&gt;storageHandler = $storageHandler;
+    }
+
+    /**
+     * Creates new fields in the database from $content
+     *
+     * @param Content $content
+     * @return void
+     */
+    public function createNewFields( Content $content )
+    {
+        foreach ( $content-&gt;version-&gt;fields as $field )
+        {
+            $field-&gt;versionNo = $content-&gt;version-&gt;versionNo;
+            $field-&gt;id = $this-&gt;contentGateway-&gt;insertNewField(
+                $content,
+                $field,
+                $this-&gt;mapper-&gt;convertToStorageValue( $field )
+            );
+
+            // If the storage handler returns true, it means that $field value has been modified
+            // So we need to update it in order to store those modifications
+            // Field converter is called once again via the Mapper
+            if ( $this-&gt;storageHandler-&gt;storeFieldData( $field ) === true )
+            {
+                $this-&gt;contentGateway-&gt;updateField(
+                    $field,
+                    $this-&gt;mapper-&gt;convertToStorageValue( $field )
+                );
+            }
+        }
+    }
+
+    /**
+     * Performs external loads for the fields in $content
+     *
+     * @param Content $content
+     * @return void
+     */
+    public function loadExternalFieldData( Content $content )
+    {
+        foreach ( $content-&gt;version-&gt;fields as $field )
+        {
+            $this-&gt;storageHandler-&gt;getFieldData( $field );
+        }
+    }
+
+    /**
+     * Updates the fields in $content in the database
+     *
+     * @param Content $content
+     * @return void
+     */
+    public function updateFields( UpdateStruct $updateStruct )
+    {
+        foreach ( $updateStruct-&gt;fields as $field )
+        {
+            $field-&gt;versionNo = $updateStruct-&gt;versionNo;
+
+            if (
+                $this-&gt;typeGateway-&gt;isFieldTranslatable(
+                    $field-&gt;fieldDefinitionId,
+                    0
+                )
+            )
+            {
+                $this-&gt;contentGateway-&gt;updateField(
+                    $field,
+                    $this-&gt;mapper-&gt;convertToStorageValue( $field )
+                );
+            }
+            else
+            {
+                $this-&gt;contentGateway-&gt;updateNonTranslatableField(
+                    $field,
+                    $this-&gt;mapper-&gt;convertToStorageValue( $field ),
+                    $updateStruct
+                );
+            }
+
+            // If the storage handler returns true, it means that $field value has been modified
+            // So we need to update it in order to store those modifications
+            // Field converter is called once again via the Mapper
+            if ( $this-&gt;storageHandler-&gt;storeFieldData( $field ) === true )
+            {
+                $this-&gt;contentGateway-&gt;updateField(
+                    $field,
+                    $this-&gt;mapper-&gt;convertToStorageValue( $field )
+                );
+            }
+        }
+    }
+
+    /**
+     * Deletes the fields in $content from the database
+     *
+     * @param Content $content
+     * @return void
+     */
+    public function deleteFields( $contentId )
+    {
+        $fieldIds = $this-&gt;contentGateway-&gt;getFieldIdsByType( $contentId );
+        foreach ( $fieldIds as $fieldType =&gt; $ids )
+        {
+            $this-&gt;storageHandler-&gt;deleteFieldData( $fieldType, $ids );
+        }
+        $this-&gt;contentGateway-&gt;deleteFields( $contentId );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

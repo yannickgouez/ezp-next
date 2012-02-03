@@ -1,0 +1,1040 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase location gateway class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\Location,
+    eZ\Publish\SPI\Persistence\Content\Location\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Location\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Query\SortClause,
+    ezp\Content\Query;
+
+/**
+ * Location gateway implementation using the zeta database component.
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Database handler
+     *
+     * @var EzcDbHandler
+     */
+    protected $handler;
+
+    /**
+     * Construct from database handler
+     *
+     * @param EzcDbHandler $handler
+     * @return void
+     */
+    public function __construct( EzcDbHandler $handler )
+    {
+        $this-&gt;handler = $handler;
+    }
+
+    /**
+     * Returns an array with basic node data
+     *
+     * We might want to cache this, since this method is used by about every
+     * method in the location handler.
+     *
+     * @optimze
+     * @param mixed $nodeId
+     * @return array
+     */
+    public function getBasicNodeData( $nodeId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $nodeId )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        if ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            return $row;
+        }
+
+        throw new \ezp\Base\Exception\NotFound( 'location', $nodeId );
+    }
+
+    /**
+     * Find all content in the given subtree
+     *
+     * @param mixed $sourceId
+     * @return array
+     */
+    public function getSubtreeContent( $sourceId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select(
+                $this-&gt;handler-&gt;quoteColumn( '*' )
+            )-&gt;from(
+                $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' )
+            )-&gt;where(
+                $query-&gt;expr-&gt;like(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string', 'ezcontentobject_tree' ),
+                    $query-&gt;bindValue( '%/' . $sourceId . '/%' )
+                )
+            )-&gt;orderBy(
+                $this-&gt;handler-&gt;quoteColumn( 'path_string', 'ezcontentobject_tree' )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Update path strings to move nodes in the ezcontentobject_tree table
+     *
+     * This query can likely be optimized to use some more advanced string
+     * operations, which then depend on the respective database.
+     *
+     * @optimize
+     * @param string $fromPathString
+     * @param string $toPathString
+     * @return void
+     */
+    public function moveSubtreeNodes( $fromPathString, $toPathString )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select(
+                $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                $this-&gt;handler-&gt;quoteColumn( 'path_string' )
+            )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;like(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $fromPathString . '%' )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $rows = $statement-&gt;fetchAll();
+        $oldParentLocation = implode( '/', array_slice( explode( '/', $fromPathString ), 0, -2 ) ) . '/';
+        foreach ( $rows as $row )
+        {
+            $newLocation = str_replace( $oldParentLocation, $toPathString, $row['path_string'] );
+
+            $query = $this-&gt;handler-&gt;createUpdateQuery();
+            $query
+                -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+                -&gt;set(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $newLocation )
+                )
+                -&gt;set(
+                    $this-&gt;handler-&gt;quoteColumn( 'depth' ),
+                    $query-&gt;bindValue( substr_count( $newLocation, '/' ) - 2 )
+                )
+                -&gt;where(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                        $query-&gt;bindValue( $row['node_id'] )
+                    )
+                );
+            $query-&gt;prepare()-&gt;execute();
+        }
+    }
+
+    /**
+     * Updated subtree modification time for all nodes on path
+     *
+     * @param string $pathString
+     * @return void
+     */
+    public function updateSubtreeModificationTime( $pathString )
+    {
+        $nodes = array_filter( explode( '/', $pathString ) );
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'modified_subnode' ),
+                $query-&gt;bindValue( time() )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $nodes
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Sets a location to be hidden, and it self + all children to invisible.
+     *
+     * @param string $pathString
+     */
+    public function hideSubtree( $pathString )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_invisible' ),
+                $query-&gt;bindValue( 1 )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'modified_subnode' ),
+                $query-&gt;bindValue( time() )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;like(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $pathString . '%' )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_hidden' ),
+                $query-&gt;bindValue( 1 )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $pathString )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Sets a location to be unhidden, and self + children to visible unless a parent is hidding the tree.
+     * If not make sure only children down to first hidden node is marked visible.
+     *
+     * @param string $pathString
+     */
+    public function unHideSubtree( $pathString )
+    {
+        // Unhide the requested node
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_hidden' ),
+                $query-&gt;bindValue( 0 )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $pathString )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        // Check if any parent nodes are explicitely hidden
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( $this-&gt;handler-&gt;quoteColumn( 'path_string' ) )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'is_hidden' ),
+                        $query-&gt;bindValue( 1 )
+                    ),
+                    $query-&gt;expr-&gt;in(
+                        $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                        array_filter( explode( '/', $pathString ) )
+                    )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+        if ( count( $statement-&gt;fetchAll( \PDO::FETCH_COLUMN ) ) )
+        {
+            // There are parent nodes set hidden, so that we can skip marking
+            // something visible again.
+            return;
+        }
+
+        // Find nodes of explicitely hidden subtrees in the subtree which
+        // should be unhidden
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( $this-&gt;handler-&gt;quoteColumn( 'path_string' ) )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'is_hidden' ),
+                        $query-&gt;bindValue( 1 )
+                    ),
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                        $query-&gt;bindValue( $pathString . '%' )
+                    )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+        $hiddenSubtrees = $statement-&gt;fetchAll( \PDO::FETCH_COLUMN );
+
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_invisible' ),
+                $query-&gt;bindValue( 0 )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'modified_subnode' ),
+                $query-&gt;bindValue( time() )
+            );
+
+        // Build where expression selecting the nodes, which should be made
+        // visible again
+        $where = $query-&gt;expr-&gt;like(
+            $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+            $query-&gt;bindValue( $pathString . '%' )
+        );
+        if ( count( $hiddenSubtrees ) )
+        {
+            $handler = $this-&gt;handler;
+            $where = $query-&gt;expr-&gt;lAnd(
+                $where,
+                $query-&gt;expr-&gt;lAnd(
+                    array_map(
+                        function ( $pathString ) use ( $query, $handler )
+                        {
+                            return $query-&gt;expr-&gt;not(
+                                $query-&gt;expr-&gt;like(
+                                    $handler-&gt;quoteColumn( 'path_string' ),
+                                    $query-&gt;bindValue( $pathString . '%' )
+                                )
+                            );
+                        },
+                        $hiddenSubtrees
+                    )
+                )
+            );
+        }
+        $query-&gt;where( $where );
+        $statement = $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Swaps the content object being pointed to by a location object.
+     *
+     * Make the location identified by $locationId1 refer to the Content
+     * referred to by $locationId2 and vice versa.
+     *
+     * @param mixed $locationId1
+     * @param mixed $locationId2
+     * @return boolean
+     */
+    public function swap( $locationId1, $locationId2 )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select(
+                $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' )
+            )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    array( $locationId1, $locationId2 )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+        foreach ( $statement-&gt;fetchAll() as $row )
+        {
+            $contentObjects[$row['node_id']] = $row['contentobject_id'];
+        }
+
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                $query-&gt;bindValue( $contentObjects[$locationId2] )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $locationId1 )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                $query-&gt;bindValue( $contentObjects[$locationId1] )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $locationId2 )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Creates a new location in given $parentNode
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Location\CreateStruct $createStruct
+     * @param array $parentNode
+     * @return \eZ\Publish\SPI\Persistence\Content\Location
+     */
+    public function create( CreateStruct $createStruct, array $parentNode, $published = false )
+    {
+        $location = new Location();
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                $query-&gt;bindValue( $location-&gt;contentId = $createStruct-&gt;contentId, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_is_published' ),
+                $query-&gt;bindValue( (int)$published, null, \PDO::PARAM_INT ) // Will be set to 1, once the contentt object has been published
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_version' ),
+                $query-&gt;bindValue( $createStruct-&gt;contentVersion, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'depth' ),
+                $query-&gt;bindValue( $location-&gt;depth = $parentNode['depth'] + 1, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_hidden' ),
+                $query-&gt;bindValue( $location-&gt;hidden = $createStruct-&gt;hidden, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_invisible' ),
+                $query-&gt;bindValue( $location-&gt;invisible = $createStruct-&gt;invisible, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'modified_subnode' ),
+                $query-&gt;bindValue( $location-&gt;modifiedSubLocation = time(), null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                $this-&gt;handler-&gt;getAutoIncrementValue( 'ezcontentobject_tree', 'node_id' )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'parent_node_id' ),
+                $query-&gt;bindValue( $location-&gt;parentId = $parentNode['node_id'], null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'path_identification_string' ),
+                $query-&gt;bindValue( null ) // Set after creation
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                $query-&gt;bindValue( 'dummy' ) // Set later
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'priority' ),
+                $query-&gt;bindValue( $location-&gt;priority = $createStruct-&gt;priority, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'remote_id' ),
+                $query-&gt;bindValue( $location-&gt;remoteId = $createStruct-&gt;remoteId )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_field' ),
+                $query-&gt;bindValue( $location-&gt;sortField = $createStruct-&gt;sortField, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_order' ),
+                $query-&gt;bindValue( $location-&gt;sortOrder = $createStruct-&gt;sortOrder, null, \PDO::PARAM_INT )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        $location-&gt;id = $this-&gt;handler-&gt;lastInsertId( $this-&gt;handler-&gt;getSequenceName( 'ezcontentobject_tree', 'node_id' ) );
+
+        $location-&gt;mainLocationId = $createStruct-&gt;mainLocationId === true ? $location-&gt;id : $createStruct-&gt;mainLocationId;
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                $query-&gt;bindValue( $parentNode['path_string'] . $location-&gt;id . '/' )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'main_node_id' ),
+                $query-&gt;bindValue( $location-&gt;mainLocationId, null, \PDO::PARAM_INT )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $location-&gt;id, null, \PDO::PARAM_INT )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+
+        return $location;
+    }
+
+    /**
+     * Create an entry in the node assignment table
+     *
+     * @param CreateStruct $createStruct
+     * @param mixed $parentNodeId
+     * @param int $type
+     * @return void
+     */
+    public function createNodeAssignment( CreateStruct $createStruct, $parentNodeId, $type = self::NODE_ASSIGNMENT_OP_CODE_CREATE_NOP )
+    {
+        $isMain = ( $createStruct-&gt;mainLocationId === true ? 1 : 0 );
+
+        $query = $this-&gt;handler-&gt;createInsertQuery();
+        $query
+            -&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'eznode_assignment' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                $query-&gt;bindValue( $createStruct-&gt;contentId, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'contentobject_version' ),
+                $query-&gt;bindValue( $createStruct-&gt;contentVersion, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'from_node_id' ),
+                $query-&gt;bindValue( 0, null, \PDO::PARAM_INT ) // unused field
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                $this-&gt;handler-&gt;getAutoIncrementValue( 'eznode_assignment', 'id' )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'is_main' ),
+                $query-&gt;bindValue( $isMain, null, \PDO::PARAM_INT ) // Changed by the business layer, later
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'op_code' ),
+                $query-&gt;bindValue( $type, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'parent_node' ),
+                $query-&gt;bindValue( $parentNodeId, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'parent_remote_id' ),
+                $query-&gt;bindValue( '' )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'remote_id' ),
+                $query-&gt;bindValue( 0, null, \PDO::PARAM_INT )
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_field' ),
+                $query-&gt;bindValue( 2, null, \PDO::PARAM_INT ) // eZContentObjectTreeNode::SORT_FIELD_PUBLISHED
+            )-&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_order' ),
+                $query-&gt;bindValue( 0, null, \PDO::PARAM_INT ) // eZContentObjectTreeNode::SORT_ORDER_DESC
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Update node assignement table
+     *
+     * @param int $contentObjectId
+     * @param int $oldParent
+     * @param int $newParent
+     * @param int $opcode
+     * @return void
+     */
+    public function updateNodeAssignment( $contentObjectId, $oldParent, $newParent, $opcode )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'eznode_assignment' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'parent_node' ),
+                $query-&gt;bindValue( $newParent, null, \PDO::PARAM_INT )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'op_code' ),
+                $query-&gt;bindValue( $opcode, null, \PDO::PARAM_INT )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                        $query-&gt;bindValue( $contentObjectId, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'parent_node' ),
+                        $query-&gt;bindValue( $oldParent, null, \PDO::PARAM_INT )
+                    )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Create locations from node assignments
+     *
+     * Convert existing node assignments into real locations.
+     *
+     * @param mixed $contentId
+     * @param mixed $versionNo
+     * @return void
+     */
+    public function createLocationsFromNodeAssignments( $contentId, $versionNo )
+    {
+        // select all node assignments with OP_CODE_CREATE (3) for this content
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'eznode_assignment' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                        $query-&gt;bindValue( $contentId, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_version' ),
+                        $query-&gt;bindValue( $versionNo, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'op_code' ),
+                        $query-&gt;bindValue( self::NODE_ASSIGNMENT_OP_CODE_CREATE, null, \PDO::PARAM_INT )
+                    )
+                )
+            )-&gt;orderBy( 'id' );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        // convert all these assignments to nodes
+        $nodeMainLocationId = false;
+
+        while ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            if ( (bool)$row['is_main'] === true )
+            {
+                $mainLocationId = true;
+            }
+            else
+            {
+                $mainLocationId = $this-&gt;getMainNodeId( $contentId, $versionNo );
+            }
+            $this-&gt;create(
+                new CreateStruct(
+                    array(
+                        'contentId' =&gt; $row['contentobject_id'],
+                        'contentVersion' =&gt; $row['contentobject_version'],
+                        'mainLocationId' =&gt; $mainLocationId,
+                        'remoteId' =&gt; $row['remote_id'],
+                        'sortField' =&gt; $row['sort_field'],
+                        'sortOrder' =&gt; $row['sort_order'],
+                    )
+                ),
+                $this-&gt;getBasicNodeData( $row['parent_node'] )
+            );
+
+            $this-&gt;updateNodeAssignment(
+                $row['contentobject_id'],
+                $row['parent_node'],
+                $row['parent_node'],
+                self::NODE_ASSIGNMENT_OP_CODE_CREATE_NOP
+            );
+        }
+    }
+
+    /**
+     * Searches for the main nodeId of $contentId in $versionId
+     * @param int $contentId
+     * @param int $versionId
+     * @return int
+     */
+    private function getMainNodeId( $contentId, $versionNo )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( 'node_id' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ),
+                        $query-&gt;bindValue( $contentId, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;like(
+                        $this-&gt;handler-&gt;quoteColumn( 'contentobject_version' ),
+                        $query-&gt;bindValue( $versionNo, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;handler-&gt;quoteColumn( 'main_node_id' ),
+                        $query-&gt;bindValue( 0, null, \PDO::PARAM_INT )
+                    )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $result = $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+        if ( count( $result ) === 1 )
+        {
+            return (int)$result[0]['node_id'];
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Updates an existing location.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Location\UpdateStruct $location
+     * @param int $locationId
+     * @return boolean
+     */
+    public function update( UpdateStruct $location, $locationId )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'priority' ),
+                $query-&gt;bindValue( $location-&gt;priority )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'remote_id' ),
+                $query-&gt;bindValue( $location-&gt;remoteId )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_order' ),
+                $query-&gt;bindValue( $location-&gt;sortOrder )
+            )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'sort_field' ),
+                $query-&gt;bindValue( $location-&gt;sortField )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $locationId
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Removes all Locations under and includin $locationId.
+     *
+     * Performs a recursive delete on the location identified by $locationId,
+     * including all of its child locations. Content which is not referred to
+     * by any other location is automatically removed. Content which looses its
+     * main Location will get the first of its other Locations assigned as the
+     * new main Location.
+     *
+     * @param mixed $locationId
+     * @return boolean
+     */
+    public function removeSubtree( $locationId )
+    {
+        throw new RuntimeException( '@TODO: Implement' );
+    }
+
+    /**
+     * Sends a subtree to the trash
+     *
+     * Moves all locations in the subtree to the Trash. The associated content
+     * objects are left untouched.
+     *
+     * @param mixed $locationId
+     * @return boolean
+     */
+    public function trashSubtree( $pathString )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;like(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $query-&gt;bindValue( $pathString . '%' )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $nodeIds = array();
+        while ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            unset( $row['contentobject_is_published'] );
+            $query = $this-&gt;handler-&gt;createInsertQuery();
+            $query-&gt;insertInto( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_trash' ) );
+
+            foreach ( $row as $key =&gt; $value )
+            {
+                $query-&gt;set( $key, $query-&gt;bindValue( $value ) );
+            }
+
+            $query-&gt;prepare()-&gt;execute();
+            $nodeIds[] = $row['node_id'];
+        }
+
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( 'ezcontentobject_tree' )
+            -&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $nodeIds
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Returns a trashed location to normal state.
+     *
+     * Recreates the originally trashed location in the new position. If no new
+     * position has been specified, it will be tried to re-create the location
+     * at the old position. If this is not possible ( because the old location
+     * does not exist any more) and exception is thrown.
+     *
+     * @param mixed $locationId
+     * @param mixed $newParentId
+     * @return boolean
+     */
+    public function untrashLocation( $locationId, $newParentId = null )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_trash' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $locationId )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $nodeIds = array();
+        if ( !( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) ) )
+        {
+            throw new \ezp\Base\Exception\NotFound( 'trashed location', $locationId );
+        }
+
+        $newParentId = $newParentId ?: $row['parent_node_id'];
+        $parentData = $this-&gt;getBasicNodeData( $newParentId );
+
+        if ( $row['main_node_id'] === $row['node_id'] )
+        {
+            $row['main_node_id'] = true;
+        }
+
+        $this-&gt;create(
+            new CreateStruct(
+                array(
+                    'priority' =&gt; $row['priority'],
+                    'hidden' =&gt; $row['is_hidden'],
+                    'invisible' =&gt; $row['is_invisible'],
+                    'remoteId' =&gt; $row['remote_id'],
+                    'contentId' =&gt; $row['contentobject_id'],
+                    'contentVersion' =&gt; $row['contentobject_version'],
+                    'mainLocationId' =&gt; $row['main_node_id'],
+                    'sortField' =&gt; $row['sort_field'],
+                    'sortOrder' =&gt; $row['sort_order'],
+                )
+            ),
+            $parentData,
+            true
+        );
+
+        $query = $this-&gt;handler-&gt;createDeleteQuery();
+        $query
+            -&gt;deleteFrom( 'ezcontentobject_trash' )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $locationId
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Load trash data specified by location ID
+     *
+     * @param mixed $locationId
+     * @return array
+     */
+    public function loadTrashByLocation( $locationId )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_trash' ) )
+            -&gt;where(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;handler-&gt;quoteColumn( 'node_id' ),
+                    $query-&gt;bindValue( $locationId )
+                )
+            );
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        if ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            return $row;
+        }
+
+        throw new \ezp\Base\Exception\NotFound( 'trash', $locationId );
+    }
+
+    /**
+     * List trashed items
+     *
+     * @param int $offset
+     * @param int $limit
+     * @param array $sort
+     * @return array
+     */
+    public function listTrashed( $offset, $limit, array $sort )
+    {
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $query
+            -&gt;select( '*' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_trash' ) );
+
+        foreach ( $sort as $condition )
+        {
+            $sortDirection = $condition-&gt;direction === Query::SORT_ASC ? \ezcQuerySelect::ASC : \ezcQuerySelect::DESC;
+            switch ( true )
+            {
+                case $condition instanceof SortClause\LocationDepth:
+                    $query-&gt;orderBy( 'depth', $sortDirection );
+                    break;
+
+                case $condition instanceof SortClause\LocationPathString:
+                    $query-&gt;orderBy( 'path_string', $sortDirection );
+                    break;
+
+                case $condition instanceof SortClause\LocationPriority:
+                    $query-&gt;orderBy( 'priority', $sortDirection );
+                    break;
+
+                default:
+                    // Only handle location related sort clauses. The others
+                    // require data aggregation which is not sensible here.
+                    // Since also criteria are yet ignored, because they are
+                    // simply not used yet in eZ Publish, we skip that for now.
+                    throw new \RuntimeException( 'Unhandled sort clause: ' . get_class( $condition ) );
+                    break;
+            }
+        }
+
+        if ( $limit !== null )
+        {
+            $query-&gt;limit( $limit, $offset );
+        }
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $rows = array();
+        while ( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) )
+        {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Set section on all content objects in the subtree
+     *
+     * @param mixed $pathString
+     * @param mixed $sectionId
+     * @return boolean
+     */
+    public function setSectionForSubtree( $pathString, $sectionId )
+    {
+        $query = $this-&gt;handler-&gt;createUpdateQuery();
+
+        $subSelect = $query-&gt;subSelect();
+        $subSelect
+            -&gt;select( $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' ) )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_tree' ) )
+            -&gt;where(
+                $subSelect-&gt;expr-&gt;like(
+                    $this-&gt;handler-&gt;quoteColumn( 'path_string' ),
+                    $subSelect-&gt;bindValue( $pathString . '%' )
+                )
+            );
+
+        $query
+            -&gt;update( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject' ) )
+            -&gt;set(
+                $this-&gt;handler-&gt;quoteColumn( 'section_id' ),
+                $query-&gt;bindValue( $sectionId )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                    $subSelect
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

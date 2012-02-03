@@ -1,0 +1,233 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase field criterion handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler;
+use eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriteriaConverter,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\FieldIdentifierStruct,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry,
+    ezp\Base\Exception,
+    ezcQuerySelect;
+
+/**
+ * Field criterion handler
+ */
+class Field extends CriterionHandler
+{
+    /**
+     * DB handler to fetch additional field information
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\EzcDatabase
+     */
+    protected $dbHandler;
+
+    /**
+     * Field converter registry
+     *
+     * @var Converter\Registry
+     */
+    protected $fieldConverterRegistry;
+
+    /**
+     * Construct from handler handler
+     *
+     * @param EzcDbHandler $dbHandler
+     * @param Converter\Registry $fieldConverterRegistry
+     * @return void
+     */
+    public function __construct( EzcDbHandler $dbHandler, Registry $fieldConverterRegistry )
+    {
+        $this-&gt;dbHandler = $dbHandler;
+        $this-&gt;fieldConverterRegistry = $fieldConverterRegistry;
+    }
+
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function accept( Criterion $criterion )
+    {
+        return $criterion instanceof Criterion\Field;
+    }
+
+    /**
+     * Returns relevant field information for the specified field
+     *
+     * The returned information is returned as an array of the attribute
+     * identifier and the sort column, which should be used.
+     *
+     * @caching
+     * @param Criterion\FieldIdentifierStruct $target
+     * @return array
+     */
+    protected function getFieldInformation( FieldIdentifierStruct $target )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query
+            -&gt;select(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id', 'ezcontentclass_attribute' ),
+                $this-&gt;dbHandler-&gt;quoteColumn( 'data_type_string', 'ezcontentclass_attribute' )
+            )
+            -&gt;from(
+                $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' ),
+                $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+            )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id', 'ezcontentclass_attribute' ),
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'id', 'ezcontentclass' )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'identifier', 'ezcontentclass' ),
+                        $query-&gt;bindValue( $target-&gt;contentTypeIdentifier )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'identifier', 'ezcontentclass_attribute' ),
+                        $query-&gt;bindValue( $target-&gt;fieldIdentifier )
+                    )
+                )
+            );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+        if ( !( $row = $statement-&gt;fetch( \PDO::FETCH_ASSOC ) ) )
+        {
+            throw new Exception\NotFound( 'Content type', $target-&gt;contentTypeIdentifier . '/' . $target-&gt;fieldIdentifier );
+        }
+
+        $converter = $this-&gt;fieldConverterRegistry-&gt;getConverter( $row['data_type_string'] );
+
+        return array(
+            'id' =&gt; $row['id'],
+            'column' =&gt; $converter-&gt;getIndexColumn(),
+        );
+    }
+
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param CriteriaConverter $converter
+     * @param \ezcQuerySelect $query
+     * @param Criterion $criterion
+     * @return \ezcQueryExpression
+     */
+    public function handle( CriteriaConverter $converter, ezcQuerySelect $query, Criterion $criterion )
+    {
+        $fieldInformation = $this-&gt;getFieldInformation( $criterion-&gt;target );
+        $column = $this-&gt;dbHandler-&gt;quoteColumn( $fieldInformation['column'] );
+
+        $subSelect = $query-&gt;subSelect();
+        $subSelect
+            -&gt;select(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_id' )
+            )-&gt;from(
+                $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject_attribute' )
+            );
+
+        switch ( $criterion-&gt;operator )
+        {
+            case Criterion\Operator::IN:
+                $filter = $subSelect-&gt;expr-&gt;in(
+                    $column,
+                    $criterion-&gt;value
+                );
+                break;
+
+            case Criterion\Operator::BETWEEN:
+                $filter = $subSelect-&gt;expr-&gt;between(
+                    $column,
+                    $subSelect-&gt;bindValue( $criterion-&gt;value[0] ),
+                    $subSelect-&gt;bindValue( $criterion-&gt;value[1] )
+                );
+                break;
+
+            case Criterion\Operator::EQ:
+            case Criterion\Operator::GT:
+            case Criterion\Operator::GTE:
+            case Criterion\Operator::LT:
+            case Criterion\Operator::LTE:
+                $operatorFunction = $this-&gt;comparatorMap[$criterion-&gt;operator];
+                $filter = $subSelect-&gt;expr-&gt;$operatorFunction(
+                    $column,
+                    $subSelect-&gt;bindValue( $criterion-&gt;value )
+                );
+                break;
+
+            default:
+                throw new \RuntimeException( 'Unknown operator.' );
+        }
+
+        $subSelect-&gt;where(
+            $subSelect-&gt;expr-&gt;lAnd(
+                $subSelect-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclassattribute_id' ),
+                    $subSelect-&gt;bindValue( $fieldInformation['id'] )
+                ),
+                $filter
+            )
+        );
+
+        return $query-&gt;expr-&gt;in(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id', 'ezcontentobject' ),
+            $subSelect
+        );
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

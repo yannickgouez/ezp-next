@@ -1,0 +1,486 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Content Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content;
+use eZ\Publish\Core\Persistence\Legacy\Content\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\Content\Mapper,
+    eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway as LocationGateway,
+    eZ\Publish\SPI\Persistence\Content\Handler as BaseContentHandler,
+    eZ\Publish\SPI\Persistence\Content\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    eZ\Publish\SPI\Persistence\Content\RestrictedVersion,
+    eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as RelationCreateStruct;
+
+/**
+ * The Content Handler stores Content and ContentType objects.
+ */
+class Handler implements BaseContentHandler
+{
+    /**
+     * Content gateway.
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Gateway
+     */
+    protected $contentGateway;
+
+    /**
+     * Location gateway.
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway
+     */
+    protected $locationGateway;
+
+    /**
+     * Mapper.
+     *
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
+     * FieldHandler
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\FieldHandler
+     */
+    protected $fieldHandler;
+
+    /**
+     * Creates a new content handler.
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway $contentGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Location\Gateway $locationGateway
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Mapper $mapper
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\FieldHandler $fieldHandler
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Gateway $contentGateway
+     */
+    public function __construct(
+        Gateway $contentGateway,
+        LocationGateway $locationGateway,
+        Mapper $mapper,
+        FieldHandler $fieldHandler
+    )
+    {
+        $this-&gt;contentGateway = $contentGateway;
+        $this-&gt;locationGateway = $locationGateway;
+        $this-&gt;mapper = $mapper;
+        $this-&gt;fieldHandler = $fieldHandler;
+    }
+
+    /**
+     * Creates a new Content entity in the storage engine.
+     *
+     * The values contained inside the $content will form the basis of stored
+     * entity.
+     *
+     * Will contain always a complete list of fields.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\CreateStruct $struct Content creation struct.
+     * @return \eZ\Publish\SPI\Persistence\Content Content value object
+     */
+    public function create( CreateStruct $struct )
+    {
+        $content = $this-&gt;mapper-&gt;createContentFromCreateStruct(
+            $struct
+        );
+
+        $content-&gt;id = $this-&gt;contentGateway-&gt;insertContentObject( $struct );
+
+        $content-&gt;version = $this-&gt;mapper-&gt;createVersionForContent( $content, 1 );
+        $content-&gt;version-&gt;id = $this-&gt;contentGateway-&gt;insertVersion(
+            $content-&gt;version, $struct-&gt;fields, $content-&gt;alwaysAvailable
+        );
+        $content-&gt;version-&gt;fields = $struct-&gt;fields;
+        $content-&gt;version-&gt;name = $struct-&gt;name;
+
+        $this-&gt;fieldHandler-&gt;createNewFields( $content );
+
+        foreach ( $struct-&gt;locations as $index =&gt; $location )
+        {
+            $isMain = ( $index === 0 );
+            $this-&gt;locationGateway-&gt;createNodeAssignment(
+                $this-&gt;mapper-&gt;createLocationCreateStruct( $content ),
+                $location-&gt;parentId,
+                Location\Gateway::NODE_ASSIGNMENT_OP_CODE_CREATE
+            );
+        }
+
+        // Create name
+        foreach ( $content-&gt;version-&gt;name as $language =&gt; $name )
+        {
+            $this-&gt;contentGateway-&gt;setName(
+                $content-&gt;id,
+                $content-&gt;version-&gt;versionNo,
+                $name, $language
+            );
+        }
+
+        return $content;
+    }
+
+    /**
+     * Performs the publishing operations required to set the version identified by $updateStruct-&gt;versionNo and
+     * $updateStruct-&gt;id as the published one.
+     *
+     * The UpdateStruct will also contain an array of Content name indexed by Locale.
+     *
+     * The publish procedure will:
+     * - Create location nodes based on the node assignments
+     * - Create the entry in the ezcontentobject_name table
+     * - Updates the content object using the provided update struct
+     * - Updates the node assignments
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\UpdateStruct An UpdateStruct with id, versionNo and name array
+     * @return \eZ\Publish\SPI\Persistence\Content The published Content
+     */
+    public function publish( UpdateStruct $updateStruct )
+    {
+        $content = $this-&gt;update( $updateStruct );
+
+        // @todo : Is it necessary to do this here ? create()/update() should be sufficient I think...
+        foreach ( $updateStruct-&gt;name as $language =&gt; $name )
+        {
+            $this-&gt;contentGateway-&gt;setName(
+                $updateStruct-&gt;id,
+                $updateStruct-&gt;versionNo,
+                $name, $language
+            );
+        }
+
+        $this-&gt;locationGateway-&gt;createLocationsFromNodeAssignments(
+            $updateStruct-&gt;id,
+            $updateStruct-&gt;versionNo
+        );
+        return $content;
+    }
+
+    /**
+     * Creates a new draft version from $contentId in $version.
+     *
+     * Copies all fields from $contentId in $srcVersion and creates a new
+     * version of the referred Content from it.
+     *
+     * Note: When creating a new draft in the old admin interface there will
+     * also be an entry in the `eznode_assignment` created for the draft. This
+     * is ignored in this implementation.
+     *
+     * @param int $contentId
+     * @param int|bool $srcVersion
+     * @return \eZ\Publish\SPI\Persistence\Content\Version
+     */
+    public function createDraftFromVersion( $contentId, $srcVersion )
+    {
+        $content = $this-&gt;load( $contentId, $srcVersion );
+        $fields = $content-&gt;version-&gt;fields;
+
+        // Create new version
+        $content-&gt;version = $this-&gt;mapper-&gt;createVersionForContent(
+            $content,
+            $content-&gt;version-&gt;versionNo + 1
+        );
+
+        $content-&gt;version-&gt;id = $this-&gt;contentGateway-&gt;insertVersion(
+            $content-&gt;version,
+            $content-&gt;version-&gt;fields,
+            $content-&gt;alwaysAvailable
+        );
+
+        // Clone fields from previous version and append them to the new one
+        // @TODO Manage translations
+        $content-&gt;version-&gt;fields = array();
+        foreach ( $fields as $field )
+        {
+            $newField = clone $field;
+            $newField-&gt;versionNo = $content-&gt;version-&gt;versionNo;
+            $content-&gt;version-&gt;fields[] = $newField;
+        }
+
+        $this-&gt;fieldHandler-&gt;createNewFields( $content );
+
+        return $content-&gt;version;
+    }
+
+    /**
+     * Returns the raw data of a content object identified by $id, in a struct.
+     *
+     * A version to load must be specified. If you want to load the current
+     * version of a content object use SearchHandler::findSingle() with the
+     * ContentId criterion.
+     *
+     * Optionally a translation filter may be specified. If specified only the
+     * translations with the listed language codes will be retrieved. If not,
+     * all translations will be retrieved.
+     *
+     * @param int|string $id
+     * @param int|string $version
+     * @param string[] $translations
+     * @return \eZ\Publish\SPI\Persistence\Content Content value object
+     */
+    public function load( $id, $version, $translations = null )
+    {
+        $rows = $this-&gt;contentGateway-&gt;load( $id, $version, $translations );
+
+        if ( !count( $rows ) )
+        {
+            throw new \ezp\Base\Exception\NotFound( 'content', $id );
+        }
+
+        $contentObjects = $this-&gt;mapper-&gt;extractContentFromRows( $rows );
+        $content = $contentObjects[0];
+
+        $this-&gt;fieldHandler-&gt;loadExternalFieldData( $content );
+
+        return $content;
+    }
+
+    /**
+     * Sets the state of object identified by $contentId and $version to $state.
+     *
+     * The $status can be one of STATUS_DRAFT, STATUS_PUBLISHED, STATUS_ARCHIVED
+     * @todo Is this supposed to be constants from Content or Version? They differ..
+     *
+     * @param int $contentId
+     * @param int $status
+     * @param int $version
+     * @see ezp\Content
+     * @return boolean
+     */
+    public function setStatus( $contentId, $status, $version )
+    {
+        return $this-&gt;contentGateway-&gt;setStatus( $contentId, $version, $status );
+    }
+
+    /**
+     * Sets the object-state of object identified by $contentId and $stateGroup to $state.
+     *
+     * The $state is the id of the state within one group.
+     *
+     * @param mixed $contentId
+     * @param mixed $stateGroup
+     * @param mixed $state
+     * @return boolean
+     * @see ezp\Content
+     */
+    public function setObjectState( $contentId, $stateGroup, $state )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Gets the object-state of object identified by $contentId and $stateGroup to $state.
+     *
+     * The $state is the id of the state within one group.
+     *
+     * @param mixed $contentId
+     * @param mixed $stateGroup
+     * @return mixed
+     * @see ezp\Content
+     */
+    public function getObjectState( $contentId, $stateGroup )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Updates a content object entity with data and identifier $content
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\UpdateStruct $content
+     * @return \eZ\Publish\SPI\Persistence\Content
+     */
+    public function update( UpdateStruct $content )
+    {
+        $this-&gt;contentGateway-&gt;updateContent( $content );
+        $this-&gt;contentGateway-&gt;updateVersion( $content );
+        $this-&gt;fieldHandler-&gt;updateFields( $content );
+        foreach ( $content-&gt;name as $language =&gt; $name )
+        {
+            $this-&gt;contentGateway-&gt;setName(
+                $content-&gt;id,
+                $content-&gt;versionNo,
+                $name, $language
+            );
+        }
+
+        return $this-&gt;load( $content-&gt;id, $content-&gt;versionNo );
+    }
+
+    /**
+     * Deletes all versions and fields, all locations (subtree), and all relations.
+     *
+     * Removes the relations, but not the related objects. Alle subtrees of the
+     * assigned nodes of this content objects are removed (recursivley).
+     *
+     * @param int $contentId
+     * @return boolean
+     */
+    public function delete( $contentId )
+    {
+        $locationIds = $this-&gt;contentGateway-&gt;getAllLocationIds( $contentId );
+        foreach ( $locationIds as $locationId )
+        {
+            $this-&gt;locationGateway-&gt;removeSubtree( $locationId );
+        }
+        $this-&gt;fieldHandler-&gt;deleteFields( $contentId );
+
+        $this-&gt;contentGateway-&gt;deleteRelations( $contentId );
+        $this-&gt;contentGateway-&gt;deleteVersions( $contentId );
+        $this-&gt;contentGateway-&gt;deleteNames( $contentId );
+        $this-&gt;contentGateway-&gt;deleteContent( $contentId );
+    }
+
+    /**
+     * Return the versions for $contentId
+     *
+     * @param int $contentId
+     * @return eZ\Publish\SPI\Persistence\Content\RestrictedVersion[]
+     */
+    public function listVersions( $contentId )
+    {
+        $rows = $this-&gt;contentGateway-&gt;listVersions( $contentId );
+        return $this-&gt;mapper-&gt;extractVersionListFromRows( $rows );
+    }
+
+    /**
+     * Copy Content with Fields and Versions from $contentId in $version.
+     *
+     * Copies all fields from $contentId in $version (or all versions if false)
+     * to a new object which is returned. Version numbers are maintained.
+     *
+     * @param int $contentId
+     * @param int|false $version Copy all versions if left false
+     * @return \eZ\Publish\SPI\Persistence\Content
+     * @throws \ezp\Base\Exception\NotFound If content or version is not found
+     */
+    public function copy( $contentId, $version )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Creates a copy of the latest published version of $contentId
+     *
+     * @param mixed $contentId
+     * @return \eZ\Publish\SPI\Persistence\Content
+     */
+    public function createCopy( $contentId )
+    {
+        $rows = $this-&gt;contentGateway-&gt;loadLatestPublishedData( $contentId );
+
+        if ( 0 == count( $rows ) )
+        {
+            throw new \ezp\Base\Exception\NotFound( 'content', $contentId );
+        }
+        $contentObjects = $this-&gt;mapper-&gt;extractContentFromRows( $rows );
+
+        $createStruct = $this-&gt;mapper-&gt;createCreateStructFromContent(
+            reset( $contentObjects )
+        );
+        return $this-&gt;create( $createStruct );
+    }
+
+    /**
+     * Creates a relation between $sourceContentId in $sourceContentVersionNo
+     * and $destinationContentId with a specific $type.
+     *
+     * @todo Should the existence verifications happen here or is this supposed to be handled at a higher level?
+     *
+     * @param  \eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct $relation
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation
+     */
+    public function addRelation( RelationCreateStruct $relation )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Removes a relation by relation Id.
+     *
+     * @todo Should the existence verifications happen here or is this supposed to be handled at a higher level?
+     *
+     * @param mixed $relationId
+     */
+    public function removeRelation( $relationId )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Loads relations from $sourceContentId. Optionally, loads only those with $type and $sourceContentVersionNo.
+     *
+     * @param mixed $sourceContentId Source Content ID
+     * @param mixed|null $sourceContentVersionNo Source Content Version, null if not specified
+     * @param int|null $type {@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation[]
+     */
+    public function loadRelations( $sourceContentId, $sourceContentVersionNo = null, $type = null )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+
+    /**
+     * Loads relations from $contentId. Optionally, loads only those with $type.
+     *
+     * Only loads relations against published versions.
+     *
+     * @param mixed $destinationContentId Destination Content ID
+     * @param int|null $type {@see \ezp\Content\Relation::COMMON, \ezp\Content\Relation::EMBED, \ezp\Content\Relation::LINK, \ezp\Content\Relation::ATTRIBUTE}
+     * @return \eZ\Publish\SPI\Persistence\Content\Relation[]
+     */
+    public function loadReverseRelations( $destinationContentId, $type = null )
+    {
+        throw new \Exception( &quot;@TODO: Not implemented yet.&quot; );
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

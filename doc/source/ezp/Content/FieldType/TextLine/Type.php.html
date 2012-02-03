@@ -1,0 +1,113 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the TextLine class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\TextLine;
+use ezp\Content\FieldType,
+    ezp\Content\FieldType\Value as BaseValue,
+    ezp\Base\Exception\BadFieldTypeInput;
+
+/**
+ * The TextLine field type.
+ *
+ * This field type represents a simple string.
+ */
+class Type extends FieldType
+{
+    const FIELD_TYPE_IDENTIFIER = &quot;ezstring&quot;;
+    const IS_SEARCHABLE = true;
+
+    protected $allowedValidators = array(
+        'ezp\\Content\\FieldType\\TextLine\\StringLengthValidator'
+    );
+
+    /**
+     * Returns the fallback default value of field type when no such default
+     * value is provided in the field definition in content types.
+     *
+     * @return \ezp\Content\FieldType\TextLine\Value
+     */
+    protected function getDefaultValue()
+    {
+        return new Value( '' );
+    }
+
+    /**
+     * Checks if $inputValue can be parsed.
+     * If the $inputValue actually can be parsed, the value is returned.
+     * Otherwise, an \ezp\Base\Exception\BadFieldTypeInput exception is thrown
+     *
+     * @throws \ezp\Base\Exception\BadFieldTypeInput Thrown when $inputValue is not understood.
+     * @param \ezp\Content\FieldType\TextLine\Value $inputValue
+     * @return \ezp\Content\FieldType\TextLine\Value
+     */
+    protected function canParseValue( BaseValue $inputValue )
+    {
+        if ( !$inputValue instanceof Value || !is_string( $inputValue-&gt;text ) )
+        {
+            throw new BadFieldTypeInput( $inputValue, get_class( $this ) );
+        }
+        return $inputValue;
+    }
+
+    /**
+     * Returns information for FieldValue-&gt;$sortKey relevant to the field type.
+     *
+     * @todo String normalization should occur here.
+     * @return array
+     */
+    protected function getSortInfo()
+    {
+        return array( 'sort_key_string' =&gt; $this-&gt;getValue()-&gt;text );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

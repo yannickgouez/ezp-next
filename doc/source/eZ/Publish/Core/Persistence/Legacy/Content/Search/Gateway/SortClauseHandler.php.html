@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase sort clause handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\SPI\Persistence\Content\Query\SortClause,
+    ezp\Content\Query,
+    ezcQuerySelect;
+
+/**
+ * Handler for a single sort clause
+ */
+abstract class SortClauseHandler
+{
+    /**
+     * Database handler
+     *
+     * @var eZ\Publish\Core\Persistence\Legacy\EzcDbHandler
+     */
+    protected $dbHandler;
+
+    /**
+     * Creates a new criterion handler
+     *
+     * @param EzcDbHandler $dbHandler
+     */
+    public function __construct( EzcDbHandler $dbHandler )
+    {
+        $this-&gt;dbHandler = $dbHandler;
+    }
+
+    /**
+     * Check if this sort clause handler accepts to handle the given sort clause.
+     *
+     * @param SortClause $sortClause
+     * @return bool
+     */
+    abstract public function accept( SortClause $sortClause );
+
+    /**
+     * Apply selects to the query
+     *
+     * Returns the name of the (aliased) column, which information should be
+     * used for sorting.
+     *
+     * @param \ezcQuerySelect $query
+     * @param SortClause $sortClause
+     * @param int $number
+     * @return string
+     */
+    abstract public function applySelect( ezcQuerySelect $query, SortClause $sortClause, $number );
+
+    /**
+     * applies joins to the query
+     *
+     * @param \ezcQuerySelect $query
+     * @param SortClause $sortClause
+     * @param int $number
+     * @return void
+     */
+    abstract public function applyJoin( ezcQuerySelect $query, SortClause $sortClause, $number );
+
+    /**
+     * Returns the quoted sort column name
+     *
+     * @param int $number
+     * @return string
+     */
+    protected function getSortColumnName( $number )
+    {
+        return $this-&gt;dbHandler-&gt;quoteIdentifier( 'sort_column_' . $number );
+    }
+
+    /**
+     * Returns the sort table name
+     *
+     * @param int $number
+     * @return string
+     */
+    protected function getSortTableName( $number )
+    {
+        return 'sort_table_' . $number;
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,392 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the NamePatternResolver class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\Utils;
+use ezp\Content\Version;
+
+/**
+ * NamePatternResolver is a utility class for resolving content name and url alias patterns.
+ * This code supports content name pattern groups.
+ *
+ * Syntax:
+ * &lt;code&gt;
+ * &amp;lt;attribute_identifier&amp;gt;
+ * &amp;lt;attribute_identifier&amp;gt; &amp;lt;2nd-identifier&amp;gt;
+ * User text &amp;lt;attribute_identifier&amp;gt;|(&amp;lt;2nd-identifier&amp;gt;&amp;lt;3rd-identifier&amp;gt;)
+ * &lt;/code&gt;
+ *
+ * Example:
+ * &lt;code&gt;
+ * &amp;lt;nickname|(&amp;lt;firstname&amp;gt; &amp;lt;lastname&amp;gt;)&amp;gt;
+ * &lt;/code&gt;
+ *
+ * Tokens are looked up from left to right. If a match is found for the
+ * leftmost token, the 2nd token will not be used. Tokens are representations
+ * of fields. So a match means that that the current field has data.
+ *
+ * Tokens are the field definition identifiers which are used in the class edit-interface.
+ */
+class NamePatternResolver
+{
+    /**
+     * The string to use to signify group tokens.
+     *
+     * @var string
+     */
+    const META_STRING = 'EZMETAGROUP_';
+
+    /**
+     * Max length of content name.
+     *
+     * @var int
+     */
+    const CONTENT_NAME_MAX_LENGTH = 255;
+
+    /**
+     * Holds token groups
+     *
+     * @var array
+     */
+    private $groupLookupTable;
+
+    /**
+     * Contains the original name pattern entered
+     *
+     * @var string
+     */
+    private $origNamePattern;
+
+    /**
+     * Holds the filtered name pattern where token groups are replaced with
+     * meta strings
+     *
+     * @var string
+     */
+    private $namePattern;
+
+    /**
+     * The content object which holds the attributes used to resolve name pattern.
+     *
+     * @var \ezp\Content\Version
+     */
+    private $contentVersion;
+
+    /**
+     * Holds data fetched from content fields' Value object.
+     * Key is the field identifier.
+     * Value is the string value obtained via {@link \ezp\Content\FieldType\ValueInterface::getTitle()}
+     *
+     * @see \ezp\Content\FieldType\ValueInterface::getTitle()
+     * @var string[]
+     */
+    private $fieldTitleArray;
+
+    /**
+     * Constructs a object to resolve $namePattern with $contentVersion fields values
+     *
+     * @param string $namePattern Name pattern (aka &quot;name schema&quot; for content name/urlAlias.
+     *                            See {@link \ezp\Persistence\Content\Type::$nameSchema} for more info.
+     * @param \ezp\Content\Version $contentVersion
+     * @todo Take translation into account
+     */
+    public function __construct( $namePattern, Version $contentVersion )
+    {
+        $this-&gt;origNamePattern = $namePattern;
+        $this-&gt;contentVersion = $contentVersion;
+        $this-&gt;namePattern = $this-&gt;filterNamePattern( $namePattern );
+    }
+
+    /**
+     * Return the real name for a content name pattern
+     *
+     * @param int $limit The limit on the string length, by defaul 0 aka none
+     * @param string $sequence End sequence applied to string if limit has been reached
+     * @return string
+     */
+    public function resolveNamePattern( $limit = 0, $sequence = '' )
+    {
+        // Fetch fields title for present identifiers
+        $this-&gt;fieldTitleArray = $this-&gt;getFieldsTitle( $this-&gt;origNamePattern );
+
+        // Replace tokens with real values
+        $objectName = $this-&gt;translatePattern();
+
+        // Make sure length is not longer then $limit unless it's 0
+        if ( !$limit || strlen( $objectName ) &lt;= $limit )
+        {
+            return $objectName;
+        }
+        else
+        {
+            return rtrim( substr( $objectName, 0, $limit - strlen( $sequence ) + 1 ) ) . $sequence;
+        }
+    }
+
+    /**
+     * Fetches the list of available Field identifiers in the token and returns
+     * an array of their current title value.
+     *
+     * @see \ezp\Content\FieldType\ValueInterface::getTitle()
+     * @return string[] Key is the field identifier, value is the title value
+     */
+    private function getFieldsTitle( $namePattern )
+    {
+        $returnFieldTitleArray = array();
+        $fields = $this-&gt;contentVersion-&gt;getFields();
+
+        foreach ( $this-&gt;getIdentifiers( $namePattern ) as $fieldIdentifier )
+        {
+            if ( isset( $fields[$fieldIdentifier] ) )
+            {
+                $returnFieldTitleArray[$fieldIdentifier] = $fields[$fieldIdentifier]-&gt;getValue()-&gt;getTitle();
+            }
+            // @todo : Shouldn't we log an error here if $fieldIdentifier is invalid ?
+        }
+
+        return $returnFieldTitleArray;
+    }
+
+    /**
+     * Replaces tokens in the name pattern with their resolved values.
+     *
+     * @return string
+     */
+    private function translatePattern()
+    {
+        $tokenArray = $this-&gt;extractTokens( $this-&gt;namePattern );
+        $objectName = $this-&gt;namePattern;
+
+        foreach ( $tokenArray as $token )
+        {
+            $string = $this-&gt;resolveToken( $token );
+            $objectName = str_replace( $token, $string, $objectName );
+        }
+
+        return $objectName;
+    }
+
+    /**
+     * Extract all tokens from $namePattern
+     *
+     * Example:
+     * &lt;code&gt;
+     * Text &amp;lt;token&amp;gt; more text ==&amp;gt; &amp;lt;token&amp;gt;
+     * &lt;/code&gt;
+     *
+     * @param string $namePattern
+     * @return array
+     */
+    private function extractTokens( $namePattern )
+    {
+        $foundTokens = preg_match_all( &quot;|&lt;([^&gt;]+)&gt;|U&quot;, $namePattern,
+                                                       $tokenArray );
+
+        return $tokenArray[0];
+    }
+
+    /**
+     * Looks up the value $token should be replaced with and returns this as
+     * a string. Meta strings denothing token groups are automatically
+     * inferred.
+     *
+     * @param string $token
+     * @return string
+     */
+    private function resolveToken( $token )
+    {
+        $replaceString = &quot;&quot;;
+        $tokenParts = $this-&gt;tokenParts( $token );
+
+        foreach ( $tokenParts as $tokenPart )
+        {
+            if ( $this-&gt;isTokenGroup( $tokenPart ) )
+            {
+                $groupTokenArray = $this-&gt;extractTokens( $this-&gt;groupLookupTable[$tokenPart] );
+                $replaceString = $this-&gt;groupLookupTable[$tokenPart];
+
+                foreach ( $groupTokenArray as $groupToken )
+                {
+                    $replaceString = str_replace( $groupToken, $this-&gt;resolveToken( $groupToken ), $replaceString );
+                }
+                // We want to stop after the first matching token part / identifier is found
+                // &lt;id1|id2&gt; if id1 has a value, id2 will not be used.
+                // In this case id1 or id1 is a token group.
+                break;
+            }
+            else
+            {
+                if ( array_key_exists( $tokenPart, $this-&gt;fieldTitleArray ) and $this-&gt;fieldTitleArray[$tokenPart] !== '' and $this-&gt;fieldTitleArray[$tokenPart] !== NULL )
+                {
+                    $replaceString = $this-&gt;fieldTitleArray[$tokenPart];
+                    // We want to stop after the first matching token part / identifier is found
+                    // &lt;id1|id2&gt; if id1 has a value, id2 will not be used.
+                    break;
+                }
+            }
+        }
+
+        return $replaceString;
+    }
+
+    /**
+     * Checks whether $identifier is a placeholder for a token group.
+     *
+     * @param string $identifier
+     * @return void
+     */
+    private function isTokenGroup( $identifier )
+    {
+        if ( strpos( $identifier, self::META_STRING ) === false )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Return the different constituents of $token in an array.
+     * The normal case here is that the different identifiers within one token
+     * will be tokenized and returned.
+     *
+     * Example:
+     * &lt;code&gt;
+     * &quot;&amp;lt;title|text&amp;gt;&quot; ==&amp;gt; array( 'title', 'text' )
+     * &lt;/code&gt;
+     *
+     * @param string $token
+     * @return array
+     */
+    private function tokenParts( $token )
+    {
+        return preg_split( '#\\W#', $token, -1, PREG_SPLIT_NO_EMPTY );
+    }
+
+    /**
+     * Builds a lookup / translation table for groups in the $namePattern.
+     * The groups are referenced with a generated meta-token in the original
+     * name pattern.
+     *
+     * Returns intermediate name pattern where groups are replaced with meta-
+     * tokens.
+     *
+     * @param string $namePattern
+     * @return string
+     */
+    private function filterNamePattern( $namePattern )
+    {
+        $retNamePattern = &quot;&quot;;
+        $foundGroups = preg_match_all( &quot;/[&lt;|\\|](\\(.+\\))[\\||&gt;]/U&quot;, $namePattern, $groupArray );
+
+        if ( $foundGroups )
+        {
+            $i = 0;
+            foreach ( $groupArray[1] as $group )
+            {
+                // Create meta-token for group
+                $metaToken = self::META_STRING . $i;
+
+                // Insert the group with its placeholder token
+                $retNamePattern = str_replace( $group, $metaToken, $namePattern );
+
+                // Remove the pattern &quot;(&quot; &quot;)&quot; from the tokens
+                $group = str_replace( array( '(', ')' ), '', $group );
+
+                $this-&gt;groupLookupTable[$metaToken] = $group;
+                ++$i;
+            }
+            return $retNamePattern;
+        }
+
+        return $namePattern;
+    }
+
+    /**
+     * Returns all identifiers from all tokens in the name pattern.
+     *
+     * @param string $patternString
+     * @return array
+     */
+    private function getIdentifiers( $patternString )
+    {
+        $allTokens = '#&lt;(.*)&gt;#U';
+        $identifiers = '#\\W#';
+
+        $tmpArray = array();
+        preg_match_all( $allTokens, $patternString, $matches );
+
+        foreach ( $matches[1] as $match )
+        {
+            $tmpArray[] = preg_split( $identifiers, $match, -1, PREG_SPLIT_NO_EMPTY );
+        }
+
+        $retArray = array();
+        foreach ( $tmpArray as $matchGroup )
+        {
+            if ( is_array( $matchGroup ) )
+            {
+                foreach ( $matchGroup as $item )
+                {
+                    $retArray[] = $item;
+                }
+            }
+            else
+            {
+                $retArray[] = $matchGroup;
+            }
+        }
+
+        return $retArray;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

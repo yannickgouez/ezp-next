@@ -1,0 +1,435 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Mapper class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content;
+use eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Field,
+    eZ\Publish\SPI\Persistence\Content\FieldValue,
+    eZ\Publish\SPI\Persistence\Content\Version,
+    eZ\Publish\SPI\Persistence\Content\RestrictedVersion,
+    eZ\Publish\Core\Persistence\Legacy\Content\Location\Mapper as LocationMapper,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry;
+
+/**
+ *
+ */
+class Mapper
+{
+    /**
+     * FieldValue converter registry
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry
+     */
+    protected $converterRegistry;
+
+    /**
+     * Location mapper
+     *
+     * @var \eZ\Publish\SPI\Persistence\Storage\Persistence\Converter\Location\Mapper
+     */
+    protected $locationMapper;
+
+    /**
+     * Creates a new mapper.
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Registry $converterRegistry
+     */
+    public function __construct( LocationMapper $locationMapper, Registry $converterRegistry )
+    {
+        $this-&gt;converterRegistry = $converterRegistry;
+        $this-&gt;locationMapper = $locationMapper;
+    }
+
+    /**
+     * Creates a Content from the given $struct
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\CreateStruct $struct
+     * @return Content
+     */
+    public function createContentFromCreateStruct( CreateStruct $struct )
+    {
+        $content = new Content();
+
+        $content-&gt;typeId = $struct-&gt;typeId;
+        $content-&gt;sectionId = $struct-&gt;sectionId;
+        $content-&gt;ownerId = $struct-&gt;ownerId;
+        $content-&gt;alwaysAvailable = $struct-&gt;alwaysAvailable;
+        $content-&gt;remoteId = $struct-&gt;remoteId;
+        $content-&gt;initialLanguageId = $struct-&gt;initialLanguageId;
+        $content-&gt;published = $struct-&gt;published;
+        $content-&gt;modified = $struct-&gt;modified;
+        $content-&gt;currentVersionNo = 1;
+        $content-&gt;status = Content::STATUS_DRAFT;
+
+        return $content;
+    }
+
+    /**
+     * Creates a Location\CreateStruct for the given $content
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content $content
+     * @return Content\Location\CreateStruct
+     */
+    public function createLocationCreateStruct( Content $content )
+    {
+        $location = new Content\Location\CreateStruct();
+
+        $location-&gt;remoteId = md5( uniqid() );
+        $location-&gt;contentId = $content-&gt;id;
+        $location-&gt;contentVersion = $content-&gt;version-&gt;versionNo;
+
+        return $location;
+    }
+
+    /**
+     * Creates a new version for the given $content
+     *
+     * @param Content $content
+     * @param int $versionNo
+     * @return Version
+     * @todo: created, modified, initial_language_id, status, user_id?
+     */
+    public function createVersionForContent( Content $content, $versionNo )
+    {
+        $version = new Version();
+
+        $version-&gt;versionNo = $versionNo;
+        $version-&gt;created = time();
+        $version-&gt;modified = $version-&gt;created;
+        $version-&gt;creatorId = $content-&gt;ownerId;
+        // @todo: Is draft version correct?
+        $version-&gt;status = Version::STATUS_DRAFT;
+        $version-&gt;contentId = $content-&gt;id;
+        // @todo Implement real language id for translation
+        $version-&gt;initialLanguageId = 2;
+
+        return $version;
+    }
+
+    /**
+     * Converts value of $field to storage value
+     *
+     * @param Field $field
+     * @return StorageFieldValue
+     */
+    public function convertToStorageValue( Field $field )
+    {
+        $converter = $this-&gt;converterRegistry-&gt;getConverter(
+            $field-&gt;type
+        );
+        $storageValue = new StorageFieldValue();
+        $converter-&gt;toStorageValue(
+            $field-&gt;value,
+            $storageValue
+        );
+        return $storageValue;
+    }
+
+    /**
+     * Extracts Content objects (and nested) from database result $rows
+     *
+     * Expects database rows to be indexed by keys of the format
+     *
+     *      &quot;$tableName_$columnName&quot;
+     *
+     * @param array $rows
+     * @return array(Content)
+     */
+    public function extractContentFromRows( array $rows )
+    {
+        $contentObjs = array();
+        $versions = array();
+        $locations = array();
+
+        foreach ( $rows as $row )
+        {
+            $contentId = (int)$row['ezcontentobject_id'];
+            if ( !isset( $contentObjs[$contentId] ) )
+            {
+                $contentObjs[$contentId] = $this-&gt;extractContentFromRow( $row );
+            }
+            if ( !isset( $versions[$contentId] ) )
+            {
+                $versions[$contentId] = array();
+            }
+            if ( !isset( $locations[$contentId] ) )
+            {
+                $locations[$contentId] = array();
+            }
+
+            $versionId = (int)$row['ezcontentobject_version_id'];
+            if ( !isset( $versions[$contentId][$versionId] ) )
+            {
+                $versions[$contentId][$versionId] = $this-&gt;extractVersionFromRow( $row );
+            }
+            if ( !isset( $versions[$contentId][$versionId]-&gt;name[$row['ezcontentobject_name_content_translation']] ) )
+            {
+                $versions[$contentId][$versionId]-&gt;name[$row['ezcontentobject_name_content_translation']] = $row['ezcontentobject_name_name'];
+            }
+            if ( !isset( $locations[$contentId][$versionId] ) )
+            {
+                $locations[$contentId][$versionId] = array();
+            }
+
+            $field = (int)$row['ezcontentobject_attribute_id'];
+            if ( !isset( $versions[$contentId][$versionId]-&gt;fields[$field] ) )
+            {
+                $versions[$contentId][$versionId]-&gt;fields[$field] = $this-&gt;extractFieldFromRow( $row );
+            }
+
+            $locationId = (int)$row['ezcontentobject_tree_node_id'];
+            if ( !isset( $locations[$contentId][$versionId][$locationId] ) )
+            {
+                $locations[$contentId][$versionId][$locationId] =
+                    $this-&gt;locationMapper-&gt;createLocationFromRow(
+                        $row, 'ezcontentobject_tree_'
+                    );
+            }
+        }
+
+        $results = array();
+        foreach ( $contentObjs as $contentId =&gt; $content )
+        {
+            foreach ( $versions[$contentId] as $versionId =&gt; $version )
+            {
+                $version-&gt;fields = array_values( $version-&gt;fields );
+
+                $newContent = clone $content;
+                $newContent-&gt;version = $version;
+                $newContent-&gt;locations = array_values(
+                    $locations[$contentId][$versionId]
+                );
+                $results[] = $newContent;
+            }
+        }
+        return $results;
+    }
+
+    /**
+     * Extracts a Content object from $row
+     *
+     * @param array $row
+     * @return Content
+     */
+    protected function extractContentFromRow( array $row )
+    {
+        $content = new Content();
+
+        $content-&gt;id = (int)$row['ezcontentobject_id'];
+        $content-&gt;typeId = (int)$row['ezcontentobject_contentclass_id'];
+        $content-&gt;sectionId = (int)$row['ezcontentobject_section_id'];
+        $content-&gt;ownerId = (int)$row['ezcontentobject_owner_id'];
+        $content-&gt;remoteId = $row['ezcontentobject_remote_id'];
+        $content-&gt;alwaysAvailable = (bool)( $row['ezcontentobject_version_language_mask'] &amp; 1 );
+        $content-&gt;currentVersionNo = (int)$row['ezcontentobject_current_version'];
+        $content-&gt;initialLanguageId = (int)$row['ezcontentobject_initial_language_id'];
+        $content-&gt;modified = (int)$row['ezcontentobject_modified'];
+        $content-&gt;published = (int)$row['ezcontentobject_published'];
+        $content-&gt;locations = array();
+
+        return $content;
+    }
+
+    /**
+     * Extracts a Version from the given $row
+     *
+     * @param array $row
+     * @return Version
+     */
+    protected function extractVersionFromRow( array $row )
+    {
+        $version = new Version();
+        $this-&gt;mapCommonVersionFields( $row, $version );
+        $version-&gt;fields = array();
+
+        return $version;
+    }
+
+    /**
+     * Maps fields from $row to $version
+     *
+     * @param array $row
+     * @param Version|RestrictedVersion $version
+     * @return void
+     */
+    protected function mapCommonVersionFields( array $row, $version )
+    {
+        $version-&gt;id = (int)$row['ezcontentobject_version_id'];
+        $version-&gt;versionNo = (int)$row['ezcontentobject_version_version'];
+        $version-&gt;modified = (int)$row['ezcontentobject_version_modified'];
+        $version-&gt;creatorId = (int)$row['ezcontentobject_version_creator_id'];
+        $version-&gt;created = (int)$row['ezcontentobject_version_created'];
+        $version-&gt;status = (int)$row['ezcontentobject_version_status'];
+        $version-&gt;contentId = (int)$row['ezcontentobject_version_contentobject_id'];
+    }
+
+    /**
+     * Extracts a Field from $row
+     *
+     * @param array $row
+     * @return Field
+     */
+    protected function extractFieldFromRow( array $row )
+    {
+        $field = new Field();
+
+        $field-&gt;id = (int)$row['ezcontentobject_attribute_id'];
+        $field-&gt;fieldDefinitionId = (int)$row['ezcontentobject_attribute_contentclassattribute_id'];
+        $field-&gt;type = $row['ezcontentobject_attribute_data_type_string'];
+        $field-&gt;value = $this-&gt;extractFieldValueFromRow( $row, $field-&gt;type );
+        $field-&gt;language = $row['ezcontentobject_attribute_language_code'];
+        $field-&gt;versionNo = (int)$row['ezcontentobject_attribute_version'];
+
+        return $field;
+    }
+
+    /**
+     * Extracts a FieldValue of $type from $row
+     *
+     * @param array $row
+     * @param string $type
+     * @return FieldValue
+     * @throws eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Exception\NotFound
+     *         if the necessary converter for $type could not be found.
+     */
+    protected function extractFieldValueFromRow( array $row, $type )
+    {
+        $storageValue = new StorageFieldValue();
+
+        $storageValue-&gt;dataFloat = (float)$row['ezcontentobject_attribute_data_float'];
+        $storageValue-&gt;dataInt = (int)$row['ezcontentobject_attribute_data_int'];
+        $storageValue-&gt;dataText = $row['ezcontentobject_attribute_data_text'];
+        $storageValue-&gt;sortKeyInt = (int)$row['ezcontentobject_attribute_sort_key_int'];
+        $storageValue-&gt;sortKeyString = $row['ezcontentobject_attribute_sort_key_string'];
+
+        $fieldValue = new FieldValue();
+
+        $converter = $this-&gt;converterRegistry-&gt;getConverter( $type );
+        $converter-&gt;toFieldValue( $storageValue, $fieldValue );
+
+        return $fieldValue;
+    }
+
+    /**
+     * Extracts a list of RestrictedVersion objects from $rows
+     *
+     * @param string[][] $rows
+     * @return RestrictedVersion[]
+     */
+    public function extractVersionListFromRows( array $rows )
+    {
+        $versionList = array();
+        foreach ( $rows as $row )
+        {
+            $versionId = (int)$row['ezcontentobject_version_id'];
+            if ( !isset( $versionList[$versionId] ) )
+            {
+                $version = new RestrictedVersion();
+                $this-&gt;mapCommonVersionFields( $row, $version );
+                $version-&gt;languageIds = array();
+
+                $versionList[$versionId] = $version;
+            }
+
+            if ( !isset( $versionList[$versionId]-&gt;name[$row['ezcontentobject_name_content_translation']] ) )
+            {
+                $versionList[$versionId]-&gt;name[$row['ezcontentobject_name_content_translation']] = $row['ezcontentobject_name_name'];
+            }
+
+            if (
+                !in_array(
+                    $row['ezcontentobject_attribute_language_code'],
+                    $versionList[$versionId]-&gt;languageIds
+                )
+            )
+            {
+                $versionList[$versionId]-&gt;languageIds[] =
+                    $row['ezcontentobject_attribute_language_code'];
+            }
+        }
+        return array_values( $versionList );
+    }
+
+    /**
+     * Creates CreateStruct from $content
+     *
+     * @param eZ\Publish\SPI\Persistence\Content $content
+     * @return eZ\Publish\SPI\Persistence\Content\CreateStruct
+     */
+    public function createCreateStructFromContent( Content $content )
+    {
+        $struct = new CreateStruct();
+        $struct-&gt;name = $content-&gt;version-&gt;name;
+        $struct-&gt;typeId = $content-&gt;typeId;
+        $struct-&gt;sectionId = $content-&gt;sectionId;
+        $struct-&gt;ownerId = $content-&gt;ownerId;
+        $struct-&gt;locations = array();
+        $struct-&gt;alwaysAvailable = $content-&gt;alwaysAvailable;
+        $struct-&gt;remoteId = $content-&gt;remoteId;
+        $struct-&gt;initialLanguageId = $content-&gt;initialLanguageId;
+        $struct-&gt;published = $content-&gt;published;
+        $struct-&gt;modified = $content-&gt;modified;
+
+        foreach ( $content-&gt;version-&gt;fields as $field )
+        {
+            $newField = clone $field;
+            $newField-&gt;id = null;
+            $struct-&gt;fields[] = $newField;
+        }
+
+        return $struct;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

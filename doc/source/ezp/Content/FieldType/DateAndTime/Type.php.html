@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the DateTime class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\DateAndTime;
+use ezp\Content\FieldType,
+    ezp\Content\FieldType\Value as BaseValue,
+    ezp\Base\Exception\BadFieldTypeInput,
+    ezp\Base\Exception\InvalidArgumentType,
+    DateTime;
+
+class Type extends FieldType
+{
+    const FIELD_TYPE_IDENTIFIER = &quot;ezdatetime&quot;;
+    const IS_SEARCHABLE = true;
+
+    /**
+     * Default value types
+     */
+    const DEFAULT_EMPTY = 0,
+          DEFAULT_CURRENT_DATE = 1,
+          DEFAULT_CURRENT_DATE_ADJUSTED = 2;
+
+    protected $allowedSettings = array(
+        'useSeconds' =&gt; false,
+        // One of the DEFAULT_* class constants
+        'defaultType' =&gt; self::DEFAULT_EMPTY,
+        /*
+         * @var \DateInterval
+         * Used only if defaultValueType is set to DEFAULT_CURRENT_DATE_ADJUSTED
+         */
+        'dateInterval' =&gt; null
+    );
+
+    /**
+     * Returns the fallback default value of field type when no such default
+     * value is provided in the field definition in content types.
+     *
+     * @return \ezp\Content\FieldType\DateAndTime\Value
+     */
+    protected function getDefaultValue()
+    {
+        return new Value;
+    }
+
+    /**
+     * Checks if value can be parsed.
+     *
+     * If the value actually can be parsed, the value is returned.
+     *
+     * @throws ezp\Base\Exception\BadFieldTypeInput Thrown when $inputValue is not understood.
+     * @param mixed $inputValue
+     * @return mixed
+     */
+    protected function canParseValue( BaseValue $inputValue )
+    {
+        if ( $inputValue instanceof Value )
+        {
+            if ( isset( $inputValue-&gt;value ) &amp;&amp; !$inputValue-&gt;value instanceof DateTime )
+                throw new BadFieldTypeInput( $inputValue, get_class( $this ) );
+
+            return $inputValue;
+        }
+
+        throw new InvalidArgumentType( 'value', 'ezp\\Content\\FieldType\\DateAndTime\\Value' );
+    }
+
+    /**
+     * Returns information for FieldValue-&gt;$sortKey relevant to the field type.
+     *
+     * @return array
+     */
+    protected function getSortInfo()
+    {
+        $timestamp = 0;
+        if ( $this-&gt;getValue()-&gt;value instanceof DateTime )
+            $timestamp = $this-&gt;getValue()-&gt;value-&gt;getTimestamp();
+
+        return array( 'sort_key_int' =&gt; $timestamp );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

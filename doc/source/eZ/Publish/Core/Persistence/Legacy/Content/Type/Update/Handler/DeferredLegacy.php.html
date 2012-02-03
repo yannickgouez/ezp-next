@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the DeferredLegacy Type Update Handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type\Update\Handler;
+use eZ\Publish\Core\Persistence\Legacy\Content\Type\Update\Handler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\Content\Type\ContentUpdater;
+
+/**
+ * DeferredLegacy based type update handler
+ */
+class DeferredLegacy extends Handler
+{
+    /**
+     * eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway
+     *
+     * @var mixed
+     */
+    protected $contentTypeGateway;
+
+    /**
+     * Creates a new content type update handler
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway $contentTypeGateway
+     */
+    public function __construct( Gateway $contentTypeGateway )
+    {
+        $this-&gt;contentTypeGateway = $contentTypeGateway;
+    }
+
+    /**
+     * Updates existing content objects from $fromType to $toType
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type $fromType
+     * @param \eZ\Publish\SPI\Persistence\Content\Type $toType
+     * @return void
+     */
+    public function updateContentObjects( $fromType, $toType )
+    {
+    }
+
+    /**
+     * Deletes $fromType and all of its field definitions
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type $fromType
+     * @return void
+     */
+    public function deleteOldType( $fromType )
+    {
+    }
+
+    /**
+     * Publishes $toType to $newStatus
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type $toType
+     * @param int $newStatus
+     * @return void
+     */
+    public function publishNewType( $toType, $newStatus )
+    {
+        $this-&gt;contentTypeGateway-&gt;publishTypeAndFields(
+            $toType-&gt;id,
+            $toType-&gt;status,
+            Type::STATUS_MODIFIED
+        );
+
+        $script = eZScheduledScript::create(
+            'syncobjectattributes.php',
+            eZINI::instance( 'ezscriptmonitor.ini' )-&gt;variable( 'GeneralSettings', 'PhpCliCommand' ) .
+            ' extension/ezscriptmonitor/bin/' . eZScheduledScript::SCRIPT_NAME_STRING .
+            ' -s ' . eZScheduledScript::SITE_ACCESS_STRING . ' --classid=' . $toType-&gt;id
+        );
+        $script-&gt;store();
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

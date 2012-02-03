@@ -1,0 +1,247 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Content Search handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\InMemory;
+
+use eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\Search\Handler as SearchHandlerInterface,
+    eZ\Publish\SPI\Persistence\Content\Search\Result,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\ContentId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\ContentTypeId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\LocationId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\RemoteId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\SectionId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\UserMetadata,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\ParentLocationId,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\LogicalAnd,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\Operator,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion\Subtree,
+    ezp\Base\Exception\NotFound,
+    Exception;
+
+/**
+ * The Content Search handler retrieves sets of of Content objects, based on a
+ * set of criteria.
+ *
+ * The basic idea of this class is to do the following:
+ *
+ * 1) The find methods retrieve a recursive set of filters, which define which
+ * content objects to retrieve from the database. Those may be combined using
+ * boolean operators.
+ *
+ * 2) This recursive criterion definition is visited into a query, which limits
+ * the content retrieved from the database. We might not be able to create
+ * sensible queries from all criterion definitions.
+ *
+ * 3) The query might be possible to optimize (remove empty statements),
+ * reduce singular and and or constructs&acirc;€&brvbar;
+ *
+ * 4) Additionally we might need a post-query filtering step, which filters
+ * content objects based on criteria, which could not be converted in to
+ * database statements.
+ */
+class SearchHandler extends SearchHandlerInterface
+{
+    /**
+     * @var Handler
+     */
+    protected $handler;
+
+    /**
+     * @var Backend
+     */
+    protected $backend;
+
+    /**
+     * Setups current handler instance with reference to Handler object that created it.
+     *
+     * @param Handler $handler
+     * @param Backend $backend The storage engine backend
+     */
+    public function __construct( Handler $handler, Backend $backend )
+    {
+        $this-&gt;handler = $handler;
+        $this-&gt;backend = $backend;
+    }
+
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Content\Search\Handler
+     */
+    public function find( Criterion $criterion, $offset = 0, $limit = null, array $sort = null, $translations = null )
+    {
+        // Only some criteria are supported as getting full support for all in InMemory engine is not a priority
+        $match = array();
+        self::generateMatchByCriteria( array( $criterion ), $match );
+
+        if ( empty( $match ) )
+        {
+            throw new Exception( &quot;Logical error: \$match is empty&quot; );
+        }
+
+        $list = $this-&gt;backend-&gt;find(
+            'Content',
+            $match,
+            array(
+                'locations' =&gt; array(
+                    'type' =&gt; 'Content\\Location',
+                    'match' =&gt; array( 'contentId' =&gt; 'id' )
+                ),
+                'version' =&gt; array(
+                    'type' =&gt; 'Content\\Version',
+                    'single' =&gt; true,
+                    'match' =&gt; array( 'contentId' =&gt; 'id', 'versionNo' =&gt; 'currentVersionNo' ),
+                    'sub' =&gt; array(
+                        'fields' =&gt; array(
+                            'type' =&gt; 'Content\\Field',
+                            'match' =&gt; array( '_contentId' =&gt; 'contentId', 'versionNo' =&gt; 'versionNo' ),
+                        )
+                    )
+                ),
+            )
+        );
+
+        $result = new Result();
+        $result-&gt;count = count( $list );
+
+        if ( $limit === null &amp;&amp; $offset === 0 )
+            $result-&gt;content = $list;
+        else if ( $limit === null )
+             $result-&gt;content = array_slice( $list, $offset );
+        else
+            $result-&gt;content = array_slice( $list, $offset, $limit );
+
+        return $result;
+    }
+
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Content\Search\Handler
+     */
+    public function findSingle( Criterion $criterion, $translations = null )
+    {
+        $list = $this-&gt;find( $criterion, 0, 1, null, $translations );
+        if ( !$list-&gt;count )
+            throw new NotFound( 'Content', $criterion );
+
+        return $list-&gt;content[0];
+    }
+
+    /**
+     * @see \eZ\Publish\SPI\Persistence\Content\Search\Handler
+     */
+    public function indexContent( Content $content )
+    {
+        throw new Exception( &quot;Not implemented yet.&quot; );
+    }
+
+    /**
+     * Generate match array for use with Backend based on criteria
+     *
+     * @param array $criteria
+     * @param array $match
+     * @return void
+     */
+    protected static function generateMatchByCriteria( array $criteria, array &amp;$match )
+    {
+        foreach ( $criteria as $criterion )
+        {
+            if ( $criterion instanceof LogicalAnd )
+            {
+                self::generateMatchByCriteria( $criterion-&gt;criteria, $match );
+            }
+            else if ( $criterion instanceof ContentId &amp;&amp; !isset( $match['id'] ) )
+            {
+                $match['id'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof ContentTypeId &amp;&amp; !isset( $match['typeId'] ) )
+            {
+                $match['typeId'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof LocationId &amp;&amp; !isset( $match['locations']['id'] ) )
+            {
+                $match['locations']['id'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof RemoteId &amp;&amp; !isset( $match['remoteId'] ) )
+            {
+                $match['remoteId'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof SectionId &amp;&amp; !isset( $match['sectionId'] ) )
+            {
+                $match['sectionId'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof ParentLocationId &amp;&amp; !isset( $match['locations']['parentId'] ) )
+            {
+                $match['locations']['parentId'] = $criterion-&gt;value[0];
+            }
+            else if ( $criterion instanceof Subtree &amp;&amp; !isset( $match['locations']['pathString'] ) )
+            {
+                $match['locations']['pathString'] = $criterion-&gt;value[0] . '%';
+            }
+            else
+            {
+                if ( $criterion instanceof UserMetadata &amp;&amp; $criterion-&gt;target !== $criterion::MODIFIER )
+                {
+                    if ( $criterion-&gt;target === $criterion::OWNER &amp;&amp; !isset( $match['ownerId'] ) )
+                        $match['ownerId'] = $criterion-&gt;value[0];
+                    else if ( $criterion-&gt;target === $criterion::CREATOR &amp;&amp; !isset( $match['version']['creatorId'] ) )
+                        $match['version']['creatorId'] = $criterion-&gt;value[0];
+                    //else if ( $criterion-&gt;target === $criterion::MODIFIER &amp;&amp; !isset( $match['version']['creatorId'] ) )
+                        //$match['version']['creatorId'] = $criterion-&gt;value[0];
+                    continue;
+                }
+                throw new Exception( &quot;Support for provided criterion not supported or used more then once: &quot; . get_class( $criterion ) );
+            }
+        }
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

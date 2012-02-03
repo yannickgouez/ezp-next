@@ -1,0 +1,277 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase content locator gateway class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Gateway\EzcDatabase\QueryBuilder,
+    eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\Search,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    ezcQuerySelect;
+
+/**
+ * Content locator gateway implementation using the zeta handler component.
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Database handler
+     *
+     * @var EzcDbHandler
+     */
+    protected $handler;
+
+    /**
+     * Criteria converter
+     *
+     * @var CriteriaConverter
+     */
+    protected $criteriaConverter;
+
+    /**
+     * Sort clause converter
+     *
+     * @var SortClauseConverter
+     */
+    protected $sortClauseConverter;
+
+    /**
+     * Content load query builder
+     *
+     * @var eZ\Publish\Core\Persistence\Legacy\Content\Gateway\EzcDatabase\QueryBuilder
+     */
+    protected $queryBuilder;
+
+    /**
+     * Construct from handler handler
+     *
+     * @param EzcDbHandler $handler
+     * @return void
+     */
+    public function __construct(
+        EzcDbHandler $handler,
+        CriteriaConverter $criteriaConverter,
+        SortClauseConverter $sortClauseConverter,
+        QueryBuilder $queryBuilder
+    )
+    {
+        $this-&gt;handler = $handler;
+        $this-&gt;criteriaConverter = $criteriaConverter;
+        $this-&gt;sortClauseConverter = $sortClauseConverter;
+        $this-&gt;queryBuilder = $queryBuilder;
+    }
+
+    /**
+     * Returns a list of object satisfying the $criterion.
+     *
+     * @param Criterion $criterion
+     * @param int $offset
+     * @param int|null $limit
+     * @param \eZ\Publish\SPI\Persistence\Content\Query\SortClause[] $sort
+     * @param string[] $translations
+     * @return mixed[][]
+     */
+    public function find( Criterion $criterion, $offset = 0, $limit = null, array $sort = null, array $translations = null )
+    {
+        $limit = $limit !== null ? $limit : PHP_INT_MAX;
+
+        // Get full object count
+        $query = $this-&gt;handler-&gt;createSelectQuery();
+        $condition = $this-&gt;getQueryCondition( $criterion, $query, $translations );
+
+        $query
+            -&gt;select( 'COUNT( * )' )
+            -&gt;from( $this-&gt;handler-&gt;quoteTable( 'ezcontentobject' ) )
+            -&gt;where( $condition );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        $count = (int)$statement-&gt;fetchColumn();
+
+        if ( $count === 0 || $limit === 0 )
+        {
+            return array( 'count' =&gt; $count, 'rows' =&gt; array() );
+        }
+
+        $contentIds = $this-&gt;getContentIds( $query, $condition, $sort, $offset, $limit );
+
+        return array(
+            'count' =&gt; $count,
+            'rows' =&gt; $this-&gt;loadContent( $contentIds, $translations ),
+        );
+    }
+
+    /**
+     * Get query condition
+     *
+     * @param Criterion $criterion
+     * @param \ezcQuerySelect $query
+     * @param mixed $translations
+     * @return string
+     */
+    protected function getQueryCondition( Criterion $criterion, ezcQuerySelect $query, $translations )
+    {
+        $condition = $this-&gt;criteriaConverter-&gt;convertCriteria( $query, $criterion );
+
+        if ( $translations === null )
+        {
+            return $condition;
+        }
+
+        $translationQuery = $query-&gt;subSelect();
+        $translationQuery-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'contentobject_id' )
+        )-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezcontentobject_attribute' )
+        )-&gt;where(
+            $translationQuery-&gt;expr-&gt;in(
+                $this-&gt;handler-&gt;quoteColumn( 'language_code' ),
+                $translations
+            )
+        );
+
+        return $query-&gt;expr-&gt;lAnd(
+            $condition,
+            $query-&gt;expr-&gt;in(
+                $this-&gt;handler-&gt;quoteColumn( 'id' ),
+                $translationQuery
+            )
+        );
+    }
+
+    /**
+     * Get sorted arrays of content IDs, which should be returned
+     *
+     * @param \ezcQuerySelect ixed $query
+     * @param string $condition
+     * @param mixed $sort
+     * @param int $offset
+     * @param int $limit
+     * @return int[]
+     */
+    protected function getContentIds( ezcQuerySelect $query, $condition, $sort, $offset, $limit )
+    {
+        $query-&gt;reset();
+        $query-&gt;select(
+            $this-&gt;handler-&gt;quoteColumn( 'id', 'ezcontentobject' )
+        );
+
+        if ( $sort !== null )
+        {
+            $this-&gt;sortClauseConverter-&gt;applySelect( $query, $sort );
+        }
+
+        $query-&gt;from(
+            $this-&gt;handler-&gt;quoteTable( 'ezcontentobject' )
+        );
+
+        if ( $sort !== null )
+        {
+            $this-&gt;sortClauseConverter-&gt;applyJoin( $query, $sort );
+        }
+
+        $query-&gt;where( $condition );
+
+        if ( $sort !== null )
+        {
+            $this-&gt;sortClauseConverter-&gt;applyOrderBy( $query, $sort );
+        }
+
+        $query-&gt;limit( $limit, $offset );
+
+        $statement = $query-&gt;prepare();
+        $statement-&gt;execute();
+
+        return $statement-&gt;fetchAll( \PDO::FETCH_COLUMN );
+    }
+
+    /**
+     * Load the actual content based on the provided IDs
+     *
+     * @param array $contentIds
+     * @param mixed $translations
+     * @return mixed[]
+     */
+    protected function loadContent( array $contentIds, $translations )
+    {
+        $loadQuery = $this-&gt;queryBuilder-&gt;createFindQuery( $translations );
+        $loadQuery-&gt;where(
+            $loadQuery-&gt;expr-&gt;in(
+                $this-&gt;handler-&gt;quoteColumn( 'id', 'ezcontentobject' ),
+                $contentIds
+            )
+        );
+
+        $statement = $loadQuery-&gt;prepare();
+        $statement-&gt;execute();
+
+        $rows = $statement-&gt;fetchAll( \PDO::FETCH_ASSOC );
+
+        // Sort array, as defined in the $contentIds array
+        $contentIdOrder = array_flip( $contentIds );
+        usort(
+            $rows,
+            function ( $current, $next ) use ( $contentIdOrder )
+            {
+                return $contentIdOrder[$current['ezcontentobject_id']] -
+                    $contentIdOrder[$next['ezcontentobject_id']];
+            }
+        );
+
+        return $rows;
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,119 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Configuration Parser Interface
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Base\Configuration;
+
+/**
+ * Configuration Interfaces for configuration parser &amp; writer
+ *
+ */
+interface Parser
+{
+    /**
+     * Construct an instance of Parser
+     *
+     * @param array $globalConfiguration
+     */
+    public function __construct( array $globalConfiguration );
+
+    /**
+     * Parse file and return raw configuration data
+     *
+     * @param string $fileName A valid file name
+     * @param string $fileContent
+     * @return array A plain array structure of configuration data where array clearing
+     *         is marked with {@link Configuration::TEMP_INI_UNSET_VAR} and php variables are plain
+     *         php values(numbers, floats, true and false). In addition strings are rtrimmed to
+     *         avoid common user mistakes when dealing with configuration data (trailing whitespace).
+     *         eg (ini example):
+     *             [section]
+     *             list[]
+     *             list[]=item
+     *             list[]=false
+     *
+     *             var=true
+     *             num=2
+     *             float=1.2
+     *             string=1,5
+     *
+     *         Result:
+     *             array(
+     *                 'section' =&gt; array(
+     *                     'list' =&gt; array(
+     *                         '__UNSET__',
+     *                         'item',
+     *                         false,
+     *                     ),
+     *                     'var' =&gt; true,
+     *                     'num' =&gt; 2,
+     *                     'float' =&gt; 1.2,
+     *                     'string' =&gt; '1,5',
+     *                 )
+     *             )
+     *
+     * @todo Define exceptions
+     */
+    public function parse( $fileName, $fileContent );
+
+    /**
+     * Store raw configuration data to file
+     *
+     * @see parse() For $configurationData definition
+     * @param string $fileName A valid file name, will be overwritten if it exists
+     * @param array $configurationData
+     *
+     * @todo Define exceptions
+     */
+    public function write( $fileName, array $configurationData );
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

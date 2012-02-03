@@ -1,0 +1,182 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the User mapper
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\User;
+use eZ\Publish\SPI\Persistence\User,
+    eZ\Publish\SPI\Persistence\User\Role,
+    eZ\Publish\SPI\Persistence\User\RoleUpdateStruct,
+    eZ\Publish\SPI\Persistence\User\Policy,
+    RuntimeException;
+
+/**
+ * mapper for User realted objects
+ *
+ */
+class Mapper
+{
+    /**
+     * Map user data into user object
+     *
+     * @param array $data
+     * @return \eZ\Publish\SPI\Persistence\User
+     */
+    public function mapUser( array $data )
+    {
+        $user = new User();
+        $user-&gt;id = $data[0]['contentobject_id'];
+        $user-&gt;login = $data[0]['login'];
+        $user-&gt;email = $data[0]['email'];
+        $user-&gt;passwordHash = $data[0]['password_hash'];
+        $user-&gt;hashAlgorithm = $data[0]['password_hash_type'];
+        $user-&gt;isEnabled = (bool)$data[0]['is_enabled'];
+        $user-&gt;maxLogin = $data[0]['max_login'];
+
+        return $user;
+    }
+
+    /**
+     * Map policy data to an array of policies
+     *
+     * @param array $data
+     * @return \eZ\Publish\SPI\Persistence\User\Policy
+     */
+    public function mapPolicies( array $data )
+    {
+        $policies = array();
+        foreach ( $data as $row )
+        {
+            $policyId = $row['ezpolicy_id'];
+            if ( !isset( $policies[$policyId] ) &amp;&amp;
+                 ( $policyId !== null ) )
+            {
+                $policies[$policyId] = new Policy(
+                    array(
+                        'id' =&gt; $row['ezpolicy_id'],
+                        'roleId' =&gt; $row['ezrole_id'],
+                        'module' =&gt; $row['ezpolicy_module_name'],
+                        'function' =&gt; $row['ezpolicy_function_name'],
+                    )
+                );
+            }
+
+            if ( !$row['ezpolicy_limitation_identifier'] )
+            {
+                continue;
+            }
+
+            if ( !isset( $policies[$policyId]-&gt;limitations[$row['ezpolicy_limitation_identifier']] ) )
+            {
+                $policies[$policyId]-&gt;limitations[$row['ezpolicy_limitation_identifier']] = array( $row['ezpolicy_limitation_value_value'] );
+            }
+            else if ( !in_array( $row['ezpolicy_limitation_value_value'], $policies[$policyId]-&gt;limitations[$row['ezpolicy_limitation_identifier']] ) )
+            {
+                $policies[$policyId]-&gt;limitations[$row['ezpolicy_limitation_identifier']][] = $row['ezpolicy_limitation_value_value'];
+            }
+        }
+
+        return array_values( $policies );
+    }
+
+    /**
+     * Map role data to a role
+     *
+     * @param array $data
+     * @return \eZ\Publish\SPI\Persistence\User\Role
+     */
+    public function mapRole( array $data )
+    {
+        $role = new Role();
+
+        foreach ( $data as $row )
+        {
+            if ( empty( $role-&gt;id ) )
+            {
+                $role-&gt;id = $row['ezrole_id'];
+                $role-&gt;name = $row['ezrole_name'];
+            }
+
+            $role-&gt;groupIds[] = $row['ezuser_role_contentobject_id'];
+        }
+
+        // Remove dublicates and santitize arrays
+        $role-&gt;groupIds = array_values( array_unique( array_filter( $role-&gt;groupIds ) ) );
+        $role-&gt;policies = $this-&gt;mapPolicies( $data );
+
+        return $role;
+    }
+
+    /**
+     * Map data for a set of roles
+     *
+     * @param array $data
+     * @return \eZ\Publish\SPI\Persistence\User\Role[]
+     */
+    public function mapRoles( array $data )
+    {
+        $roleData = array();
+        foreach ( $data as $row )
+        {
+            $roleData[$row['ezrole_id']][] = $row;
+        }
+
+        $roles = array();
+        foreach ( $roleData as $data )
+        {
+            $roles[] = $this-&gt;mapRole( $data );
+        }
+
+        return $roles;
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

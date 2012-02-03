@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the StorageRegistry class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content;
+use eZ\Publish\SPI\Persistence\Fields\Storage,
+    eZ\Publish\Core\Persistence\Legacy\Exception,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\NullStorage;
+
+/**
+ * Registry for external storages
+ */
+class StorageRegistry
+{
+    /**
+     * Map of storages
+     *
+     * @var array
+     */
+    protected $storageMap = array();
+
+    /**
+     * Register a storage
+     *
+     * @param string $typeName
+     * @param Storage $storage
+     * @return void
+     */
+    public function register( $typeName, Storage $storage )
+    {
+        $this-&gt;storageMap[$typeName] = $storage;
+    }
+
+    /**
+     * Returns the storage for $typeName
+     *
+     * @param string $typeName
+     * @return Storage
+     */
+    public function getStorage( $typeName )
+    {
+        if ( !isset( $this-&gt;storageMap[$typeName] ) )
+        {
+            $this-&gt;register( $typeName, new NullStorage );
+        }
+        return $this-&gt;storageMap[$typeName];
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -77,7 +77,8 @@
       });
 
       
-    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/EzcDbHandler/Pgsql.php</h1>
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">eZ/Publish/Core/Persistence/Legacy/EzcDbHandler/Pgsql.php<a href="source/eZ/Publish/Core/Persistence/Legacy/EzcDbHandler/Pgsql.php.html"><img src="images/icons/view_source.png" border="0"></a>
+</h1>
 <div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
 <div id="file-nav-options">
               Show:
@@ -138,7 +139,7 @@ method dispatching.</p><small>Inherited from:
           )
         </span>
         :
-          void</code><div class="description">
+          mixed</code><div class="description">
 <span class="attribute">inherited</span><p class="short_description">Proxy methods to the aggregated DB handler</p>
 <small>Inherited from:
                     <a href="db_eZ_Publish_Core_Persistence_Legacy_EzcDbHandler.html#%5CeZ%5CPublish%5CCore%5CPersistence%5CLegacy%5CEzcDbHandler::__call()">\eZ\Publish\Core\Persistence\Legacy\EzcDbHandler::__call()</a></small>
@@ -160,6 +161,16 @@ method dispatching.</p><small>Inherited from:
 <th>$parameters</th>
 <td>array</td>
 <td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
 </tr>
 </table>
 </div>
@@ -195,7 +206,7 @@ method dispatching.</p><small>Inherited from:
 </div>
 <a id="\eZ\Publish\Core\Persistence\Legacy\EzcDbHandler\Pgsql::aliasedColumn()" class="anchor"></a><div class="method public inherited_from ">
 <a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">aliasedColumn</span><span class="nb-faded-text">(
-          \eZ\Publish\Core\Persistence\Legacy\ezcDbQuery $query, string $columnName, string $tableName
+          \ezcQuerySelect $query, string $columnName, string | null $tableName
               =
               null
           )
@@ -216,7 +227,7 @@ method dispatching.</p><small>Inherited from:
 </tr></thead>
 <tr>
 <th>$query</th>
-<td>\eZ\Publish\Core\Persistence\Legacy\ezcDbQuery</td>
+<td>\ezcQuerySelect</td>
 <td><em></em></td>
 </tr>
 <tr>
@@ -226,7 +237,7 @@ method dispatching.</p><small>Inherited from:
 </tr>
 <tr>
 <th>$tableName</th>
-<td>string</td>
+<td>string | null</td>
 <td><em></em></td>
 </tr>
 </table>

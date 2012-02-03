@@ -1,0 +1,89 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the DirPath class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Io;
+
+/**
+ * Utility class to deal with dir paths
+ */
+class DirPath
+{
+    /**
+     * Cleans a directory path.
+     * Removes or add trailing slash in $path if necessary, according to $includeEndSeparator flag.
+     *
+     * @param string|array $path The directory path. Can also be an array of path.
+     *                           If an array of string is provided, then paths will be concatenated
+     * @param bool $includeEndSeparator
+     * @return string
+     */
+    public static function clean( $path, $includeEndSeparator = false )
+    {
+        if ( is_array( $path ) )
+            $path = implode( '/', $path );
+
+        $pathLen = strlen( $path );
+        $hasEndSeparator = ( $pathLen &gt; 0 &amp;&amp; $path[$pathLen - 1] == '/' );
+        if ( $includeEndSeparator &amp;&amp; !$hasEndSeparator )
+            $path .= '/';
+        else if ( !$includeEndSeparator &amp;&amp; $hasEndSeparator &amp;&amp; $pathLen &gt; 1 )
+            $path = substr( $path, 0, -1 );
+
+        // Clean up multiple slash occurrences
+        if ( strpos( $path, '//' ) !== false )
+            $path = preg_replace( '#/{2,}#', '/', $path );
+
+        return $path;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

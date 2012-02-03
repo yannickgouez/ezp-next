@@ -1,0 +1,250 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the TrashHandler implementation
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\InMemory;
+use eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler as TrashHandlerInterface,
+    eZ\Publish\SPI\Persistence\Content\Location\Trashed as TrashedValue,
+    eZ\Publish\SPI\Persistence\Content\Location\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Location as LocationValue,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    ezp\Base\Exception\NotFound,
+    ezp\Content\Location\Exception\ParentNotFound;
+
+/**
+ * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+ */
+class TrashHandler implements TrashHandlerInterface
+{
+    /**
+     * @var Handler
+     */
+    protected $handler;
+
+    /**
+     * @var Backend
+     */
+    protected $backend;
+
+    /**
+     * Setups current handler instance with reference to Handler object that created it.
+     *
+     * @param Handler $handler
+     * @param Backend $backend The storage engine backend
+     */
+    public function __construct( Handler $handler, Backend $backend )
+    {
+        $this-&gt;handler = $handler;
+        $this-&gt;backend = $backend;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function load( $id )
+    {
+        return $this-&gt;backend-&gt;load( 'Content\\Location\\Trashed', $id );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function trashSubtree( $locationId )
+    {
+        $trashedLocation = $this-&gt;trash( $locationId );
+
+        // Begin recursive call on children, if any
+        $directChildren = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'parentId' =&gt; $locationId ) );
+        if ( !empty( $directChildren ) )
+        {
+            foreach ( $directChildren as $child )
+            {
+                $this-&gt;trashSubtree( $child-&gt;id );
+            }
+        }
+
+        return $trashedLocation;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    private function trash( $locationId )
+    {
+        $location = $this-&gt;handler-&gt;locationHandler()-&gt;load( $locationId );
+
+        // First delete location from tree
+        // If there are remaining locations for content, update the mainLocationId
+        $this-&gt;backend-&gt;delete( 'Content\\Location', $locationId );
+        $remainingLocations = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'contentId' =&gt; $location-&gt;contentId ) );
+        if ( !empty( $remainingLocations ) )
+        {
+            $this-&gt;backend-&gt;updateByMatch(
+                'Content\\Location',
+                array( 'contentId' =&gt; $location-&gt;contentId ),
+                array( 'mainLocationId' =&gt; $remainingLocations[0]-&gt;id )
+            );
+        }
+
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $location-&gt;pathString ) );
+
+        // Create new trashed location and return it
+        $params = (array)$location;
+        return $this-&gt;backend-&gt;create( 'Content\\Location\\Trashed', $params, false );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function untrashLocation( $trashedId, $newParentId )
+    {
+        $trashedLocation = $this-&gt;load( $trashedId );
+        try
+        {
+            $newParent = $this-&gt;handler-&gt;locationHandler()-&gt;load( $newParentId );
+        }
+        catch ( NotFound $e )
+        {
+            throw new ParentNotFound( $trashedLocation-&gt;id, $newParentId, $e );
+        }
+
+        // Restore location under $newParent
+        $struct = new CreateStruct;
+        foreach ( $struct as $property =&gt; $value )
+        {
+            if ( isset( $trashedLocation-&gt;$property ) )
+            {
+                $struct-&gt;$property = $trashedLocation-&gt;$property;
+            }
+        }
+
+        $struct-&gt;parentId = $newParentId;
+        return $this-&gt;handler-&gt;locationHandler()-&gt;create( $struct )-&gt;id;
+    }
+
+    /**
+     * Limited implementation (no criterion/sort support).
+     * Will return all trashed locations, regardless criterion filter or sort clauses provided.
+     * Offset/Limit is however supported
+     *
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function listTrashed( Criterion $criterion = null, $offset = 0, $limit = null, array $sort = null )
+    {
+        return array_splice(
+            $this-&gt;backend-&gt;find( 'Content\\Location\\Trashed' ),
+            $offset,
+            $limit
+        );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function emptyTrash()
+    {
+        $trashedIds = array();
+        $contentIds = array();
+        foreach ( $this-&gt;backend-&gt;find( 'Content\\Location\\Trashed' ) as $trashed )
+        {
+            $trashedIds[] = $trashed-&gt;id;
+            $contentIds[] = $trashed-&gt;contentId;
+        }
+
+        if ( !empty( $trashedIds ) )
+        {
+            // Remove associated content for trashed locations
+            foreach ( $contentIds as $contentId )
+            {
+                $this-&gt;handler-&gt;contentHandler()-&gt;delete( $contentId );
+            }
+
+            // Remove trashed locations
+            $this-&gt;backend-&gt;deleteByMatch( 'Content\\Location\\Trashed', array( 'id' =&gt; $trashedIds ) );
+        }
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Trash\Handler
+     */
+    public function emptyOne( $trashedId )
+    {
+        $vo = $this-&gt;load( $trashedId );
+        $this-&gt;handler-&gt;contentHandler()-&gt;delete( $vo-&gt;contentId );
+        $this-&gt;backend-&gt;delete( 'Content\\Location\\Trashed', $trashedId );
+    }
+
+    /**
+     * Updates subtree modification time for all locations starting from $startPathString
+     * @param string $startPathString
+     */
+    private function updateSubtreeModificationTime( $startPathString )
+    {
+        $this-&gt;backend-&gt;updateByMatch(
+            'Content\\Location',
+            array( 'pathString' =&gt; $startPathString . '%' ),
+            array( 'modifiedSubLocation' =&gt; time() )
+        );
+    }
+
+    /**
+     * Returns parent path string for $pathString
+     * @param string $pathString
+     * @return string
+     */
+    private function getParentPathString( $pathString )
+    {
+        return substr( $pathString, 0, -2 );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

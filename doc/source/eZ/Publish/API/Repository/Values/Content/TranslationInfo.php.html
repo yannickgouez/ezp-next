@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+namespace eZ\Publish\API\Repository\Values\Content;
+
+use eZ\Publish\API\Repository\Values\ValueObject;
+
+use eZ\Publish\API\Repository\Values\Content\VersionInfo;
+
+/**
+ *
+ * 5.x this class is used for reading and writing translation informations into the repository
+ * @property-read ContentInfo $contentInfo returns $sourceVersionInfo-&gt;getContentInfo() 
+ *
+ */
+class TranslationInfo extends ValueObject
+{
+    /**
+     * the language code of the source language of the translation
+     *
+     * @var string
+     */
+    public $sourceLanguageCode;
+
+    /**
+     * the language code of the destination language of the translation
+     *
+     * @var string
+     */
+    public $destinationLanguageCode;
+
+    /**
+     * the source version this translation is based on
+     *
+     * @var VersionInfo
+     */
+    public $srcVersionInfo;
+
+    /**
+     * the destination version this translation is placed in
+     *
+     * @var VersionInfo
+     */
+    public $destinationVersionInfo;
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

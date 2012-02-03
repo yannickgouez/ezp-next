@@ -1,0 +1,116 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * in 5.x it is possible to add multiple translations in one version
+ * the information which versions and language are translated can be put into the repository
+ * via a translation info. This approach assumes that the actual translation process is done
+ * via a workflow engine. By storing the source version and source language it is possible
+ * to trigger new translation workflows if fields in the source language have changed.
+ */
+
+/**
+ * assumed as injected
+ * @var eZ\Publish\API\Repository\Repository $repository
+ */
+$repository = null;
+
+$contentService = $repository-&gt;getContentService();
+
+// load the source version info of a content object
+$versionInfo = $contentService-&gt;loadVersionInfoById( $contentId );
+
+// create a draft from the before published content
+$draft = $contentService-&gt;createDraftFromContent( $versionInfo-&gt;contentInfo, $versionInfo );
+
+/**
+ * Translate one language
+ */
+$translationInfo = $contentService-&gt;newTranslationInfo();
+$translationInfo-&gt;sourceLanguage = 'eng-US';
+$translationInfo-&gt;sourceVersion = $versionInfo;
+$translationInfo-&gt;destinationLanguage = 'ger-DE';
+$translationInfo-&gt;destinationVersion = $draft;
+
+$translation = $contentService-&gt;newTranslation();
+$translation-&gt;fields['title'] = 'Titel';
+// .....
+
+$draft = $contentService-&gt;translateVersion( $translationInfo, $translation );
+
+// publish the version
+$newPublishedVersion = $contentService-&gt;publishContent( $draft-&gt;versionInfo );
+
+
+/**
+ * Translate more than one language at once (low level)
+ */
+
+$contentUpdate = $contentService-&gt;newVersionUpdateStruct();
+$contentUpdate-&gt;fields['title']['ger-DE'] = 'Titel';
+// ...
+$contentUpdate-&gt;fields['title']['fra-FR'] = 'Titre';
+// ..
+
+$draft = $contentService-&gt;updateContent( $draft, $contentUpdate );
+
+$newPublishedVersion = $contentService-&gt;publishContent( $draft-&gt;versionInfo );
+
+$translationInfo = $contentService-&gt;newTranslationInfo();
+$translationInfo-&gt;sourceLanguage = 'eng-US';
+$translationInfo-&gt;sourceVersion = $versionInfo;
+$translationInfo-&gt;destinationLanguage = 'ger-DE';
+$translationInfo-&gt;destinationVersion = $newPublishedVersion;
+
+$contentService-&gt;addTranslationInfo( $translationInfo );
+
+$translationInfo = $contentService-&gt;newTranslationInfo();
+$translationInfo-&gt;sourceLanguage = 'eng-US';
+$translationInfo-&gt;sourceVersion = $versionInfo;
+$translationInfo-&gt;destinationLanguage = 'fra-FR';
+$translationInfo-&gt;destinationVersion = $newPublishedVersion;
+
+$contentService-&gt;addTranslationInfo( $translationInfo );
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

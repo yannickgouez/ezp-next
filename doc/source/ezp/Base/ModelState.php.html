@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing DomainObject interface
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base;
+
+/**
+ * Interface for domain objects
+ *
+ */
+interface ModelState
+{
+    /**
+     * Sets internal variables on object from array
+     *
+     * Key is property name and value is property value.
+     *
+     * @internal
+     * @param array $state
+     * @return \ezp\Base\ModelState
+     * @throws \ezp\Base\Exception\PropertyNotFound If one of the properties in $state is not found
+     */
+    public function setState( array $state );
+
+    /**
+     * Gets internal variables on object as array
+     *
+     * Key is property name and value is property value.
+     *
+     * @internal
+     * @param string|null $property Optional, lets you specify to only return one property by name
+     * @return array|mixed Array if $property is null, else value of property
+     * @throws \ezp\Base\Exception\PropertyNotFound If $property is not found (when not null)
+     */
+    public function getState( $property = null );
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

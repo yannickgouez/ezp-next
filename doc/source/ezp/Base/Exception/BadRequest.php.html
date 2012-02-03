@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Contains Bad Request Exception implementation
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Base\Exception;
+use Exception as PHPException;
+
+/**
+ * Bad Request Exception implementation
+ *
+ * 10.4.1 400 Bad Request
+ *
+ * The request could not be understood by the server due to malformed syntax. The client SHOULD NOT repeat the request
+ * without modifications.
+ *
+ * Use:
+ *   throw new BadRequest( 'Oauth Token', 'http header' );
+ *
+ */
+class BadRequest extends Http
+{
+    /**
+     * Generates: Bad request, missing {$missing} in {$from}
+     *
+     * @param string $missing
+     * @param string $from
+     * @param \Exception|null $previous
+     */
+    public function __construct( $missing, $from, PHPException $previous = null )
+    {
+        parent::__construct( &quot;Bad request, missing {$missing} in {$from}&quot;, self::BAD_REQUEST, $previous );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * @package eZ\Publish\API\Repository\Values
+ */
+namespace eZ\Publish\API\Repository\Values;
+use ezp\Base\Exception\PropertyNotFound,
+    ezp\Base\Exception\PropertyPermission;// @todo rename to PropertyReadOnly?
+
+/**
+ * The base class for all value objects and structs
+ *
+ * Supports readonly properties by marking them as protected.
+ * In this case they will only be writable using constructor, and need to be documented
+ * using @property-read &lt;type&gt; &lt;$var&gt; in class doc in addition to inline property doc.
+ * Writable properties must be public and must be documented inline.
+ *
+ * @package eZ\Publish\API\Repository\Values
+ */
+abstract class ValueObject
+{
+    /**
+     * Construct object optionally with a set of properties
+     *
+     * Readonly properties values must be set using $properties as they are not writable anymore
+     * after object has been created.
+     *
+     * @param array $properties
+     */
+    public function __construct( array $properties = array() )
+    {
+        foreach ( $properties as $property =&gt; $value )
+        {
+            $this-&gt;$property = $value;
+        }
+    }
+
+    /**
+     * Magic set function handling writes to non public properties
+     *
+     * Throws PropertyNotFound exception on all writes to undefined properties so typos are not silently accepted and
+     * throws PropertyPermission exception on readonly (protected) properties.
+     *
+     * @param string $property Name of the property
+     * @param string $value
+     *
+     * @return void
+     *
+     * @throws PropertyNotFound When property does not exist
+     * @throws PropertyPermission When property is readonly (protected)
+     */
+    public function __set( $property, $value )
+    {
+        if ( property_exists( $this, $property ) )
+        {
+            throw new PropertyPermission( $property, PropertyPermission::READ, get_class( $this ) );
+        }
+        throw new PropertyNotFound( $property, get_class( $this ) );
+    }
+
+    /**
+     * Magic get function handling read to non public properties
+     *
+     * Returns value for all readonly (protected) properties.
+     * Throws PropertyNotFound exception on all reads to undefined properties so typos are not silently accepted.
+     *
+     * @param string $property Name of the property
+     *
+     * @return mixed
+     *
+     * @throws PropertyNotFound When property does not exist
+     */
+    public function __get( $property )
+    {
+        if ( property_exists( $this, $property ) )
+        {
+            return $this-&gt;$property;
+        }
+        throw new PropertyNotFound( $property, get_class( $this ) );
+    }
+
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

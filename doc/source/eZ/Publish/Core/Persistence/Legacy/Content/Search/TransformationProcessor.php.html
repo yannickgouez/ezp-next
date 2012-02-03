@@ -1,0 +1,152 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the TransformationProcessor class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search;
+use eZ\Publish\SPI\Persistence\Fields\Storage;
+
+/**
+ * Class for processing a set of transformations on a string
+ */
+class TransformationProcessor
+{
+    /**
+     * Transformation parser
+     *
+     * @var TransformationParser
+     */
+    protected $parser = null;
+
+    /**
+     * Transformation compiler
+     *
+     * @var TransformationPcreCompiler
+     */
+    protected $compiler = null;
+
+    /**
+     * Parsed rules
+     *
+     * @var array
+     */
+    protected $rules = array();
+
+    /**
+     * Compiled rules, which can directly be applied to the input strings
+     *
+     * @var array
+     */
+    protected $compiledRules = null;
+
+    /**
+     * Construct
+     *
+     * @return void
+     */
+    public function __construct( TransformationParser $parser, TransformationPcreCompiler $compiler )
+    {
+        $this-&gt;parser = $parser;
+        $this-&gt;compiler = $compiler;
+    }
+
+    /**
+     * Load rules from the given file
+     *
+     * @param string $file
+     * @return void
+     */
+    public function loadRules( $file )
+    {
+        $this-&gt;rules = array_merge(
+            $this-&gt;rules,
+            $this-&gt;parser-&gt;parse( $file )
+        );
+        $this-&gt;compiledRules = null;
+    }
+
+    /**
+     * Transform the given string
+     *
+     * Transform the given string using the given rules. If no rules are
+     * specified, all available rules will be used for the transformation.
+     *
+     * @param string $string
+     * @param array $ruleNames
+     * @return string
+     */
+    public function transform( $string, array $ruleNames = null )
+    {
+        if ( $this-&gt;compiledRules === null )
+        {
+            $this-&gt;compiledRules = $this-&gt;compiler-&gt;compile( $this-&gt;rules );
+        }
+
+        $ruleNames = $ruleNames ?: array_keys( $this-&gt;compiledRules );
+
+        foreach ( $ruleNames as $ruleName )
+        {
+            foreach ( $this-&gt;compiledRules[$ruleName] as $rule )
+            {
+                $string = preg_replace_callback(
+                    $rule['regexp'],
+                    $rule['callback'],
+                    $string
+                );
+            }
+        }
+
+        return $string;
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

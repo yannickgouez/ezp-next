@@ -1,0 +1,181 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Validator base class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType;
+use ezp\Base\Exception\PropertyNotFound,
+    ezp\Content\FieldType\Value;
+
+/**
+ * Base field type validator validator.
+ */
+abstract class Validator
+{
+    protected $errors = array();
+
+    /**
+     * Hash of constraints handled by the validator.
+     * Key is the constraint name, value is the default value.
+     * If no default value is needed, just set to false.
+     *
+     * Example:
+     * &lt;code&gt;
+     * // With no default value
+     * protected $constraints = array(
+     *     &quot;maxStringLength&quot; =&gt; false
+     * );
+     *
+     * // With a default value
+     * protected $constraints = array(
+     *     &quot;minIntegerValue&quot; =&gt; 0,
+     *     &quot;maxIntegerValue&quot; =&gt; 40
+     * );
+     * &lt;/code&gt;
+     *
+     * @var array
+     */
+    protected $constraints = array();
+
+    /**
+     * Perform validation on $value.
+     *
+     * Will return true when all constraints are matched. If one or more
+     * constraints fail, the method will return false.
+     *
+     * When a check against a constraint has failed, an entry will be added to the
+     * $errors array.
+     *
+     * @abstract
+     * @param \ezp\Content\FieldType\Value $value
+     * @return bool
+     */
+    abstract public function validate( Value $value );
+
+    /**
+     * Return array of messages on performed validations.
+     *
+     * When no validation errors occured, the returned array should be empty.
+     *
+     * @return array
+     */
+    public function getMessage()
+    {
+        return $this-&gt;errors;
+    }
+
+    /**
+     * Combines configurable constraints in the validator and creates a map.
+     *
+     * This map is then supposed to be used inside a FieldDefinition.
+     *
+     * @internal
+     * @return array
+     */
+    public function getValidatorConstraints()
+    {
+        return $this-&gt;constraints;
+    }
+
+    /**
+     * Initialized an instance of Validator, with earlier configured constraints.
+     *
+     * @internal
+     * @throws \ezp\Base\Exception\PropertyNotFound
+     * @param array $constraints
+     * @return void
+     */
+    public final function initializeWithConstraints( array $constraints )
+    {
+        foreach ( $constraints as $constraint =&gt; $value )
+        {
+            if ( !isset( $this-&gt;constraints[$constraint] ) )
+            {
+                throw new PropertyNotFound( &quot;The constraint, {$constraint}, is not valid for this validator.&quot; );
+            }
+
+            $this-&gt;constraints[$constraint] = $value;
+        }
+    }
+
+    /**
+     * Magic getter.
+     * Returns constraint value, from its $name
+     *
+     * @param string $name
+     * @return mixed
+     * @throws \ezp\Base\Exception\PropertyNotFound
+     */
+    public function __get( $name )
+    {
+        if ( !isset( $this-&gt;constraints[$name] ) )
+            throw new PropertyNotFound( &quot;The constraint, {$name}, is not valid for this validator.&quot; );
+
+        return $this-&gt;constraints[$name];
+    }
+
+    /**
+     * Magic setter.
+     * Sets $value to constraint, identified by $name
+     *
+     * @param string $name
+     * @param mixed $value
+     * @throws \ezp\Base\Exception\PropertyNotFound
+     */
+    public function __set( $name, $value )
+    {
+        if ( !isset( $this-&gt;constraints[$name] ) )
+            throw new PropertyNotFound( &quot;The constraint, {$name}, is not valid for this validator.&quot; );
+
+        $this-&gt;constraints[$name] = $value;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

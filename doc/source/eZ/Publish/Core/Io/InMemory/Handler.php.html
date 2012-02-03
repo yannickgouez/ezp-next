@@ -1,0 +1,261 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the eZ\Publish\SPI\Io\Handler interface
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Io\InMemory;
+
+use eZ\Publish\SPI\Io\Handler as IoHandlerInterface,
+    eZ\Publish\SPI\Io\BinaryFile,
+    eZ\Publish\SPI\Io\BinaryFileUpdateStruct,
+    eZ\Publish\SPI\Io\BinaryFileCreateStruct,
+    ezp\Base\Exception\NotFound,
+    ezp\Io\Exception\PathExists,
+    DateTime;
+
+/**
+ * Backend interface for handling of binary files I/O
+ */
+
+class Handler implements IoHandlerInterface
+{
+    /**
+     * Files storage
+     * @var array
+     */
+    private $storage;
+
+    /**
+     * Actual file data
+     * @var array(filepath=&gt;binaryData)
+     */
+    private $data;
+
+    /**
+     * File data resources (handles)
+     * @var resource[]
+     */
+    private $resources = array();
+
+    public function __construct()
+    {
+        $this-&gt;storage = array();
+    }
+
+    /**
+     * Creates and stores a new BinaryFile based on the BinaryFileCreateStruct $file
+     *
+     * @param \eZ\Publish\SPI\Io\BinaryFileCreateStruct $file
+     * @return \eZ\Publish\SPI\Io\BinaryFile The newly created BinaryFile object
+     *
+     * @throws \ezp\Base\Exception\PathExists If the target path already exists
+     */
+    public function create( BinaryFileCreateStruct $file )
+    {
+        if ( isset( $this-&gt;storage[$file-&gt;path] ) )
+        {
+            throw new PathExists( $file-&gt;path );
+        }
+
+        $this-&gt;data[$file-&gt;path] = base64_encode( fread( $file-&gt;getInputStream(), $file-&gt;size ) );
+
+        $binaryFile = new BinaryFile();
+        $binaryFile-&gt;path = $file-&gt;path;
+        $binaryFile-&gt;contentType = $file-&gt;contentType;
+        $binaryFile-&gt;ctime = new DateTime;
+        $binaryFile-&gt;mtime = clone $binaryFile-&gt;ctime;
+        $binaryFile-&gt;originalFile = $file-&gt;originalFile;
+        $binaryFile-&gt;size = $file-&gt;size;
+        $this-&gt;storage[$binaryFile-&gt;path] = $binaryFile;
+
+        return $this-&gt;storage[$binaryFile-&gt;path];
+    }
+
+    /**
+     * Deletes the existing BinaryFile with path $path
+     *
+     * @param string $path
+     * @throws \ezp\Base\Exception\NotFound If the file doesn't exist
+     */
+    public function delete( $path )
+    {
+        if ( !isset( $this-&gt;storage[$path] ) )
+        {
+            throw new NotFound( 'BinaryFile', $path );
+        }
+
+        unset( $this-&gt;storage[$path] );
+        unset( $this-&gt;data[$path] );
+    }
+
+    /**
+     * Updates the file identified by $path with data from $updateFile
+     *
+     * @param string $path
+     * @param \eZ\Publish\SPI\Io\BinaryFileUpdateStruct $updateFile
+     * @return \eZ\Publish\SPI\Io\BinaryFile The updated BinaryFile
+     *
+     * @throws \ezp\Base\Exception\NotFound If the source path doesn't exist
+     * @throws \ezp\Base\Exception\PathExists If the target path already exists
+     */
+    public function update( $path, BinaryFileUpdateStruct $updateFile )
+    {
+        if ( !isset( $this-&gt;storage[$path] ) )
+        {
+            throw new NotFound( 'BinaryFile', $path );
+        }
+
+        // path
+        if ( $updateFile-&gt;path !== null &amp;&amp; $updateFile-&gt;path != $path )
+        {
+            if ( isset( $this-&gt;storage[$updateFile-&gt;path] ) )
+            {
+                throw new PathExists( $updateFile-&gt;path );
+            }
+
+            $oldPath = $path;
+            $newPath = $updateFile-&gt;path;
+
+            $this-&gt;storage[$newPath] = $this-&gt;storage[$oldPath];
+            $this-&gt;data[$newPath] = $this-&gt;data[$oldPath];
+
+            $this-&gt;storage[$newPath]-&gt;path = $newPath;
+
+            unset( $this-&gt;storage[$oldPath] );
+            unset( $this-&gt;data[$oldPath] );
+
+            $path = $newPath;
+        }
+
+        $resource = $updateFile-&gt;getInputStream();
+        if ( $resource !== null )
+        {
+            $this-&gt;data[$path] = base64_encode( fread( $resource, $updateFile-&gt;size ) );
+            if ( $updateFile-&gt;size !== null )
+            {
+                $this-&gt;storage[$path]-&gt;size = $updateFile-&gt;size;
+            }
+        }
+
+        if ( $updateFile-&gt;mtime !== null &amp;&amp; $updateFile-&gt;mtime !== $this-&gt;storage[$path]-&gt;mtime )
+        {
+            $this-&gt;storage[$path]-&gt;mtime = $updateFile-&gt;mtime;
+        }
+
+        if ( $updateFile-&gt;ctime !== null &amp;&amp; $updateFile-&gt;ctime !== $this-&gt;storage[$path]-&gt;ctime )
+        {
+            $this-&gt;storage[$path]-&gt;ctime = $updateFile-&gt;ctime;
+        }
+
+        return $this-&gt;storage[$path];
+    }
+
+    /**
+     * Checks if the BinaryFile with path $path exists
+     *
+     * @param string $path
+     * @return bool
+     */
+    public function exists( $path )
+    {
+        return isset( $this-&gt;storage[$path] );
+    }
+
+    /**
+     * Loads the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return \eZ\Publish\SPI\Io\BinaryFile
+     * @throws \ezp\Base\Exception\NotFound If no file identified by $path exists
+     */
+    public function load( $path )
+    {
+        if ( !isset( $this-&gt;storage[$path] ) )
+        {
+            throw new NotFound( 'BinaryFile', $path );
+        }
+        return $this-&gt;storage[$path];
+    }
+
+    /**
+     * Returns a file resource to the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return resource
+     * @throws \ezp\Base\Exception\NotFound If no file identified by $path exists
+     */
+    public function getFileResource( $path )
+    {
+        if ( !isset( $this-&gt;storage[$path] ) )
+        {
+            throw new NotFound( 'BinaryFile', $path );
+        }
+        $uri = 'data://' . (string)$this-&gt;storage[$path]-&gt;contentType . ';base64,' . $this-&gt;data[$path];
+
+        return fopen( $uri, 'rb' );
+    }
+
+    /**
+     * Returns the contents of the BinaryFile identified by $path
+     *
+     * @param string $path
+     * @return string
+     * @throws \ezp\Base\Exception\NotFound if the file couldn't be found
+     */
+    public function getFileContents( $path )
+    {
+        if ( !isset( $this-&gt;storage[$path] ) )
+        {
+            throw new NotFound( 'BinaryFile', $path );
+        }
+        return base64_decode( $this-&gt;data[$path] );
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

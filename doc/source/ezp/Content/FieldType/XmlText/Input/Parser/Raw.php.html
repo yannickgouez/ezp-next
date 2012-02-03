@@ -1,0 +1,1113 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the ezp\Content\FieldType\XmlText\Input\Parser\Simplified class.
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\XmlText\Input\Parser;
+
+use ezp\Content\FieldType\XmlText\Input\Parser as InputParser,
+    ezp\Content\FieldType\XmlText\Input\Parser\Base as BaseParser,
+    ezp\Base\Configuration,
+    ezp\Content\Location,
+    DOMElement, DOMDocument;
+
+/**
+ * Raw XmlText input parser.
+ *
+ * Accepts native XmlText, as it doesn't perform any tag conversion.
+ * Other parsers are available for this purpose (Simplified and OnlineEditor).
+ */
+class Raw extends BaseParser implements InputParser
+{
+    protected $OutputTags = array(
+        'section'   =&gt; array(),
+
+        'embed'     =&gt; array( //'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler' =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerEmbed',
+                              'attributes' =&gt; array( 'id' =&gt; 'xhtml:id' ),
+                              'requiredInputAttributes' =&gt; array( 'href' ) ),
+
+        'embed-inline'     =&gt; array( //'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler' =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerEmbed',
+                              'attributes' =&gt; array( 'id' =&gt; 'xhtml:id' ),
+                              'requiredInputAttributes' =&gt; array( 'href' ) ),
+
+        'object'    =&gt; array( //'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler' =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerObject',
+                              'attributes' =&gt; array( 'href' =&gt; 'image:ezurl_href',
+                                                     'target' =&gt; 'image:ezurl_target',
+                                                     'ezurl_href' =&gt; 'image:ezurl_href',
+                                                     'ezurl_id' =&gt; 'image:ezurl_id',
+                                                     'ezurl_target' =&gt; 'image:ezurl_target' ),
+                              'requiredInputAttributes' =&gt; array( 'id' ) ),
+
+        'table'     =&gt; array( 'structHandler' =&gt; 'appendParagraph' ),
+
+        'tr'        =&gt; array(),
+
+        'td'        =&gt; array( 'attributes' =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                     'colspan' =&gt; 'xhtml:colspan',
+                                                     'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'th'        =&gt; array( 'attributes' =&gt; array( 'width' =&gt; 'xhtml:width',
+                                                     'colspan' =&gt; 'xhtml:colspan',
+                                                     'rowspan' =&gt; 'xhtml:rowspan' ) ),
+
+        'ol'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'ul'        =&gt; array( 'structHandler' =&gt; 'structHandlerLists' ),
+
+        'li'        =&gt; array( 'autoCloseOn' =&gt; array( 'li' ) ),
+
+        'header'    =&gt; array( 'autoCloseOn' =&gt; array( 'paragraph' ),
+                              'structHandler' =&gt; 'structHandlerHeader' ),
+
+        'paragraph' =&gt; array( 'autoCloseOn' =&gt; array( 'paragraph' ),
+                              'publishHandler' =&gt; 'publishHandlerParagraph' ),
+
+        'line'      =&gt; array(),
+
+        'br'        =&gt; array( 'parsingHandler' =&gt; 'breakInlineFlow',
+                              'structHandler' =&gt; 'structHandlerBr',
+                              'attributes' =&gt; false ),
+
+        'literal'   =&gt; array( 'parsingHandler' =&gt; 'parsingHandlerLiteral',
+                              'structHandler' =&gt; 'appendParagraph' ),
+
+        'strong'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'emphasize' =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'link'      =&gt; array( 'structHandler' =&gt; 'appendLineParagraph',
+                              'publishHandler' =&gt; 'publishHandlerLink',
+                              'attributes' =&gt; array( 'title' =&gt; 'xhtml:title',
+                                                     'id' =&gt; 'xhtml:id' ),
+                              'requiredInputAttributes' =&gt; array( 'href' ) ),
+
+        'anchor'    =&gt; array( 'structHandler' =&gt; 'appendLineParagraph' ),
+
+        'custom'    =&gt; array( 'structHandler' =&gt; 'structHandlerCustom',
+                              'publishHandler' =&gt; 'publishHandlerCustom',
+                              'requiredInputAttributes' =&gt; array( 'name' ) ),
+
+        '#text'     =&gt; array( 'structHandler' =&gt; 'structHandlerText' )
+    );
+
+    public function process( $xmlString, $createRootNode = true  )
+    {
+        $xmlString = $this-&gt;processXmlHeader( $xmlString );
+        if ( $xmlString === false )
+        {
+            return false;
+        }
+
+        $xmlString = $this-&gt;processRootSection( $xmlString );
+        if ( $xmlString === false )
+        {
+            return false;
+        }
+
+        return parent::process( $xmlString, $createRootNode );
+    }
+
+    /**
+     * Checks $xmlString for the root section + namespaces, and removes it afterwards
+     *
+     * @param mixed $xmlString
+     * @return string $xmlString without the root section
+     */
+    protected function processRootSection( $xmlString)
+    {
+        $sectionOpenStartPos = strpos( $xmlString, '&lt;section' );
+        if ( $sectionOpenStartPos === false )
+        {
+            $this-&gt;handleError( self::ERROR_SYNTAX, 'Incorrect/missing root &amp;lt;section&amp;gt; opening tag' );
+            return false;
+        }
+
+        // inline closing (empty XML) ?
+        $hasInlineSectionTag = false;
+        $sectionCloseStartPos = strrpos( $xmlString, '&lt;/section&gt;' );
+        if ( $sectionCloseStartPos === false )
+        {
+            $pos = strpos( $xmlString, '/&gt;' );
+            if ( $pos === false )
+            {
+                $this-&gt;handleError( self::ERROR_SYNTAX, 'Incorrect/missing root &amp;lt;section&amp;gt; closing tag' );
+                return false;
+            }
+            else
+            {
+                $hasInlineSectionTag = true;
+                $sectionOpenEndPos = $pos;
+            }
+            unset( $pos );
+        }
+        if ( !$hasInlineSectionTag )
+        {
+            $sectionOpenEndPos = strpos( $xmlString, '&gt;' );
+            if ( $sectionOpenEndPos === false )
+            {
+                $this-&gt;handleError( self::ERROR_SYNTAX, 'Incorrect/missing root &amp;lt;section&amp;gt; opening tag' );
+                return false;
+            }
+        }
+
+        $sectionTagString = substr( $xmlString, $sectionOpenStartPos + 9, $sectionOpenEndPos - 9 );
+        $namespaces = array( 'image' =&gt; false, 'xhtml' =&gt; false, 'custom' =&gt; false );
+        foreach ( explode( ' ', $sectionTagString ) as $tagPart )
+        {
+            if ( strpos( $tagPart, '=' ) === false )
+            {
+                continue;
+            }
+
+            $tagPartArray = explode( ':', $tagPart, 2 );
+            if ( $tagPartArray[0] !== 'xmlns' )
+            {
+                continue;
+            }
+
+            $tagPartArray = explode( '=', $tagPartArray[1] );
+            if ( count( $tagPartArray ) !== 2 )
+            {
+                $this-&gt;handleError( self::ERROR_SYNTAX,
+                    'Missing namespaces in initial section declaration (' . implode( ',', array_keys( $namespaces ) ) . ')' );
+                return false;
+            }
+
+            $nsUri = str_replace( '&quot;', '', trim( $tagPartArray[1] ) );
+            $nsName = $tagPartArray[0];
+            if ( isset( $namespaces[$nsName] ) &amp;&amp; $nsUri === $this-&gt;Namespaces[$nsName] )
+            {
+                unset( $namespaces[$nsName] );
+            }
+        }
+        if ( count( $namespaces ) &gt; 0 )
+        {
+            $this-&gt;handleError( self::ERROR_SYNTAX,
+                'Missing namespaces in initial section declaration (' . implode( ',', array_keys( $namespaces ) ) . ')' );
+            return false;
+        }
+
+        if ( $hasInlineSectionTag )
+        {
+            $xmlString = substr( $xmlString, $sectionOpenEndPos + 1 );
+        }
+        else
+        {
+            $xmlString = substr( $xmlString, $sectionOpenEndPos + 1, $sectionCloseStartPos - $sectionOpenEndPos - 1 );
+        }
+        return $xmlString;
+    }
+
+    /**
+     * Checks the &lt;? xml header in $xmlstring, and removes it
+     * @param string $xmlString
+     * return string $xmlString with the tag removed
+     */
+    protected function processXmlHeader( $xmlString )
+    {
+        // check &amp; remove xml charset / version declaration
+        if ( strpos( $xmlString, '&lt;?xml' ) === false )
+        {
+            $this-&gt;handleError( self::ERROR_SYNTAX, 'Missing XML version + encoding declaration' );
+            return false;
+        }
+        $xmlString = substr( $xmlString, strpos( $xmlString, '?&gt;' ) + 3 );
+
+        return $xmlString;
+    }
+
+    /*
+       Parsing Handlers (called at pass 1)
+    */
+    protected function parsingHandlerLiteral( $element, &amp;$param )
+    {
+        $ret = null;
+        $data = $param[0];
+        $pos =&amp; $param[1];
+
+        $tablePos = strpos( $data, '&lt;/literal&gt;', $pos );
+        if ( $tablePos === false )
+        {
+            $tablePos = strpos( $data, '&lt;/LITERAL&gt;', $pos );
+        }
+
+        if ( $tablePos === false )
+        {
+            return $ret;
+        }
+
+        $text = substr( $data, $pos, $tablePos - $pos );
+
+        $textNode = $this-&gt;Document-&gt;createTextNode( $text );
+        $element-&gt;appendChild( $textNode );
+
+        $pos = $tablePos + strlen( '&lt;/literal&gt;' );
+        $ret = false;
+
+        return $ret;
+    }
+
+    protected function breakInlineFlow( $element, $param )
+    {
+        // Breaks the flow of inline tags. Used for non-inline tags caught within inline.
+        // Works for tags with no children only.
+        $ret = null;
+        $data =&amp; $param[0];
+        $pos =&amp; $param[1];
+        $tagBeginPos = $param[2];
+        $parent = $element-&gt;parentNode;
+
+        $wholeTagString = substr( $data, $tagBeginPos, $pos - $tagBeginPos );
+
+        if ( $parent &amp;&amp;
+            $this-&gt;XMLSchema-&gt;isInline( $parent ) )
+        {
+            $insertData = '';
+            $currentParent = $parent;
+            // Close all parent tags
+            end( $this-&gt;ParentStack );
+            do
+            {
+                $stackData = current( $this-&gt;ParentStack );
+                $currentParentName = $stackData[0];
+                $insertData .= &quot;&lt;/$currentParentName&gt;&quot;;
+                $currentParent-&gt;setAttributeNS( 'http://ez.no/namespaces/ezpublish3/temporary/', 'tmp:new-element', 'true' );
+                $currentParent = $currentParent-&gt;parentNode;
+                prev( $this-&gt;ParentStack );
+            }
+            while ( $this-&gt;XMLSchema-&gt;isInline( $currentParent ) );
+
+            $insertData .= $wholeTagString;
+
+            $currentParent = $parent;
+            end( $this-&gt;ParentStack );
+            $appendData = '';
+            do
+            {
+                $stackData = current( $this-&gt;ParentStack );
+                $currentParentName = $stackData[0];
+                $currentParentAttrString = '';
+                if ( $stackData[2] )
+                {
+                    $currentParentAttrString = ' ' . $stackData[2];
+                }
+                $currentParentAttrString .= &quot; tmp:new-element='true'&quot;;
+                $appendData = &quot;&lt;$currentParentName$currentParentAttrString&gt;&quot; . $appendData;
+                $currentParent = $currentParent-&gt;parentNode;
+                prev( $this-&gt;ParentStack );
+            }
+            while ( $this-&gt;XMLSchema-&gt;isInline( $currentParent ) );
+
+            $insertData .= $appendData;
+
+            $data = $insertData . substr( $data, $pos );
+            $pos = 0;
+            $element = $parent-&gt;removeChild( $element );
+            $ret = false;
+        }
+
+        return $ret;
+    }
+
+    /*
+       Structure handlers. (called at pass 2)
+    */
+    // Structure handler for inline nodes.
+    protected function appendLineParagraph( $element, $newParent )
+    {
+        // eZDebugSetting::writeDebug( 'kernel-datatype-ezxmltext', $newParent, 'eZSimplifiedXMLInputParser::appendLineParagraph new parent' );
+        $ret = array();
+        $parent = $element-&gt;parentNode;
+        if ( !$parent instanceof DOMElement )
+        {
+            return $ret;
+        }
+
+        $parentName = $parent-&gt;nodeName;
+        $newParentName = $newParent != null ? $newParent-&gt;nodeName : '';
+
+        // Correct structure by adding &lt;line&gt; and &lt;paragraph&gt; tags.
+        if ( $parentName == 'line' || $this-&gt;XMLSchema-&gt;isInline( $parent ) )
+        {
+            return $ret;
+        }
+
+        if ( $newParentName == 'line' )
+        {
+            $element = $parent-&gt;removeChild( $element );
+            $newParent-&gt;appendChild( $element );
+            $newLine = $newParent;
+            $ret['result'] = $newParent;
+        }
+        elseif ( $parentName == 'paragraph' )
+        {
+            $newLine = $this-&gt;createAndPublishElement( 'line', $ret );
+            $element = $parent-&gt;replaceChild( $newLine, $element );
+            $newLine-&gt;appendChild( $element );
+            $ret['result'] = $newLine;
+        }
+        elseif ( $newParentName == 'paragraph' )
+        {
+            $newLine = $this-&gt;createAndPublishElement( 'line', $ret );
+            $element = $parent-&gt;removeChild( $element );
+            $newParent-&gt;appendChild( $newLine );
+            $newLine-&gt;appendChild( $element );
+            $ret['result'] = $newLine;
+        }
+        elseif ( $this-&gt;XMLSchema-&gt;check( $parent, 'paragraph' ) )
+        {
+            $newLine = $this-&gt;createAndPublishElement( 'line', $ret );
+            $newPara = $this-&gt;createAndPublishElement( 'paragraph', $ret );
+            $element = $parent-&gt;replaceChild( $newPara, $element );
+            $newPara-&gt;appendChild( $newLine );
+            $newLine-&gt;appendChild( $element );
+            $ret['result'] = $newLine;
+        }
+
+        return $ret;
+    }
+
+    // Structure handler for temporary &lt;br&gt; elements
+    protected function structHandlerBr( $element, $newParent )
+    {
+        $ret = array();
+        $ret['result'] = $newParent;
+        $parent = $element-&gt;parentNode;
+
+        $next = $element-&gt;nextSibling;
+
+        if ( $element-&gt;getAttribute( 'ignore' ) != 'true' &amp;&amp;
+            $next &amp;&amp;
+            $next-&gt;nodeName == 'br' )
+        {
+            if ( $this-&gt;XMLSchema-&gt;check( $parent, 'paragraph' ) )
+            {
+                if ( !$newParent )
+                {
+                    // create paragraph in case of the first empty paragraph
+                    $newPara = $this-&gt;createAndPublishElement( 'paragraph', $ret );
+                    $parent-&gt;replaceChild( $newPara, $element );
+                }
+                elseif ( $newParent-&gt;nodeName == 'paragraph' ||
+                    $newParent-&gt;nodeName == 'line' )
+                {
+                    // break paragraph or line flow
+                    unset( $ret );
+                    $ret = array();
+
+                    // Do not process next &lt;br&gt; tag
+                    $next-&gt;setAttribute( 'ignore', 'true' );
+
+                    // create paragraph in case of the last empty paragraph (not inside section)
+                    $nextToNext = $next-&gt;nextSibling;
+                    $tmp = $parent;
+                    while ( !$nextToNext &amp;&amp; $tmp &amp;&amp; $tmp-&gt;nodeName == 'section' )
+                    {
+                        $nextToNext = $tmp-&gt;nextSibling;
+                        $tmp = $tmp-&gt;parentNode;
+                    }
+                    if ( !$nextToNext )
+                    {
+                        $newPara = $this-&gt;createAndPublishElement( 'paragraph', $ret );
+                        $parent-&gt;replaceChild( $newPara, $element );
+                    }
+                }
+            }
+        }
+        else
+        {
+            if ( $newParent &amp;&amp; $newParent-&gt;nodeName == 'line' )
+            {
+                $ret['result'] = $newParent-&gt;parentNode;
+            }
+        }
+
+        // Trim spaces used for tag indenting
+        if ( $next &amp;&amp; $next-&gt;nodeType == XML_TEXT_NODE &amp;&amp; !trim( $next-&gt;textContent ) )
+        {
+            $nextToNext = $next-&gt;nextSibling;
+            if ( !$nextToNext || $nextToNext-&gt;nodeName != 'br' )
+            {
+                $next = $parent-&gt;removeChild( $next );
+            }
+        }
+        return $ret;
+    }
+
+    // Structure handler for in-paragraph nodes.
+    protected function appendParagraph( $element, &amp;$newParent )
+    {
+        $ret = array();
+        $parent = $element-&gt;parentNode;
+        if ( !$parent )
+        {
+            return $ret;
+        }
+
+        $parentName = $parent-&gt;nodeName;
+
+        if ( $parentName != 'paragraph' )
+        {
+            if ( $newParent &amp;&amp; $newParent-&gt;nodeName == 'paragraph' )
+            {
+                $element = $parent-&gt;removeChild( $element );
+                $newParent-&gt;appendChild( $element );
+                $ret['result'] = $newParent;
+            }
+            elseif ( $newParent &amp;&amp; $newParent-&gt;parentNode &amp;&amp; $newParent-&gt;parentNode-&gt;nodeName == 'paragraph' )
+            {
+                $para = $newParent-&gt;parentNode;
+                $element = $parent-&gt;removeChild( $element );
+                $para-&gt;appendChild( $element );
+                $ret['result'] = $newParent-&gt;parentNode;
+            }
+            elseif ( $this-&gt;XMLSchema-&gt;check( $parentName, 'paragraph' ) )
+            {
+                $newPara = $this-&gt;createAndPublishElement( 'paragraph', $ret );
+                $parent-&gt;replaceChild( $newPara, $element );
+                $newPara-&gt;appendChild( $element );
+                $ret['result'] = $newPara;
+            }
+        }
+        return $ret;
+    }
+
+    // Structure handler for 'header' tag.
+    protected function structHandlerHeader( $element, &amp;$param )
+    {
+        $ret = null;
+        $parent = $element-&gt;parentNode;
+        $level = $element-&gt;getAttribute( 'level' );
+        if ( $level &lt; 1 )
+        {
+            $level = 1;
+        }
+
+        $element-&gt;removeAttribute( 'level' );
+        if ( $level )
+        {
+            $sectionLevel = -1;
+            $current = $element;
+            while ( $current-&gt;parentNode )
+            {
+                $current = $current-&gt;parentNode;
+                if ( $current-&gt;nodeName == 'section' )
+                {
+                    $sectionLevel++;
+                }
+                else
+                {
+                    if ( $current-&gt;nodeName == 'td' )
+                    {
+                        $sectionLevel++;
+                        break;
+                    }
+                }
+            }
+            if ( $level &gt; $sectionLevel )
+            {
+                if ( $this-&gt;getOption( self::OPT_STRICT_HEADERS ) &amp;&amp;
+                    $level - $sectionLevel &gt; 1 )
+                {
+                    $this-&gt;handleError( eZXMLInputParser::ERROR_SCHEMA, &quot;Incorrect headers nesting&quot; );
+                }
+
+                $newParent = $parent;
+                for ( $i = $sectionLevel; $i &lt; $level; $i++ )
+                {
+                    $newSection = $this-&gt;Document-&gt;createElement( 'section' );
+                    if ( $i == $sectionLevel )
+                    {
+                        $newSection = $newParent-&gt;insertBefore( $newSection, $element );
+                    }
+                    else
+                    {
+                        $newParent-&gt;appendChild( $newSection );
+                    }
+
+                    $newParent = $newSection;
+                    unset( $newSection );
+                }
+                $elementToMove = $element;
+                while ( $elementToMove &amp;&amp;
+                    $elementToMove-&gt;nodeName != 'section' )
+                {
+                    $next = $elementToMove-&gt;nextSibling;
+                    $elementToMove = $parent-&gt;removeChild( $elementToMove );
+                    $newParent-&gt;appendChild( $elementToMove );
+                    $elementToMove = $next;
+
+                    if ( $elementToMove &amp;&amp; $elementToMove-&gt;nodeName == 'header' )
+                    {
+                        // in the case of non-strict headers
+                        $headerLevel = $elementToMove-&gt;getAttribute( 'level' );
+                        if ( $level - $sectionLevel &gt; 1 )
+                        {
+                            if ( $headerLevel == $level )
+                            {
+                                $newParent2 = $this-&gt;Document-&gt;createElement( 'section' );
+                                $newParent-&gt;parentNode-&gt;appendChild( $newParent2 );
+                                $newParent = $newParent2;
+                            }
+                            elseif ( $headerLevel &lt; $level )
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if ( $headerLevel &lt;= $level )
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            elseif ( $level &lt; $sectionLevel )
+            {
+                $newLevel = $sectionLevel + 1;
+                $current = $element;
+                while ( $level &lt; $newLevel )
+                {
+                    $current = $current-&gt;parentNode;
+                    if ( $current-&gt;nodeName == 'section' )
+                    {
+                        $newLevel--;
+                    }
+                }
+                $elementToMove = $element;
+                while ( $elementToMove &amp;&amp;
+                    $elementToMove-&gt;nodeName != 'section' )
+                {
+                    $next = $elementToMove-&gt;nextSibling;
+                    $elementToMove = $parent-&gt;removeChild( $elementToMove );
+                    $current-&gt;appendChild( $elementToMove );
+                    $elementToMove = $next;
+
+                    if ( $elementToMove-&gt;nodeName == 'header' &amp;&amp;
+                        $elementToMove-&gt;getAttribute( 'level' ) &lt;= $level )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+
+    // Structure handler for 'custom' tag.
+    protected function structHandlerCustom( $element, &amp;$params )
+    {
+        $ret = null;
+        if ( $this-&gt;XMLSchema-&gt;isInline( $element ) )
+        {
+            $ret = $this-&gt;appendLineParagraph( $element, $params );
+        }
+        else
+        {
+            $ret = $this-&gt;appendParagraph( $element, $params );
+        }
+        return $ret;
+    }
+
+    // Structure handler for 'ul' and 'ol' tags.
+    protected function structHandlerLists( $element, &amp;$params )
+    {
+        $ret = array();
+        $parent = $element-&gt;parentNode;
+        $parentName = $parent-&gt;nodeName;
+
+        if ( $parentName == 'paragraph' )
+        {
+            return $ret;
+        }
+
+        // If we are inside a list
+        if ( $parentName == 'ol' || $parentName == 'ul' )
+        {
+            // If previous 'li' doesn't exist, create it,
+            // else append to the previous 'li' element.
+            $prev = $element-&gt;previousSibling;
+            if ( !$prev )
+            {
+                $li = $this-&gt;Document-&gt;createElement( 'li' );
+                $li = $parent-&gt;insertBefore( $li, $element );
+                $element = $parent-&gt;removeChild( $element );
+                $li-&gt;appendChild( $element );
+            }
+            else
+            {
+                $lastChild = $prev-&gt;lastChild;
+                if ( $lastChild-&gt;nodeName != 'paragraph' )
+                {
+                    $para = $this-&gt;Document-&gt;createElement( 'paragraph' );
+                    $element = $parent-&gt;removeChild( $element );
+                    $prev-&gt;appendChild( $element );
+                    $ret['result'] = $para;
+                }
+                else
+                {
+                    $element = $parent-&gt;removeChild( $element );
+                    $lastChild-&gt;appendChild( $element );
+                    $ret['result'] = $lastChild;
+                }
+                return $ret;
+            }
+        }
+        if ( $parentName == 'li' )
+        {
+            $prev = $element-&gt;previousSibling;
+            if ( $prev )
+            {
+                $element = $parent-&gt;removeChild( $element );
+                $prev-&gt;appendChild( $element );
+                $ret['result'] = $prev;
+                return $ret;
+            }
+        }
+        $ret = $this-&gt;appendParagraph( $element, $params );
+
+        return $ret;
+    }
+
+    // Structure handler for #text
+    protected function structHandlerText( $element, &amp;$newParent )
+    {
+        $ret = null;
+        $parent = $element-&gt;parentNode;
+        if ( !$parent )
+        {
+            return $ret;
+        }
+
+        // Remove empty text elements
+        if ( $element-&gt;textContent == '' )
+        {
+            $element = $parent-&gt;removeChild( $element );
+            return $ret;
+        }
+
+        $ret = $this-&gt;appendLineParagraph( $element, $newParent );
+
+        // Left trim spaces:
+        if ( $this-&gt;getOption( self::OPT_TRIM_SPACES ) )
+        {
+            $trim = false;
+            $currentElement = $element;
+
+            // Check if it is the first element in line
+            do
+            {
+                $prev = $currentElement-&gt;previousSibling;
+                if ( $prev )
+                {
+                    break;
+                }
+
+                $currentElement = $currentElement-&gt;parentNode;
+
+                if ( $currentElement instanceof DOMElement &amp;&amp;
+                    ( $currentElement-&gt;nodeName == 'line' ||
+                    $currentElement-&gt;nodeName == 'paragraph' ) )
+                {
+                    $trim = true;
+                    break;
+                }
+
+            } while ( $currentElement instanceof DOMElement );
+
+            if ( $trim )
+            {
+                // Trim and remove if empty
+                $element-&gt;textContent = ltrim( $element-&gt;textContent );
+                if ( $element-&gt;textContent == '' )
+                {
+                    $parent = $element-&gt;parentNode;
+                    $element = $parent-&gt;removeChild( $element );
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /*
+       Publish handlers. (called at pass 2)
+    */
+    // Publish handler for 'paragraph' element.
+    protected function publishHandlerParagraph( $element, &amp;$params )
+    {
+        $ret = null;
+        // Removes single line tag
+        $line = $element-&gt;lastChild;
+        if ( $element-&gt;childNodes-&gt;length == 1 &amp;&amp; $line-&gt;nodeName == 'line' )
+        {
+            $lineChildren = array();
+            $lineChildNodes = $line-&gt;childNodes;
+            foreach ( $lineChildNodes as $lineChildNode )
+            {
+                $lineChildren[] = $lineChildNode;
+            }
+
+            $line = $element-&gt;removeChild( $line );
+            foreach ( $lineChildren as $lineChild )
+            {
+                $element-&gt;appendChild( $lineChild );
+            }
+        }
+
+        return $ret;
+    }
+
+    // Publish handler for 'link' element.
+    protected function publishHandlerLink( $element, &amp;$params )
+    {
+        $ret = null;
+
+        $href = $element-&gt;getAttribute( 'href' );
+
+        if ( $href )
+        {
+            if ( preg_match( &quot;@^ezobject://[0-9]+(#.*)?$@&quot;, $href ) )
+            {
+                $url = strtok( $href, '#' );
+                $anchorName = strtok( '#' );
+                $objectID = substr( strrchr( $url, &quot;/&quot; ), 1 );
+                $element-&gt;setAttribute( 'object_id', $objectID );
+
+                if ( !in_array( $objectID, $this-&gt;linkedObjectIDArray ) )
+                {
+                    $this-&gt;linkedObjectIDArray[] = $objectID;
+                }
+            }
+            elseif ( preg_match( &quot;@^eznode://.+(#.*)?$@&quot; , $href ) )
+            {
+                $objectID = null;
+                $url = strtok( $href, '#' );
+                $anchorName = strtok( '#' );
+                $nodePath = substr( strchr( $url, &quot;/&quot; ), 2 );
+                if ( preg_match( &quot;@^[0-9]+$@&quot;, $nodePath ) )
+                {
+                    $nodeID = $nodePath;
+                    $node = eZContentObjectTreeNode::fetch( $nodeID, false, false );
+                    if ( !$node )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA,&quot;Node '$nodeID' does not exist.&quot; );
+                    }
+                    else
+                    {
+                        $objectID = $node['contentobject_id'];
+                    }
+                }
+                else
+                {
+                    $node = eZContentObjectTreeNode::fetchByURLPath( $nodePath, false );
+                    if ( !$node )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Node '$nodePath' does not exist.&quot; );
+                    }
+                    else
+                    {
+                        $nodeID = $node['node_id'];
+                        $objectID = $node['contentobject_id'];
+                    }
+                    $element-&gt;setAttribute( 'show_path', 'true' );
+                }
+                $element-&gt;setAttribute( 'node_id', $nodeID );
+
+                if ( $objectID &amp;&amp; !in_array( $objectID, $this-&gt;linkedObjectIDArray ) )
+                {
+                    $this-&gt;linkedObjectIDArray[] = $objectID;
+                }
+            }
+            elseif ( preg_match( &quot;@^#.*$@&quot; , $href ) )
+            {
+                $anchorName = substr( $href, 1 );
+            }
+            else
+            {
+                //washing href. single and double quotes replaced with their urlencoded form
+                $href = str_replace( array('\'','&quot;'), array('%27','%22'), $href );
+
+                $temp = explode( '#', $href );
+                $url = $temp[0];
+                if ( isset( $temp[1] ) )
+                {
+                    $anchorName = $temp[1];
+                }
+
+                if ( $url )
+                {
+                    // Protection from XSS attack
+                    if ( preg_match( &quot;/^(java|vb)script:.*/i&quot; , $url ) )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Using scripts in links is not allowed, link '$url' has been removed&quot; );
+
+                        $element-&gt;removeAttribute( 'href' );
+                        return $ret;
+
+                    }
+                    // Check mail address validity
+                    if ( preg_match( &quot;/^mailto:(.*)/i&quot; , $url, $mailAddr ) &amp;&amp;
+                        !eZMail::validate( $mailAddr[1] ) )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Invalid e-mail address: '$mailAddr[1]'&quot; );
+
+                        $element-&gt;removeAttribute( 'href' );
+                        return $ret;
+                    }
+                    // Store urlID instead of href
+                    $urlID = $this-&gt;convertHrefToID( $url );
+                    if ( $urlID )
+                    {
+                        $urlIDAttributeName = 'url_id';
+
+                        $element-&gt;setAttribute( $urlIDAttributeName, $urlID );
+                    }
+                }
+            }
+
+            if ( isset( $anchorName ) &amp;&amp; $anchorName )
+            {
+                $element-&gt;setAttribute( 'anchor_name', $anchorName );
+            }
+
+            $element-&gt;removeAttribute( 'href' );
+        }
+
+        return $ret;
+    }
+
+    protected function convertHrefToID( $href )
+    {
+        $href = str_replace(&quot;&amp;amp;&quot;, &quot;&amp;&quot;, $href );
+
+        $urlID = eZURL::registerURL( $href );
+
+        if ( !in_array( $urlID, $this-&gt;urlIDArray ) )
+        {
+            $this-&gt;urlIDArray[] = $urlID;
+        }
+
+        return $urlID;
+    }
+
+    // Publish handler for 'embed' element.
+    protected function publishHandlerEmbed( $element, &amp;$params )
+    {
+        $ret = null;
+
+        $href = $element-&gt;getAttribute( 'href' );
+        //washing href. single and double quotes replaced with their urlencoded form
+        $href = str_replace( array('\'','&quot;'), array('%27','%22'), $href );
+
+        if ( $href != null )
+        {
+            if ( preg_match( &quot;@^ezobject://[0-9]+$@&quot; , $href ) )
+            {
+                $objectID = substr( strrchr( $href, &quot;/&quot; ), 1 );
+
+                // protection from self-embedding
+                if ( $objectID == $this-&gt;contentObjectID )
+                {
+                    $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Object '$objectID' can not be embedded to itself.&quot; );
+
+                    $element-&gt;removeAttribute( 'href' );
+                    return $ret;
+                }
+
+                $element-&gt;setAttribute( 'object_id', $objectID );
+
+                if ( !in_array( $objectID, $this-&gt;relatedObjectIDArray ) )
+                {
+                    $this-&gt;relatedObjectIDArray[] = $objectID;
+                }
+            }
+            elseif ( preg_match( &quot;@^eznode://.+$@&quot; , $href ) )
+            {
+                $nodePath = substr( strchr( $href, &quot;/&quot; ), 2 );
+
+                if ( preg_match( &quot;@^[0-9]+$@&quot;, $nodePath ) )
+                {
+                    $nodeID = $nodePath;
+                    $node = eZContentObjectTreeNode::fetch( $nodeID, false, false );
+                    if ( !$node )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Location '$nodeID' does not exist.&quot; );
+
+                        $element-&gt;removeAttribute( 'href' );
+                        return $ret;
+                    }
+                }
+                else
+                {
+                    $node = eZContentObjectTreeNode::fetchByURLPath( $nodePath, false );
+                    if ( !$node )
+                    {
+                        $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Location '$nodePath' does not exist.&quot; );
+
+                        $element-&gt;removeAttribute( 'href' );
+                        return $ret;
+                    }
+                    $nodeID = $node['node_id'];
+                    $element-&gt;setAttribute( 'show_path', 'true' );
+                }
+
+                $element-&gt;setAttribute( 'node_id', $nodeID );
+                $objectID = $node['contentobject_id'];
+
+                // protection from self-embedding
+                if ( $objectID == $this-&gt;contentObjectID )
+                {
+                    $this-&gt;handleError( eZXMLInputParser::ERROR_DATA, &quot;Object '$objectID' can not be embedded to itself.&quot; );
+
+                    $element-&gt;removeAttribute( 'href' );
+                    return $ret;
+                }
+
+                if ( !in_array( $objectID, $this-&gt;relatedObjectIDArray ) )
+                {
+                    $this-&gt;relatedObjectIDArray[] = $objectID;
+                }
+            }
+            else
+            {
+                $this-&gt;isInputValid = false;
+                $this-&gt;Messages[] = 'Invalid reference in &amp;lt;embed&amp;gt; tag. Note that &lt;embed&gt; tag supports only \'eznode\' and \'ezobject\' protocols.';
+                $element-&gt;removeAttribute( 'href' );
+                return $ret;
+            }
+        }
+
+        $element-&gt;removeAttribute( 'href' );
+        $this-&gt;convertCustomAttributes( $element );
+        return $ret;
+    }
+
+    // Publish handler for 'object' element.
+    protected function publishHandlerObject( $element, &amp;$params )
+    {
+        $ret = null;
+
+        $objectID = $element-&gt;getAttribute( 'id' );
+        // protection from self-embedding
+        if ( $objectID == $this-&gt;contentObjectID )
+        {
+            $this-&gt;isInputValid = false;
+            $this-&gt;Messages[] = &quot;Object '$objectID' can not be embeded to itself.&quot;;
+            return $ret;
+        }
+
+        if ( !in_array( $objectID, $this-&gt;relatedObjectIDArray ) )
+        {
+            $this-&gt;relatedObjectIDArray[] = $objectID;
+        }
+
+        // If there are any image object with links.
+        $href = $element-&gt;getAttributeNS( $this-&gt;Namespaces['image'], 'ezurl_href' );
+        //washing href. single and double quotes inside url replaced with their urlencoded form
+        $href = str_replace( array('\'','&quot;'), array('%27','%22'), $href );
+
+        $urlID = $element-&gt;getAttributeNS( $this-&gt;Namespaces['image'], 'ezurl_id' );
+
+        if ( $href != null )
+        {
+            $urlID = eZURL::registerURL( $href );
+            $element-&gt;setAttributeNS( $this-&gt;Namespaces['image'], 'image:ezurl_id', $urlID );
+            $element-&gt;removeAttributeNS( $this-&gt;Namespaces['image'], 'ezurl_href' );
+        }
+
+        if ( $urlID != null )
+        {
+            $this-&gt;urlIDArray[] = $urlID;
+        }
+
+        $this-&gt;convertCustomAttributes( $element );
+
+        return $ret;
+    }
+
+    // Publish handler for 'custom' element.
+    protected function publishHandlerCustom( $element, &amp;$params )
+    {
+        $ret = null;
+
+        $element-&gt;removeAttribute( 'inline' );
+        $this-&gt;convertCustomAttributes( $element );
+
+        return $ret;
+    }
+
+    protected function convertCustomAttributes( $element )
+    {
+        $schemaAttrs = $this-&gt;XMLSchema-&gt;attributes( $element );
+        $attributes = $element-&gt;attributes;
+
+        for ( $i = $attributes-&gt;length - 1; $i &gt;= 0; $i-- )
+        {
+            $attr = $attributes-&gt;item( $i );
+            if ( !$attr-&gt;prefix &amp;&amp; !in_array( $attr-&gt;nodeName, $schemaAttrs ) )
+            {
+                $element-&gt;setAttributeNS( $this-&gt;Namespaces['custom'], 'custom:' . $attr-&gt;name, $element-&gt;getAttribute( $attr-&gt;name ) );
+                $element-&gt;removeAttributeNode( $attr );
+            }
+        }
+    }
+}
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

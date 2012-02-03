@@ -1,0 +1,249 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing Concrete User class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\User;
+use ezp\Base\Model,
+    ezp\Base\Collection\Type as TypeCollection,
+    ezp\Persistence\User as UserValue,
+    ezp\User;
+
+/**
+ * This class represents a User item
+ *
+ * @property-read mixed $id
+ * @property string $login
+ * @property string $email
+ * @property string $password
+ * @property int $hashAlgorithm
+ * @property \ezp\User\Group[] $groups
+ * @property \ezp\User\Role[] $roles
+ * @property \ezp\User\Policy[] $policies
+ */
+class Concrete extends Model implements User
+{
+    /**
+     * @var array Readable of properties on this object
+     */
+    protected $readWriteProperties = array(
+        'id' =&gt; false,
+        'login' =&gt; true,
+        'email' =&gt; true,
+        'passwordHash' =&gt; true,
+        'hashAlgorithm' =&gt; true,// @todo Make read only?
+        'isEnabled' =&gt; true,
+        //'maxLogin' =&gt; true,
+    );
+
+    /**
+     * @var array Dynamic properties on this object
+     */
+    protected $dynamicProperties = array(
+        'groups' =&gt; false,
+        'roles' =&gt; false,
+        'policies' =&gt; false,
+    );
+
+    /**
+     * @var \ezp\Content The User Group Content Object
+     */
+    protected $content;
+
+    /**
+     * Assigned Roles
+     *
+     * @var \ezp\User\Role[]
+     */
+    protected $roles;
+
+    /**
+     * Assigned and inherited policies (via assigned and inherited roles)
+     *
+     * @var \ezp\User\Policy[]
+     */
+    protected $policies;
+
+    /**
+     * @var \ezp\User\Group[] The Groups user is assigned to
+     */
+    protected $groups;
+
+    /**
+     * Creates and setups User object
+     *
+     * @param mixed $id Lets you specify id of User object on creation
+     */
+    public function __construct( $id = null )
+    {
+        $this-&gt;properties = new UserValue( array( 'id' =&gt; $id ) );
+        $this-&gt;content = (object)array( 'locations' =&gt; array() );
+        $this-&gt;roles = new TypeCollection( 'ezp\\User\\Role' );
+        $this-&gt;policies = new TypeCollection( 'ezp\\User\\Policy' );
+        $this-&gt;groups = new TypeCollection( 'ezp\\User\\Group' );
+    }
+
+    /**
+     * Returns definition of the user object, atm: permissions
+     *
+     * @access private
+     * @return array
+     */
+    public static function definition()
+    {
+        return array(
+            'module' =&gt; 'user',
+            'functions' =&gt; array(
+                'login' =&gt; array(
+                    'SiteAccess' =&gt; array(
+                        'compare' =&gt; function( User $user, array $limitationsValues )
+                        {
+                            // ezp code in def 64 compat mode: sprintf( '%u', crc32( $siteAccessName ) )
+                            return true;// @todo Use current siteaccess when it becomes part of API
+                        },
+                    ),
+                ),
+                'password' =&gt; array(),
+                'preferences' =&gt; array(),
+                'register' =&gt; array(),
+                // @todo If this was a limitation somewhere, then logic could have been on limitation
+                // instead of having to be inline in the code with specific calls to selfedit + logic
+                'selfedit' =&gt; array(),
+            ),
+        );
+    }
+
+    /**
+     * List of assigned groups
+     *
+     * @return \ezp\User\Group[]
+     */
+    public function getGroups()
+    {
+        return $this-&gt;groups;
+    }
+
+    /**
+     * List of assigned Roles
+     *
+     * @return array|User\Role[]
+     */
+    public function getRoles()
+    {
+        return $this-&gt;roles;
+    }
+
+    /**
+     * List of assigned and inherited policies (via assigned and inherited roles)
+     *
+     * @return array|User\Policy[]
+     */
+    public function getPolicies()
+    {
+        return $this-&gt;policies;
+    }
+
+    /**
+     * Checks if user has access to a specific module/function
+     *
+     * Return array of limitations if user has access to a certain function
+     * but limited by the returned limitations.
+     * If you have the model instance you want to check permissions against, then
+     * use {@link \ezp\Base\Repository::canUser()}.
+     *
+     * @param string $module
+     * @param string $function
+     * @return array|bool
+     */
+    public function hasAccessTo( $module, $function )
+    {
+        $limitationArray = array();
+        foreach ( $this-&gt;getPolicies() as $policy )
+        {
+            if ( $policy-&gt;module === '*' )
+                return true;
+
+            if ( $policy-&gt;module !== $module )
+                continue;
+
+            if ( $policy-&gt;function === '*' )
+                return true;
+
+            if ( $policy-&gt;function !== $function )
+                continue;
+
+            if ( $policy-&gt;limitations === '*' )
+                return true;
+
+            /*// Try to do some optimization if only one limitation, {@see \ezp\User\Tests\ServiceTest::testLoadPoliciesByUserIdHasAccessTo()}
+            if ( !empty( $limitationArray ) &amp;&amp; count( $policy-&gt;limitations ) === 1 )
+            {
+                foreach ( $policy-&gt;limitations as $limitationKey =&gt; $limitationValues );// to get first &amp; only pair
+                foreach ( $limitationArray as &amp;$limitationSet )
+                {
+                    if ( isset( $limitationSet[ $limitationKey ] ) &amp;&amp; count( $limitationSet ) === 1 )
+                    {
+                        $limitationSet[ $limitationKey ] = array_merge( $limitationSet[ $limitationKey ], $limitationValues );
+                        continue 2;
+                    }
+                }
+            }*/
+
+            $limitationArray[] = $policy-&gt;limitations;
+        }
+
+        if ( !empty( $limitationArray ) )
+            return $limitationArray;
+
+        return false;// No policies matching $module and $function
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

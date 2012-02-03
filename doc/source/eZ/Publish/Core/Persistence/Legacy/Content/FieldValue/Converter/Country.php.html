@@ -1,0 +1,150 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the Country converter
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter;
+use eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter,
+    eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Exception\InvalidValue,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\FieldValue,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    ezp\Content\FieldType\FieldSettings,
+    ezp\Content\FieldType\Country\Value as CountryValue,
+    DOMDocument;
+
+class Country implements Converter
+{
+    /**
+     * Converts data from $value to $storageFieldValue
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $value
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $storageFieldValue
+     * @throws \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\Exception\InvalidValue if a value cannot be converted
+     */
+    public function toStorageValue( FieldValue $value, StorageFieldValue $storageFieldValue )
+    {
+        $countriesAlpha2 = array();
+        $countriesLowercaseName = array();
+        foreach ( $value-&gt;data-&gt;getCountriesInfo() as $countryInfo ) {
+            $countriesAlpha2[] = $countryInfo[&quot;Alpha2&quot;];
+            $countriesLowercaseName[] = strtolower( $countryInfo[&quot;Name&quot;] );
+        }
+
+        $storageFieldValue-&gt;dataText = join( &quot;,&quot;, $countriesAlpha2 );
+        sort( $countriesAlpha2 );
+        $storageFieldValue-&gt;sortKeyString = join( &quot;,&quot;, $countriesLowercaseName );
+    }
+
+    /**
+     * Converts data from $value to $fieldValue
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldValue $value
+     * @param \eZ\Publish\SPI\Persistence\Content\FieldValue $fieldValue
+     */
+    public function toFieldValue( StorageFieldValue $value, FieldValue $fieldValue )
+    {
+        $fieldValue-&gt;data = new CountryValue( !empty( $value-&gt;dataText ) ? explode( &quot;,&quot;, $value-&gt;dataText ) : null );
+    }
+
+    /**
+     * Converts field definition data in $fieldDef into $storageFieldDef
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     */
+    public function toStorageFieldDefinition( FieldDefinition $fieldDef, StorageFieldDefinition $storageDef )
+    {
+        $fieldSettings = $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings;
+
+        if ( isset( $fieldSettings[&quot;isMultiple&quot;] ) )
+            $storageDef-&gt;dataInt1 = (int)$fieldSettings[&quot;isMultiple&quot;];
+
+        if ( !empty( $fieldSettings[&quot;default&quot;] ) )
+        {
+            $countries = new CountryValue( $fieldSettings[&quot;default&quot;] );
+            $storageDef-&gt;dataText5 = join( &quot;,&quot;, array_keys( $countries-&gt;getCountriesInfo() ) );
+        }
+    }
+
+    /**
+     * Converts field definition data in $storageDef into $fieldDef
+     *
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageDef
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDef
+     */
+    public function toFieldDefinition( StorageFieldDefinition $storageDef, FieldDefinition $fieldDef )
+    {
+        $fieldDef-&gt;fieldTypeConstraints-&gt;fieldSettings = new FieldSettings(
+            array(
+                &quot;isMultiple&quot; =&gt; !empty( $storageDef-&gt;dataInt1 ) ? (bool)$storageDef-&gt;dataInt1 : false,
+                &quot;default&quot; =&gt; !empty( $storageDef-&gt;dataText5 ) ? new CountryValue( explode( &quot;,&quot;, $storageDef-&gt;dataText5 ) ) : null,
+            )
+        );
+    }
+
+    /**
+     * Returns the name of the index column in the attribute table
+     *
+     * Returns the name of the index column the datatype uses, which is either
+     * &quot;sort_key_int&quot; or &quot;sort_key_string&quot;. This column is then used for
+     * filtering and sorting for this type.
+     *
+     * @return string
+     */
+    public function getIndexColumn()
+    {
+        return &quot;sort_key_string&quot;;
+    }
+
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

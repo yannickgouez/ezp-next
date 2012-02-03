@@ -1,0 +1,1259 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway;
+use eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway,
+    eZ\Publish\Core\Persistence\Legacy\EzcDbHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Language,
+    eZ\Publish\Core\Persistence\Legacy\Content\Language\MaskGenerator,
+    eZ\Publish\SPI\Persistence\Content\Type,
+    eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition,
+    eZ\Publish\SPI\Persistence\Content\Type\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Type\Group,
+    eZ\Publish\SPI\Persistence\Content\Type\Group\UpdateStruct as GroupUpdateStruct,
+    eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition,
+    ezcQuery,
+    ezcQuerySelect;
+
+/**
+ * Zeta Component Database based content type gateway.
+ */
+class EzcDatabase extends Gateway
+{
+    /**
+     * Columns of database tables.
+     *
+     * @var array
+     */
+    protected $columns = array(
+        'ezcontentclass' =&gt; array(
+            'id',
+            'always_available',
+            'contentobject_name',
+            'created',
+            'creator_id',
+            'modified',
+            'modifier_id',
+            'identifier',
+            'initial_language_id',
+            'is_container',
+            'language_mask',
+            'remote_id',
+            'serialized_description_list',
+            'serialized_name_list',
+            'sort_field',
+            'sort_order',
+            'url_alias_name',
+            'version',
+        ),
+        'ezcontentclass_attribute' =&gt; array(
+            'id',
+            'can_translate',
+            'category',
+            'contentclass_id',
+            'data_float1',
+            'data_float2',
+            'data_float3',
+            'data_float4',
+            'data_int1',
+            'data_int2',
+            'data_int3',
+            'data_int4',
+            'data_text1',
+            'data_text2',
+            'data_text3',
+            'data_text4',
+            'data_text5',
+            'data_type_string',
+            'identifier',
+            'is_information_collector',
+            'is_required',
+            'is_searchable',
+            'placement',
+            'serialized_data_text',
+            'serialized_description_list',
+            'serialized_name_list',
+        ),
+    );
+
+    /**
+     * Zeta Components database handler.
+     *
+     * @var EzcDbHandler
+     */
+    protected $dbHandler;
+
+    /**
+     * Language mask generator
+     *
+     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\MaskGenerator
+     */
+    protected $languageMaskGenerator;
+
+    /**
+     * Creates a new gateway based on $db
+     *
+     * @param EzcDbHandler $db
+     */
+    public function __construct( EzcDbHandler $db, MaskGenerator $languageMaskGenerator )
+    {
+        $this-&gt;dbHandler = $db;
+        $this-&gt;languageMaskGenerator = $languageMaskGenerator;
+    }
+
+    /**
+     * Inserts the given $group.
+     *
+     * @return mixed Group ID
+     */
+    public function insertGroup( Group $group )
+    {
+        $q = $this-&gt;dbHandler-&gt;createInsertQuery();
+        $q-&gt;insertInto(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclassgroup' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;getAutoIncrementValue( 'ezcontentclassgroup', 'id' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'created' ),
+            $q-&gt;bindValue( $group-&gt;created, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'creator_id' ),
+            $q-&gt;bindValue( $group-&gt;creatorId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modified' ),
+            $q-&gt;bindValue( $group-&gt;modified, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modifier_id' ),
+            $q-&gt;bindValue( $group-&gt;modifierId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' ),
+            $q-&gt;bindValue( $group-&gt;identifier )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $this-&gt;dbHandler-&gt;lastInsertId(
+            $this-&gt;dbHandler-&gt;getSequenceName( 'ezcontentclassgroup', 'id' )
+        );
+    }
+
+    /**
+     * Updates a group with data in $group.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\Group\UpdateStruct $group
+     * @return void
+     */
+    public function updateGroup( GroupUpdateStruct $group )
+    {
+        $q = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $q-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'ezcontentclassgroup' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modified' ),
+            $q-&gt;bindValue( $group-&gt;modified, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modifier_id' ),
+            $q-&gt;bindValue( $group-&gt;modifierId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' ),
+            $q-&gt;bindValue( $group-&gt;identifier )
+        )-&gt;where(
+            $q-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $q-&gt;bindValue( $group-&gt;id, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Returns the number of types in a certain group.
+     *
+     * @param int $groupId
+     * @return int
+     */
+    public function countTypesInGroup( $groupId )
+    {
+        $q = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $q-&gt;select(
+            $q-&gt;alias(
+                $q-&gt;expr-&gt;count(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' )
+                ),
+                'count'
+            )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'group_id' ),
+                $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return (int)$stmt-&gt;fetchColumn();
+    }
+
+    /**
+     * Returns the number of Groups the type is assigned to.
+     *
+     * @param int $typeId
+     * @param int $status
+     * @return int
+     */
+    public function countGroupsForType( $typeId, $status )
+    {
+        $q = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $q-&gt;select(
+            $q-&gt;alias(
+                $q-&gt;expr-&gt;count(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'group_id' )
+                ),
+                'count'
+            )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                )
+            ),
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return (int)$stmt-&gt;fetchColumn();
+    }
+
+    /**
+     * Deletes the Group with the given $groupId.
+     *
+     * @param int $groupId
+     * @return void
+     */
+    public function deleteGroup( $groupId )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom( $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclassgroup' ) )
+            -&gt;where(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+                )
+            );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Inserts data into contentclass_name.
+     *
+     * @param int $typeId
+     * @param int $typeStatus
+     * @param string[] $languages
+     * @return void
+     */
+    protected function insertTypeNameData( $typeId, $typeStatus, array $languages )
+    {
+        $tmpLanguages = $languages;
+        if ( isset( $tmpLanguages['always-available'] ) )
+        {
+            unset( $tmpLanguages['always-available'] );
+        }
+
+        foreach ( $tmpLanguages as $language =&gt; $name )
+        {
+            $query = $this-&gt;dbHandler-&gt;createInsertQuery();
+            $query
+                -&gt;insertInto( $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_name' ) )
+                -&gt;set( 'contentclass_id', $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT ) )
+                -&gt;set( 'contentclass_version', $query-&gt;bindValue( $typeStatus, null, \PDO::PARAM_INT ) )
+                -&gt;set(
+                    'language_id',
+                    $query-&gt;bindValue(
+                        $this-&gt;languageMaskGenerator-&gt;generateLanguageIndicator(
+                            $language,
+                            $this-&gt;languageMaskGenerator-&gt;isLanguageAlwaysAvailable(
+                                $language,
+                                $languages
+                            )
+                        ), null, \PDO::PARAM_INT
+                    )
+                )
+                -&gt;set( 'language_locale', $query-&gt;bindValue( $language ) )
+                -&gt;set( 'name', $query-&gt;bindValue( $name ) );
+            $query-&gt;prepare()-&gt;execute();
+        }
+    }
+
+    /**
+     * Inserts a new conten type.
+     *
+     * @param Type $createStruct
+     * @return mixed Type ID
+     */
+    public function insertType( Type $type )
+    {
+        $q = $this-&gt;dbHandler-&gt;createInsertQuery();
+        $q-&gt;insertInto( $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' ) );
+        $q-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;getAutoIncrementValue( 'ezcontentclass', 'contentclass_id' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+            $q-&gt;bindValue( $type-&gt;status, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'created' ),
+            $q-&gt;bindValue( $type-&gt;created, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'creator_id' ),
+            $q-&gt;bindValue( $type-&gt;creatorId, null, \PDO::PARAM_INT )
+        );
+        $this-&gt;setCommonTypeColumns( $q, $type );
+        $q-&gt;prepare()-&gt;execute();
+
+        $type-&gt;id = $this-&gt;dbHandler-&gt;lastInsertId(
+            $this-&gt;dbHandler-&gt;getSequenceName( 'ezcontentclass', 'id' )
+        );
+        $this-&gt;insertTypeNameData( $type-&gt;id, $type-&gt;status, $type-&gt;name );
+
+        return $type-&gt;id;
+    }
+
+    /**
+     * Set common columns for insert/update of a Type.
+     *
+     * @param \ezcQuery $q
+     * @param mixed $typeStruct
+     * @return void
+     */
+    protected function setCommonTypeColumns( ezcQuery $q, $type )
+    {
+        $q-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'serialized_name_list' ),
+            $q-&gt;bindValue( serialize( $type-&gt;name ) )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'serialized_description_list' ),
+            $q-&gt;bindValue( serialize( $type-&gt;description ) )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $q-&gt;bindValue( $type-&gt;identifier )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modified' ),
+            $q-&gt;bindValue( $type-&gt;modified, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modifier_id' ),
+            $q-&gt;bindValue( $type-&gt;modifierId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'remote_id' ),
+            $q-&gt;bindValue( $type-&gt;remoteId )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'url_alias_name' ),
+            $q-&gt;bindValue( $type-&gt;urlAliasSchema )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentobject_name' ),
+            $q-&gt;bindValue( $type-&gt;nameSchema )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'is_container' ),
+            $q-&gt;bindValue( $type-&gt;isContainer ? 1 : 0, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'language_mask' ),
+            $q-&gt;bindValue(
+                $this-&gt;languageMaskGenerator-&gt;generateLanguageMask( $type-&gt;name ),
+                null,
+                \PDO::PARAM_INT
+            )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'initial_language_id' ),
+            $q-&gt;bindValue( $type-&gt;initialLanguageId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'sort_field' ),
+            $q-&gt;bindValue( $type-&gt;sortField, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'sort_order' ),
+            $q-&gt;bindValue( $type-&gt;sortOrder, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'always_available' ),
+            $q-&gt;bindValue( (int)$type-&gt;defaultAlwaysAvailable, null, \PDO::PARAM_INT )
+        );
+    }
+
+    /**
+     * Insert assignement of $typeId to $groupId.
+     *
+     * @param mixed $groupId
+     * @param mixed $typeId
+     * @param int $status
+     * @return void
+     */
+    public function insertGroupAssignement( $groupId, $typeId, $status )
+    {
+        $groups = $this-&gt;loadGroupData( $groupId );
+        $group = $groups[0];
+
+        $q = $this-&gt;dbHandler-&gt;createInsertQuery();
+        $q-&gt;insertInto(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+            $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+            $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'group_id' ),
+            $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'group_name' ),
+            $q-&gt;bindValue( $group['name'] )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Deletes a group assignements for a Type.
+     *
+     * @param mixed $groupId
+     * @param mixed $typeId
+     * @param int $status
+     * @return void
+     */
+    public function deleteGroupAssignement( $groupId, $typeId, $status )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'group_id' ),
+                    $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Loads data about Group with $groupId.
+     *
+     * @param mixed $groupId
+     * @return string[][]
+     */
+    public function loadGroupData( $groupId )
+    {
+        $q = $this-&gt;createGroupLoadQuery();
+        $q-&gt;where(
+            $q-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Returns an array with data about all Group objects.
+     *
+     * @return string[][]
+     */
+    public function loadAllGroupsData()
+    {
+        $q = $this-&gt;createGroupLoadQuery();
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Creates the basic query to load Group data.
+     *
+     * @return ezcQuerySelect
+     */
+    protected function createGroupLoadQuery()
+    {
+        $q = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $q-&gt;select(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'created' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'creator_id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modified' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'modifier_id' ),
+            $this-&gt;dbHandler-&gt;quoteColumn( 'name' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclassgroup' )
+        );
+        return $q;
+    }
+
+    /**
+     * Loads data for all Types in $status in $groupId.
+     *
+     * @param mixed $groupId
+     * @param int $status
+     * @return string[][]
+     */
+    public function loadTypesDataForGroup( $groupId, $status )
+    {
+        $q = $this-&gt;getLoadTypeQuery();
+        $q-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'group_id',
+                        'ezcontentclass_classgroup'
+                    ),
+                    $q-&gt;bindValue( $groupId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'version',
+                        'ezcontentclass'
+                    ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Inserts a $fieldDefinition for $typeId.
+     *
+     * @param mixed $typeId
+     * @param int $status
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDefinition
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageFieldDef
+     * @return mixed Field definition ID
+     */
+    public function insertFieldDefinition(
+        $typeId, $status, FieldDefinition $fieldDefinition,
+        StorageFieldDefinition $storageFieldDef
+    )
+    {
+        $q = $this-&gt;dbHandler-&gt;createInsertQuery();
+        $q-&gt;insertInto( $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' ) );
+        $q-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+            $this-&gt;dbHandler-&gt;getAutoIncrementValue( 'ezcontentclass_attribute', 'id' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+            $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+            $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+        );
+        $this-&gt;setCommonFieldColumns( $q, $fieldDefinition, $storageFieldDef );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $this-&gt;dbHandler-&gt;lastInsertId(
+            $this-&gt;dbHandler-&gt;getSequenceName( 'ezcontentclass_attribute', 'id' )
+        );
+    }
+
+    /**
+     * Set common columns for insert/update of FieldDefinition.
+     *
+     * @param \ezcQuery $q
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDefinition
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageFieldDef
+     * @return void
+     */
+    protected function setCommonFieldColumns(
+        ezcQuery $q, FieldDefinition $fieldDefinition,
+        StorageFieldDefinition $storageFieldDef
+    )
+    {
+        $q-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'serialized_name_list' ),
+            $q-&gt;bindValue( serialize( $fieldDefinition-&gt;name ) )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'serialized_description_list' ),
+            $q-&gt;bindValue( serialize( $fieldDefinition-&gt;description ) )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'identifier' ),
+            $q-&gt;bindValue( $fieldDefinition-&gt;identifier )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'category' ),
+            $q-&gt;bindValue( $fieldDefinition-&gt;fieldGroup )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'placement' ),
+            $q-&gt;bindValue( $fieldDefinition-&gt;position, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_type_string' ),
+            $q-&gt;bindValue( $fieldDefinition-&gt;fieldType )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'can_translate' ),
+            $q-&gt;bindValue( ( $fieldDefinition-&gt;isTranslatable ? 1 : 0 ), null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'is_required' ),
+            $q-&gt;bindValue( ( $fieldDefinition-&gt;isRequired ? 1 : 0 ), null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'is_information_collector' ),
+            $q-&gt;bindValue( ( $fieldDefinition-&gt;isInfoCollector ? 1 : 0 ), null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_float1' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataFloat1 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_float2' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataFloat2 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_float3' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataFloat3 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_float4' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataFloat4 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_int1' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataInt1, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_int2' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataInt2, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_int3' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataInt3, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_int4' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataInt4, null, \PDO::PARAM_INT )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_text1' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataText1 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_text2' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataText2 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_text3' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataText3 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_text4' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataText4 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'data_text5' ),
+            $q-&gt;bindValue( $storageFieldDef-&gt;dataText5 )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'serialized_data_text' ),
+            $q-&gt;bindValue( serialize( $storageFieldDef-&gt;serializedDataText ) )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'is_searchable' ),
+            $q-&gt;bindValue( ( $fieldDefinition-&gt;isSearchable ? 1 : 0 ), null, \PDO::PARAM_INT )
+        );
+    }
+
+    /**
+     * Deletes a field definition.
+     *
+     * @param mixed $typeId
+     * @param int $status
+     * @param mixed $fieldDefinitionId
+     * @return void
+     */
+    public function deleteFieldDefinition( $typeId, $status, $fieldDefinitionId )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $q-&gt;bindValue( $fieldDefinitionId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                ),
+                // FIXME: Actually not needed
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Updates a $fieldDefinition for $typeId.
+     *
+     * @param mixed $typeId
+     * @param int $status
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition $fieldDefinition
+     * @param \eZ\Publish\Core\Persistence\Legacy\Content\StorageFieldDefinition $storageFieldDef
+     * @return void
+     * @todo Handle StorageFieldDefinition
+     */
+    public function updateFieldDefinition(
+        $typeId, $status, FieldDefinition $fieldDefinition,
+        StorageFieldDefinition $storageFieldDef
+    )
+    {
+        $q = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $q
+            -&gt;update(
+                $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+            )-&gt;where(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $q-&gt;bindValue( $fieldDefinition-&gt;id, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                ),
+                // FIXME: Actually not needed
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                )
+            );
+        $this-&gt;setCommonFieldColumns( $q, $fieldDefinition, $storageFieldDef );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Deletes all name data for $typeId in $version.
+     *
+     * @param int $typeId
+     * @param int $typeStatus
+     * @return void
+     */
+    protected function deleteTypeNameData( $typeId, $typeStatus )
+    {
+        $query = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $query-&gt;deleteFrom( 'ezcontentclass_name' )
+            -&gt;where(
+                $query-&gt;expr-&gt;lAnd(
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                        $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                    ),
+                    $query-&gt;expr-&gt;eq(
+                        $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                        $query-&gt;bindValue( $typeStatus, null, \PDO::PARAM_INT )
+                    )
+                )
+            );
+        $query-&gt;prepare()-&gt;execute();
+    }
+
+    /**
+     * Update a type with $updateStruct.
+     *
+     * @param mixed $typeId
+     * @param int $status
+     * @param \eZ\Publish\SPI\Persistence\Content\Type\UpdateStruct $updateStruct
+     * @return void
+     */
+    public function updateType( $typeId, $status, UpdateStruct $updateStruct )
+    {
+        $q = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $q-&gt;update( $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' ) );
+
+        $this-&gt;setCommonTypeColumns( $q, $updateStruct );
+
+        $q-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        $this-&gt;deleteTypeNameData( $typeId, $status );
+        $this-&gt;insertTypeNameData( $typeId, $status, $updateStruct-&gt;name );
+    }
+
+    /**
+     * Loads an array with data about $typeId in $status.
+     *
+     * @param mixed $typeId
+     * @param int $status
+     * @return array(int=&gt;array(string=&gt;mixed)) Data rows.
+     */
+    public function loadTypeData( $typeId, $status )
+    {
+        $q = $this-&gt;getLoadTypeQuery();
+        $q-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id', 'ezcontentclass' ),
+                    $q-&gt;bindValue( $typeId )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentclass' ),
+                    $q-&gt;bindValue( $status )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Loads an array with data about the type referred to by $identifier in
+     * $version.
+     *
+     * @param string $identifier
+     * @param int $version
+     * @return array(int=&gt;array(string=&gt;mixed)) Data rows.
+     */
+    public function loadTypeDataByIdentifier( $identifier, $status )
+    {
+        $q = $this-&gt;getLoadTypeQuery();
+        $q-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'identifier', 'ezcontentclass' ),
+                    $q-&gt;bindValue( $identifier )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version', 'ezcontentclass' ),
+                    $q-&gt;bindValue( $status )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return $stmt-&gt;fetchAll( \PDO::FETCH_ASSOC );
+    }
+
+    /**
+     * Returns a basic query to retrieve Type data.
+     *
+     * @return ezcQuerySelect
+     */
+    protected function getLoadTypeQuery()
+    {
+        $q = $this-&gt;dbHandler-&gt;createSelectQuery();
+
+        $this-&gt;selectColumns( $q, 'ezcontentclass' );
+        $this-&gt;selectColumns( $q, 'ezcontentclass_attribute' );
+        $q-&gt;select(
+            $this-&gt;dbHandler-&gt;aliasedColumn(
+                $q,
+                'group_id',
+                'ezcontentclass_classgroup'
+            )
+        );
+        $q-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' )
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' ),
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'id',
+                        'ezcontentclass'
+                    ),
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'contentclass_id',
+                        'ezcontentclass_attribute'
+                    )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'version',
+                        'ezcontentclass'
+                    ),
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'version',
+                        'ezcontentclass_attribute'
+                    )
+                )
+            )
+        )-&gt;leftJoin(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' ),
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'id',
+                        'ezcontentclass'
+                    ),
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'contentclass_id',
+                        'ezcontentclass_classgroup'
+                    )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'version',
+                        'ezcontentclass'
+                    ),
+                    $this-&gt;dbHandler-&gt;quoteColumn(
+                        'contentclass_version',
+                        'ezcontentclass_classgroup'
+                    )
+                )
+            )
+        );
+
+        return $q;
+    }
+
+    /**
+     * Counts the number of instances that exists of the identified type.
+     *
+     * @param int $typeId
+     * @param int $version
+     * @return int
+     */
+    public function countInstancesOfType( $typeId, $version )
+    {
+        $q = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $q-&gt;select(
+            $q-&gt;alias(
+                $q-&gt;expr-&gt;count(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' )
+                ),
+                'count'
+            )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentobject' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;eq(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+            )
+        );
+
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return (int)$stmt-&gt;fetchColumn();
+    }
+
+    /**
+     * Deletes all field definitions of a Type.
+     *
+     * @param mixed $typeId
+     * @return void
+     */
+    public function deleteFieldDefinitionsForType( $typeId, $status )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Deletes a the Type.
+     *
+     * Does no delete the field definitions!
+     *
+     * @param mixed $typeId
+     * @return void
+     */
+    public function deleteType( $typeId, $status )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Deletes all group assignements for a Type.
+     *
+     * @param mixed $typeId
+     * @return void
+     */
+    public function deleteGroupAssignementsForType( $typeId, $status )
+    {
+        $q = $this-&gt;dbHandler-&gt;createDeleteQuery();
+        $q-&gt;deleteFrom(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;where(
+            $q-&gt;expr-&gt;lAnd(
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $q-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $q-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                    $q-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+        $stmt = $q-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Publishes the Type with $typeId from $sourceVersion to $targetVersion,
+     * including its fields
+     *
+     * @param int $typeId
+     * @param int $sourceVersion
+     * @param int $targetVersion
+     * @return void
+     */
+    public function publishTypeAndFields( $typeId, $sourceVersion, $targetVersion )
+    {
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+            $query-&gt;bindValue( $targetVersion, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $query-&gt;bindValue( $sourceVersion, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $query-&gt;prepare();
+        $stmt-&gt;execute();
+
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+            $query-&gt;bindValue( $targetVersion, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                    $query-&gt;bindValue( $sourceVersion, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $query-&gt;prepare();
+        $stmt-&gt;execute();
+
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+            $query-&gt;bindValue( $targetVersion, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $query-&gt;bindValue( $sourceVersion, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $query-&gt;prepare();
+        $stmt-&gt;execute();
+
+        $query = $this-&gt;dbHandler-&gt;createUpdateQuery();
+        $query-&gt;update(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_name' )
+        )-&gt;set(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+            $query-&gt;bindValue( $targetVersion, null, \PDO::PARAM_INT )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' ),
+                    $query-&gt;bindValue( $typeId, null, \PDO::PARAM_INT )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_version' ),
+                    $query-&gt;bindValue( $sourceVersion, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $stmt = $query-&gt;prepare();
+        $stmt-&gt;execute();
+    }
+
+    /**
+     * Returns if the field identified by $fieldDefinitionId and $status is
+     * translatable
+     *
+     * @param mixed $fieldDefinitionId
+     * @param int $status
+     * @return bool
+     */
+    public function isFieldTranslatable( $fieldDefinitionId, $status )
+    {
+        $query = $this-&gt;dbHandler-&gt;createSelectQuery();
+        $query-&gt;select(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'can_translate' )
+        )-&gt;from(
+            $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_attribute' )
+        )-&gt;where(
+            $query-&gt;expr-&gt;lAnd(
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'id' ),
+                    $query-&gt;bindValue( $fieldDefinitionId, null, \PDO::PARAM_INT )
+                ),
+                $query-&gt;expr-&gt;eq(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'version' ),
+                    $query-&gt;bindValue( $status, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+        $stmt = $query-&gt;prepare();
+        $stmt-&gt;execute();
+
+        return ( 1 == $stmt-&gt;fetchColumn() );
+    }
+
+    /**
+     * Creates an array of select columns for $tableName.
+     *
+     * @param string $tableName
+     * @return array
+     */
+    protected function selectColumns( ezcQuerySelect $q, $tableName )
+    {
+        foreach ( $this-&gt;columns[$tableName] as $col )
+        {
+            $q-&gt;select(
+                $this-&gt;dbHandler-&gt;aliasedColumn( $q, $col, $tableName )
+            );
+        }
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

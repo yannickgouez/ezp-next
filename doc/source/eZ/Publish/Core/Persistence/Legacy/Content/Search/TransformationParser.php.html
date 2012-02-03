@@ -1,0 +1,243 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the TransformationParser class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search;
+use eZ\Publish\SPI\Persistence\Fields\Storage;
+
+/**
+ * Parser for transformation specifications
+ *
+ * The transformation specifications look like:
+ *
+ *  CF = CF...           : Map from one char to one or more chars  (map)
+ *  CF - CF = CF...      : Map range of chars to one or more chars (replace)
+ *  CF - CF +- xx        : Transpose several chars by value xx     (transpose)
+ *  CF - CF % yy +- xx   : Transpose several chars by value xx, yy denotes skip value
+ *                         yy equal to 1 is the same as 'transpose' (transpose-modulo)
+ *  TI[,TI...]           :
+ *
+ *  CF = Character Format
+ *  TI = Transform Identifier
+ *
+ *  Character formats:
+ *  U+xxxx : Unicode value in hexadecimal
+ *  xx: Ascii value in hexadecimal
+ *  remove : Remove character from result, can only be used in destination
+ *  keep : Keep character as it is, can only be used in destination
+ *  &quot;xxxx&quot; : Multiple characters as a string, can only be used in destination, \\ means \ and \&quot; means &quot;
+ */
+class TransformationParser
+{
+    const T_COMMENT = 1;
+    const T_WHITESPACE = 2;
+    const T_SECTION = 10;
+    const T_MAP = 11;
+    const T_REPLACE = 12;
+    const T_TRANSPOSE = 13;
+    const T_TRANSPOSE_MODULO = 14;
+
+    /**
+     * Array of token specifications.
+     *
+     * For readability reasons this array is created in the constructor to be
+     * able to use temporary variables.
+     *
+     * @var array
+     */
+    protected $tokenSpecifications = null;
+
+    /**
+     * Construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $character = '(?:U\\+[0-9a-fA-F]{4}|remove|keep|[0-9a-fA-F]+|&quot;(?:[^\\\\&quot;]+|\\\\\\\\|\\\\\'|\\\\&quot;)*?&quot;)';
+
+        $this-&gt;tokenSpecifications = array(
+            self::T_COMMENT =&gt; '(\\A#(?P&lt;comment&gt;.*)$)m',
+            self::T_WHITESPACE =&gt; '(\\A\\s+)',
+            self::T_SECTION =&gt; '(\\A(?P&lt;section&gt;[a-z0-9_-]+):\s*$)m',
+            self::T_MAP =&gt; '(\\A(?P&lt;src&gt;' . $character . ')\\s*=\\s*(?P&lt;dest&gt;' .  $character . '))',
+            self::T_REPLACE =&gt; '(\\A(?P&lt;srcStart&gt;' . $character . ')\\s*-\\s*' .
+                '(?P&lt;srcEnd&gt;'   . $character . ')\\s*=\\s*' .
+                '(?P&lt;dest&gt;'    .  $character . '))',
+            self::T_TRANSPOSE =&gt; '(\\A(?P&lt;srcStart&gt;' . $character . ')\\s*-\\s*' .
+                '(?P&lt;srcEnd&gt;'   . $character . ')\\s*' .
+                '(?P&lt;op&gt;[+-])\\s*' .
+                '(?P&lt;dest&gt;' .     $character . '))',
+            self::T_TRANSPOSE_MODULO =&gt; '(\\A(?P&lt;srcStart&gt;' . $character . ')\\s*-\\s*' .
+                '(?P&lt;srcEnd&gt;'   . $character . ')\\s*%\\s*' .
+                '(?P&lt;modulo&gt;'   . $character . ')\\s*' .
+                '(?P&lt;op&gt;[+-])\\s*' .
+                '(?P&lt;dest&gt;' . $character . '))',
+        );
+    }
+
+    /**
+     * Parse the specified transformation file into an AST
+     *
+     * @param string $file
+     * @return array
+     */
+    public function parse( $file )
+    {
+        return $this-&gt;parseString( file_get_contents( $file ) );
+    }
+
+    /**
+     * Parse the given string into an AST
+     *
+     * @param string $string
+     * @return array
+     */
+    public function parseString( $string )
+    {
+        $tokens = $this-&gt;tokenize( $string );
+
+        $tokens = array_filter(
+            $tokens,
+            function ( $token )
+            {
+                return !( $token['type'] === TransformationParser::T_WHITESPACE ||
+                          $token['type'] === TransformationParser::T_COMMENT );
+            }
+        );
+
+        $ast = array();
+        $section = null;
+        while ( $token = array_shift( $tokens ) )
+        {
+            if ( $token['type'] === self::T_SECTION )
+            {
+                $section = $token['data']['section'];
+                continue;
+            }
+
+            if ( $section === null )
+            {
+                throw new \RuntimeException( &quot;Expected section.&quot; );
+            }
+
+            $ast[$section][] = $token;
+        }
+
+        return $ast;
+    }
+
+    /**
+     * Tokenize transformation input file
+     *
+     * Returns an array of tokens
+     *
+     * @param string $string
+     * @return array
+     */
+    protected function tokenize( $string )
+    {
+        $string = preg_replace( '(\\r\\n|\\r)', &quot;\n&quot;, $string );
+        $tokens = array();
+        $line = 1;
+
+        while ( strlen( $string ) )
+        {
+            foreach ( $this-&gt;tokenSpecifications as $token =&gt; $regexp )
+            {
+                if ( !preg_match( $regexp, $string, $matches ) )
+                {
+                    continue;
+                }
+
+                // Remove matched string
+                $string = substr( $string, strlen( $matches[0] ) );
+                $line += substr_count( $matches[0], &quot;\n&quot; );
+
+                // Append token to list
+                $tokens[] = array(
+                    'type' =&gt; $token,
+                    'data' =&gt; $this-&gt;filterValues( $matches ),
+                );
+
+                // Continue with outer loop
+                continue 2;
+            }
+
+            throw new \RuntimeException( &quot;Parse error in line $line: &quot; . substr( $string, 0, 100 ) );
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Filter out numeric array keys
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function filterValues( array $data )
+    {
+        foreach ( $data as $key =&gt; $value )
+        {
+            if ( is_int( $key ) )
+            {
+                unset( $data[$key] );
+            }
+        }
+
+        return $data;
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

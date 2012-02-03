@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase content type group criterion handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler;
+use eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriteriaConverter,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    ezcQuerySelect;
+
+/**
+ * Content type group criterion handler
+ */
+class ContentTypeGroupId extends CriterionHandler
+{
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function accept( Criterion $criterion )
+    {
+        return $criterion instanceof Criterion\ContentTypeGroupId;
+    }
+
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param CriteriaConverter $converter
+     * @param \ezcQuerySelect $query
+     * @param Criterion $criterion
+     * @return \ezcQueryExpression
+     */
+    public function handle( CriteriaConverter $converter, ezcQuerySelect $query, Criterion $criterion )
+    {
+        $subSelect = $query-&gt;subSelect();
+        $subSelect
+            -&gt;select(
+                $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id' )
+            )-&gt;from(
+                $this-&gt;dbHandler-&gt;quoteTable( 'ezcontentclass_classgroup' )
+            )-&gt;where(
+                $query-&gt;expr-&gt;in(
+                    $this-&gt;dbHandler-&gt;quoteColumn( 'group_id' ),
+                    $criterion-&gt;value
+                )
+            );
+
+        return $query-&gt;expr-&gt;in(
+            $this-&gt;dbHandler-&gt;quoteColumn( 'contentclass_id', 'ezcontentobject' ),
+            $subSelect
+        );
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

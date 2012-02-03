@@ -1,0 +1,230 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * Override, a reusable abstract class providing baseline override functionality:
+ * - api to append and prepend directories
+ * - cache awareness when directories have changed
+ * -
+ *
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace ezp\Base;
+use ezp\Base\Exception\InvalidArgumentValue;
+
+abstract class Override
+{
+    /**
+     * The global path array, scoped in the order they should be parsed
+     *
+     * @var array
+     */
+    protected static $globalPaths = array(
+        //'base' =&gt; array( 'settings/' ),
+        //'modules' =&gt; array(),
+        //'siteaccess' =&gt; array(),
+        //'global' =&gt; array( 'settings/override/' ),
+    );
+
+    /**
+     * The global path array md5 hash, for use in cache names.
+     * Empty if it needs to be regenerated
+     *
+     * @var string
+     */
+    protected static $globalPathsHash = '';
+
+    /**
+     * The instance path array, scoped in the order they should be parsed
+     * Set by {@link Override::initPaths()}
+     *
+     * @var array
+     */
+    private $paths = array();
+
+    /**
+     * The instance configuration path array md5 hash, for use in cache names.
+     * Empty if it needs to be regenerated
+     *
+     * @var string
+     */
+    private $pathsHash = '';
+
+    /**
+     * Init paths by ref or copy
+     *
+     * @param bool $byRef Tells function to assign global paths by reference or not, if true then changes to global paths will affect
+     *             paths on this object directly
+     */
+    protected function initPaths( $byRef = false )
+    {
+        if ( $byRef )
+        {
+            $this-&gt;paths = &amp;static::$globalPaths;
+            $this-&gt;pathsHash = &amp;static::$globalPathsHash;
+        }
+        else
+        {
+            $this-&gt;paths = static::$globalPaths;
+            $this-&gt;pathsHash = static::$globalPathsHash;
+        }
+    }
+
+    /**
+     * Get raw global override path list data.
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     * @return array
+     */
+    public static function getGlobalDirs( $scope = null )
+    {
+        if ( $scope === null )
+            return static::$globalPaths;
+        if ( !isset( static::$globalPaths[$scope] ) )
+            throw new InvalidArgumentValue( 'scope', $scope, get_called_class() );
+
+        return static::$globalPaths[$scope];
+    }
+
+    /**
+     * Set raw global override path list data.
+     *
+     * Warning: Does not invalidate path hash on instances!
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param array $paths
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     */
+    public static function setGlobalDirs( array $paths, $scope = null )
+    {
+        if ( $scope === null )
+        {
+            static::$globalPaths = $paths;
+        }
+        else if ( !isset( static::$globalPaths[$scope] ) )
+        {
+            throw new InvalidArgumentValue( 'scope', $scope, get_called_class() );
+        }
+
+        static::$globalPaths[$scope] = $paths;
+        return true;
+    }
+
+    /**
+     * Get raw instance override path list data.
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     * @return array
+     */
+    public function getDirs( $scope = null )
+    {
+        if ( $scope === null )
+            return $this-&gt;paths;
+        if ( !isset( $this-&gt;paths[$scope] ) )
+            throw new InvalidArgumentValue( 'scope', $scope, get_class( $this ) );
+
+        return $this-&gt;paths[$scope];
+    }
+
+    /**
+     * Set raw instance override path list data.
+     *
+     * @throws InvalidArgumentValue If scope has wrong value
+     * @param array $paths
+     * @param string $scope See {@link $globalPaths} for scope values (first level keys)
+     * @return bool Return true if cache hash was cleared, indicating reload is needed
+     */
+    public function setDirs( array $paths, $scope = null )
+    {
+        if ( $scope === null )
+        {
+            if ( $this-&gt;paths === $paths )
+                return false;
+            $this-&gt;paths = $paths;
+        }
+        else if ( !isset( $this-&gt;paths[$scope] ) )
+        {
+            throw new InvalidArgumentValue( 'scope', $scope, get_class( $this ) );
+        }
+
+        if ( $this-&gt;paths[$scope] === $paths )
+        {
+            return false;
+        }
+
+        $this-&gt;paths[$scope] = $paths;
+
+        if ( $this-&gt;pathsHash !== '' )
+        {
+            $this-&gt;pathsHash = '';
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get cache hash based on override dirs
+     *
+     * @return string md5 hash
+     */
+    protected function pathsHash()
+    {
+        if ( $this-&gt;pathsHash === '' )
+        {
+            $this-&gt;pathsHash = md5( serialize( $this-&gt;paths ) );
+        }
+        return $this-&gt;pathsHash;
+    }
+}
+
+?&gt;
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

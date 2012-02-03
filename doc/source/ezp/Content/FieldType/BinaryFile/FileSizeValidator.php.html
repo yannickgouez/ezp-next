@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the FileSizeValidator class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace ezp\Content\FieldType\BinaryFile;
+use ezp\Content\FieldType\Validator,
+    ezp\Content\FieldType\Value as BaseValue;
+
+/**
+ * Validator for checking max. size of binary files.
+ *
+ * @property int $maxFileSize The maximum allowed size of file, in bytes.
+ */
+class FileSizeValidator extends Validator
+{
+    protected $constraints = array(
+        'maxFileSize' =&gt; false
+    );
+
+    /**
+     * Checks if $binaryFile has the appropriate size
+     *
+     * @param \ezp\Content\FieldType\BinaryFile\Value $value
+     * @return bool
+     */
+    public function validate( BaseValue $value )
+    {
+        $isValid = true;
+
+        if ( $this-&gt;constraints['maxFileSize'] !== false &amp;&amp; $value-&gt;file-&gt;size &gt; $this-&gt;constraints['maxFileSize'] )
+        {
+            $this-&gt;errors[] = &quot;The file size can not exceed {$this-&gt;constraints['maxFileSize']} bytes.&quot;;
+            $isValid = false;
+        }
+
+        return $isValid;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

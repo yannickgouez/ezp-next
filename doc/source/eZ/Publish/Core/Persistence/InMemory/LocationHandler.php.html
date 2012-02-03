@@ -1,0 +1,544 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the LocationHandler implementation
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ *
+ */
+
+namespace eZ\Publish\Core\Persistence\InMemory;
+use eZ\Publish\SPI\Persistence\Content\Location\Handler as LocationHandlerInterface,
+    eZ\Publish\SPI\Persistence\Content\Location\CreateStruct,
+    eZ\Publish\SPI\Persistence\Content\Location\UpdateStruct,
+    eZ\Publish\SPI\Persistence\Content\Location as LocationValue,
+    ezp\Base\Exception\NotFound;
+
+/**
+ * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+ */
+class LocationHandler implements LocationHandlerInterface
+{
+    const CHARS_ACCENT = '&Atilde;Ä&Atilde;Å&Atilde;Ç&Atilde;É&Atilde;Ñ&Atilde;Ö&Atilde;&nbsp;&Atilde;&iexcl;&Atilde;&cent;&Atilde;&pound;&Atilde;&curren;&Atilde;&yen;&Atilde;í&Atilde;ì&Atilde;î&Atilde;ï&Atilde;ñ&Atilde;ò&Atilde;&sup2;&Atilde;&sup3;&Atilde;&acute;&Atilde;&micro;&Atilde;&para;&Atilde;&cedil;&Atilde;à&Atilde;â&Atilde;ä&Atilde;ã&Atilde;&copy;&Atilde;&uml;&Atilde;&ordf;&Atilde;&laquo;&Atilde;á&Atilde;&sect;&Atilde;å&Atilde;ç&Atilde;é&Atilde;è&Atilde;&not;&Atilde;&shy;&Atilde;&reg;&Atilde;&macr;&Atilde;ô&Atilde;ö&Atilde;õ&Atilde;ú&Atilde;&sup1;&Atilde;&ordm;&Atilde;&raquo;&Atilde;&frac14;&Atilde;&iquest;&Atilde;ë&Atilde;&plusmn;';
+
+    const CHARS_NOACCENT = 'AAAAAAaaaaaaOOOOOOooooooEEEEeeeeCcIIIIiiiiUUUUuuuuyNn';
+
+    /**
+     * @var Handler
+     */
+    protected $handler;
+
+    /**
+     * @var Backend
+     */
+    protected $backend;
+
+    /**
+     * Setups current handler instance with reference to Handler object that created it.
+     *
+     * @param Handler $handler
+     * @param Backend $backend The storage engine backend
+     */
+    public function __construct( Handler $handler, Backend $backend )
+    {
+        $this-&gt;handler = $handler;
+        $this-&gt;backend = $backend;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function load( $locationId )
+    {
+        return $this-&gt;backend-&gt;load( 'Content\\Location', $locationId );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function copySubtree( $sourceId, $destinationParentId )
+    {
+        $location = $this-&gt;load( $sourceId );
+        $contentCopy = $this-&gt;handler-&gt;contentHandler()-&gt;copy( $location-&gt;contentId, false );
+
+        $newLocation = $this-&gt;create(
+            new CreateStruct(
+                array(
+                    &quot;contentId&quot; =&gt; $contentCopy-&gt;id,
+                    &quot;contentVersion&quot; =&gt; $contentCopy-&gt;currentVersionNo,
+                    &quot;sortField&quot; =&gt; $location-&gt;sortField,
+                    &quot;sortOrder&quot; =&gt; $location-&gt;sortOrder,
+                    &quot;parentId&quot; =&gt; $destinationParentId,
+                )
+            )
+        );
+
+        // Begin recursive call on children, if any
+        foreach ( $this-&gt;backend-&gt;find( &quot;Content\\Location&quot;, array( &quot;parentId&quot; =&gt; $sourceId ) ) as $child )
+        {
+            $this-&gt;copySubtree( $child-&gt;id, $newLocation-&gt;id );
+        }
+
+        return $newLocation;
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function move( $sourceId, $destinationParentId )
+    {
+        $vo = $this-&gt;load( $sourceId );
+        $newParentVO = $this-&gt;load( $destinationParentId );
+        $oldPathString = $vo-&gt;pathString;
+        $newPathString = $newParentVO-&gt;pathString . $sourceId . '/';
+        $oldPathIdentificationString = $vo-&gt;pathIdentificationString;
+        $newPathIdentificationString = '';
+        if ( $newParentVO-&gt;parentId == 1 )
+            $newPathIdentificationString = $this-&gt;getStrippedContentName( $vo );
+        else
+            $newPathIdentificationString = $this-&gt;getPathIdentificationString( $newParentVO ) . '/' . $this-&gt;getStrippedContentName( $vo );
+
+        $this-&gt;backend-&gt;update(
+            'Content\\Location',
+            $sourceId,
+            array(
+                'parentId' =&gt; $destinationParentId,
+                'pathString' =&gt; $newPathString,
+                'pathIdentificationString' =&gt; $newPathIdentificationString
+            )
+        );
+
+        $children = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'pathString' =&gt; &quot;$vo-&gt;pathString%&quot; ) );
+        foreach ( $children as $child )
+        {
+            $this-&gt;backend-&gt;update(
+                'Content\\Location',
+                $child-&gt;id,
+                array(
+                    'pathString' =&gt; str_replace( $oldPathString, $newPathString, $child-&gt;pathString ),
+                    'pathIdentificationString' =&gt; str_replace( $oldPathIdentificationString, $newPathIdentificationString, $child-&gt;pathIdentificationString )
+                )
+            );
+        }
+
+        $this-&gt;updateSubtreeModificationTime( $newParentVO-&gt;pathString );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function markSubtreeModified( $locationId, $timeStamp = null )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function hide( $id )
+    {
+        $this-&gt;backend-&gt;update( 'Content\\Location', $id, array( 'hidden' =&gt; true, 'invisible' =&gt; true ) );
+
+        $locationVO = $this-&gt;backend-&gt;load( 'Content\\Location', $id );
+        $this-&gt;backend-&gt;updateByMatch(
+            &quot;Content\\Location&quot;,
+            array( &quot;pathString&quot; =&gt; &quot;{$locationVO-&gt;pathString}%&quot; ),
+            array( &quot;invisible&quot; =&gt; true )
+        );
+
+       $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $locationVO-&gt;pathString ) );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function unHide( $id )
+    {
+        $this-&gt;backend-&gt;update( 'Content\\Location', $id, array( 'hidden' =&gt; false, 'invisible' =&gt; false ) );
+
+        $locationVO = $this-&gt;backend-&gt;load( 'Content\\Location', $id );
+        $hiddenLocations = $this-&gt;backend-&gt;find(
+            &quot;Content\\Location&quot;,
+            array(
+                &quot;pathString&quot; =&gt; &quot;{$locationVO-&gt;pathString}%&quot;,
+                &quot;hidden&quot; =&gt; true
+            )
+        );
+
+        $invisibleLocations = $this-&gt;backend-&gt;find(
+            &quot;Content\\Location&quot;,
+            array(
+                &quot;pathString&quot; =&gt; &quot;{$locationVO-&gt;pathString}%&quot;,
+                &quot;invisible&quot; =&gt; true,
+                &quot;hidden&quot; =&gt; false
+            )
+        );
+
+        $locationsToUnhide = array();
+        // Loop against all invisible locations and figure out
+        // if they are under a hidden one.
+        // If this is the case, the location won't be made visible
+        foreach ( $invisibleLocations as $loc )
+        {
+            foreach ( $hiddenLocations as $hiddenLoc )
+            {
+                if ( strpos( $loc-&gt;pathString, $hiddenLoc-&gt;pathString ) === 0 )
+                {
+                    continue 2;
+                }
+            }
+            $locationsToUnhide[] = $loc-&gt;id;
+        }
+
+        $this-&gt;backend-&gt;updateByMatch( 'Content\\Location', array( 'id' =&gt; $locationsToUnhide ), array( 'invisible' =&gt; false ) );
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $locationVO-&gt;pathString ) );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function swap( $locationId1, $locationId2 )
+    {
+        $location1 = $this-&gt;backend-&gt;load( 'Content\\Location', $locationId1 );
+        $content1 = $this-&gt;backend-&gt;load( 'Content', $location1-&gt;contentId );
+
+        $location2 = $this-&gt;backend-&gt;load( 'Content\\Location', $locationId2 );
+        $content2 = $this-&gt;backend-&gt;load( 'Content', $location2-&gt;contentId );
+
+        $this-&gt;backend-&gt;update(
+            'Content\\Location',
+            $locationId1,
+            array(
+                'contentId' =&gt; $location2-&gt;contentId,
+            )
+        );
+        $this-&gt;backend-&gt;update(
+            'Content\\Location',
+            $locationId2,
+            array(
+                'contentId' =&gt; $location1-&gt;contentId,
+            )
+        );
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $location1-&gt;pathString ) );
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $location2-&gt;pathString ) );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function update( UpdateStruct $location, $locationId )
+    {
+        return $this-&gt;backend-&gt;update(
+            'Content\\Location',
+            $locationId,
+            (array)$location
+        );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function create( CreateStruct $locationStruct )
+    {
+        $parentId = $locationStruct-&gt;parentId;
+        $parent = $this-&gt;load( $parentId );
+        $params = (array)$locationStruct;
+        $params['parentId'] = $parentId;
+        $params['depth'] = $parent-&gt;depth + 1;
+        $params['hidden'] = (bool)$locationStruct-&gt;hidden;
+        if ( !isset( $params['remoteId'] ) )
+        {
+            $params['remoteId'] = md5( uniqid( 'Content\\Location', true ) );
+        }
+
+        // Creation, then update for pathString/pathIdentificationString/mainLocationId
+        $mainLocationId = null;
+        $otherLocationsForContent = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'contentId' =&gt; $locationStruct-&gt;contentId ) );
+        if ( !empty( $otherLocationsForContent ) )
+        {
+            $mainLocationId = $otherLocationsForContent[0]-&gt;id;
+        }
+        $vo = $this-&gt;backend-&gt;create( 'Content\\Location', $params );
+        $pathString = $parent-&gt;pathString . $vo-&gt;id . '/';
+        $this-&gt;backend-&gt;update(
+            'Content\\Location',
+            $vo-&gt;id,
+            array(
+                'pathString' =&gt; $pathString,
+                'pathIdentificationString' =&gt; $this-&gt;getPathIdentificationString( $vo ),
+                'mainLocationId' =&gt; isset( $mainLocationId ) ? $mainLocationId : $vo-&gt;id
+            )
+        );
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $parent-&gt;pathString ) );
+        return $this-&gt;load( $vo-&gt;id );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function removeSubtree( $locationId )
+    {
+        $location = $this-&gt;load( $locationId );
+
+        // Begin recursive call on children, if any
+        $directChildren = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'parentId' =&gt; $locationId ) );
+        if ( !empty( $directChildren ) )
+        {
+            foreach ( $directChildren as $child )
+            {
+                $this-&gt;removeSubtree( $child-&gt;id );
+            }
+        }
+
+        $this-&gt;delete( $locationId );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function setSectionForSubtree( $locationId, $sectionId )
+    {
+        $location = $this-&gt;load( $locationId );
+        $aContentIds = array( $location-&gt;contentId );
+        $children = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'pathString' =&gt; &quot;$location-&gt;pathString%&quot; ) );
+        foreach ( $children as $child )
+        {
+            // Only get main locations
+            if ( $child-&gt;mainLocationId == $child-&gt;id )
+            {
+                $aContentIds[] = $child-&gt;contentId;
+            }
+        }
+
+        $this-&gt;backend-&gt;updateByMatch(
+            'Content',
+            array( 'id' =&gt; $aContentIds ),
+            array( 'sectionId' =&gt; $sectionId )
+        );
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function storeUrlAliasPath( $path, $locationId, $languageName = null, $alwaysAvailable = false )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function createCustomUrlAlias( $alias, $locationId, $forwarding = false, $languageName = null, $alwaysAvailable = false )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function createUrlHistoryEntry( $historicUrl, $locationId )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function listUrlsForLocation( $locationId, $urlType )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function removeUrlsForLocation( $locationId, array $urlIdentifier )
+    {
+    }
+
+    /**
+     * @see eZ\Publish\SPI\Persistence\Content\Location\Handler
+     */
+    public function getPath( $locationId, $language )
+    {
+    }
+
+    /**
+     * Removes a location from its $locationId (but not its descendants)
+     * Content which looses its main Location will get the first
+     * of its other Locations assigned as the new main Location.
+     * If content has no location left, it's removed from backend
+     *
+     * @param mixed $locationId
+     */
+    public function delete( $locationId )
+    {
+        $location = $this-&gt;load( $locationId );
+        $this-&gt;backend-&gt;delete( 'Content\\Location', $locationId );
+        $remainingLocations = $this-&gt;backend-&gt;find( 'Content\\Location', array( 'contentId' =&gt; $location-&gt;contentId ) );
+        // If no remaining location for associated content, remove the content as well
+        // Else, update the mainLocationId if needed
+        if ( empty( $remainingLocations ) )
+        {
+            try
+            {
+                $this-&gt;handler-&gt;contentHandler()-&gt;delete( $location-&gt;contentId );
+            }
+            // Ignoring a NotFound exception since the content handler also takes care of removing itself and locations
+            catch ( NotFound $e )
+            {
+            }
+        }
+        else
+        {
+            $this-&gt;backend-&gt;updateByMatch(
+                'Content\\Location',
+                array( 'contentId' =&gt; $location-&gt;contentId ),
+                array( 'mainLocationId' =&gt; $remainingLocations[0]-&gt;id )
+            );
+        }
+
+        $this-&gt;updateSubtreeModificationTime( $this-&gt;getParentPathString( $location-&gt;pathString ) );
+    }
+
+    /**
+     * Returns locations given a parent $locationId.
+     *
+     * @todo Requires approbation
+     * @param mixed $locationId
+     * @return \eZ\Publish\SPI\Persistence\Content\Location[]
+     */
+    public function loadByParentId( $locationId )
+    {
+        $result = $this-&gt;backend-&gt;find( &quot;Content\\Location&quot;, array( &quot;parentId&quot; =&gt; $locationId ) );
+
+        // If no result is found this might be caused by an unexisting location ID.
+        // We call load() to trigger a NotFound exception in such case for consistencies
+        // across the API.
+        if ( empty( $result ) )
+        {
+            $this-&gt;load( $locationId );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Updates subtree modification time for all locations starting from $startPathString
+     * @param string $startPathString
+     */
+    private function updateSubtreeModificationTime( $startPathString )
+    {
+        $this-&gt;backend-&gt;updateByMatch(
+            'Content\\Location',
+            array( 'pathString' =&gt; $startPathString . '%' ),
+            array( 'modifiedSubLocation' =&gt; time() )
+        );
+    }
+
+    /**
+     * Returns parent path string for $pathString
+     * @param string $pathString
+     * @return string
+     */
+    private function getParentPathString( $pathString )
+    {
+        return substr( $pathString, 0, -2 );
+    }
+
+    /**
+     * Returns pathIdentificationString for provided location value object
+     * @param eZ\Publish\SPI\Persistence\Content\Location $vo
+     * @return string
+     */
+    private function getPathIdentificationString( LocationValue $vo )
+    {
+        $parent = $this-&gt;load( $vo-&gt;parentId );
+        if ( $vo-&gt;parentId == 1 )
+        {
+            return '';
+        }
+
+        if ( empty( $parent-&gt;pathIdentificationString ) )
+        {
+            return $this-&gt;getStrippedContentName( $vo );
+        }
+
+        return $parent-&gt;pathIdentificationString . '/' . $this-&gt;getStrippedContentName( $vo );
+    }
+
+    /**
+     * Returns stripped content name from location value
+     * All downcase, special chars to underscores
+     * e.g. my_content_name
+     * @param LocationValue $vo
+     * @return string
+     */
+    private function getStrippedContentName( LocationValue $vo )
+    {
+        $version = $this-&gt;backend-&gt;find(
+            &quot;Content\\Version&quot;,
+            array(
+                &quot;contentId&quot; =&gt; $vo-&gt;contentId,
+                &quot;versionNo&quot; =&gt; $this-&gt;backend-&gt;load( 'Content', $vo-&gt;contentId )-&gt;currentVersionNo
+            )
+        );
+        return isset( $version[0]-&gt;name[&quot;eng-GB&quot;] )
+            ? preg_replace(
+                '`[^a-z0-9_]`i',
+                '_',
+                strtolower(
+                    trim(
+                        strtr(
+                            // @todo Remove hardcoding of eng-GB
+                            $version[0]-&gt;name[&quot;eng-GB&quot;],
+                            self::CHARS_ACCENT,
+                            self::CHARS_NOACCENT
+                        )
+                    )
+                )
+            )
+            : null;
+    }
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

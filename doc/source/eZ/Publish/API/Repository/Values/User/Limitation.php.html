@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+namespace eZ\Publish\API\Repository\Values\User;
+
+use eZ\Publish\API\Repository\Values\ValueObject;
+/**
+ * This class represents a Limitation apllied to a policy
+ */
+abstract class Limitation extends ValueObject
+{
+    // consts for BC
+    const CONTENTTYPE = &quot;Class&quot;;
+    const LANGUAGE = &quot;Language&quot;;
+    const LOCATION = &quot;Node&quot;;
+    const OWNER = &quot;Owner&quot;;
+    const PARENTOWNER = &quot;ParentOwner&quot;;
+    const PARENTCONTENTTYPE = &quot;ParentClass&quot;;
+    const PARENTDEPTH = &quot;ParentDepth&quot;;
+    const SECTION = &quot;Section&quot;;
+    const SITEACCESS = &quot;SiteAccess&quot;;
+    const STATE = &quot;State&quot;;
+    const SUBTREE = &quot;Subtree&quot;;
+    const USERGROUP = &quot;Group&quot;;
+    const PARENTUSERGROUP = &quot;ParentGroup&quot;;
+
+    /**
+     *
+     * returns the limitation identifer (one of the defined constants) or a custom limitation
+     * @return string
+     */
+    public abstract function getIdentifier();
+
+    /**
+     *
+     * An integer list of ids or identifiers for which the limitation should be applied
+     * @var array of mixed
+     */
+    public $limitationValues;
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ *
+ * @package eZ\Publish\API\Repository\Values\Content\Query
+ */
+namespace eZ\Publish\API\Repository\Values\Content\Query;
+
+
+/**
+ * Base interface for Criterion implementations
+ * @package eZ\Publish\API\Repository\Values\Content\Query
+ */
+interface CriterionInterface
+{
+    /**
+     * Creates a new Criterion for $target with operator $operator on $value
+     *
+     * @param string $target The target (field identifier for a field, metadata identifier, etc)
+     * @param string $operator The criterion operator, from Criterion\Operator
+     * @param mixed $value The Criterion value, either as an individual item or an array
+     *
+     *@return CriterionInterface
+     */
+    public static function createFromQueryBuilder( $target, $operator, $value );
+
+    /**
+     * Criterion description function.
+     *
+     * Returns the combination of the Criterion's supported operator/value,
+     * as an array of eZ\Publish\API\Repository\Values\Content\Query\Criterion\Operator\Specifications objects
+     * - Operator is one supported Operator, as an Operator::* constant
+     * - ValueType is the type of input value this operator requires, either array or single
+     * - SupportedTypes is an array of types the operator will accept
+     * - ValueCountLimitation is an integer saying how many values are expected.
+     *
+     * &lt;code&gt;
+     * // IN and EQ are supported
+     * return array(
+     *     // The EQ operator expects a single value, either as an integer or a string
+     *     new Specifications(
+     *         Operator::EQ,
+     *         Specifications::INPUT_TYPE_SINGLE,
+     *         array( Specifications::INPUT_VALUE_INTEGER, Specifications::INPUT_VALUE_STRING ),
+     *     ),
+     *     // The IN operator expects an array of values, of either integers or strings
+     *     new Specifications(
+     *         Operator::IN,
+     *         Specifications::INPUT_TYPE_ARRAY,
+     *         array( Specifications::INPUT_VALUE_INTEGER, Specifications::INPUT_VALUE_STRING )
+     *     )
+     * )*
+     * &lt;/code&gt;
+     * @return \eZ\Publish\API\Repository\Values\Content\Query\Criterion\Operator\Specifications[]
+     */
+    public function getSpecifications();
+}
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>

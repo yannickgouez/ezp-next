@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../js/jquery-1.4.2.min.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shCore.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushJScript.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushPhp.js">
+        </script>
+        <script
+            type="text/javascript"
+            src="../../../../../../../../../../syntax_highlighter/scripts/shBrushXml.js">
+        </script>
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCore.css" rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shCoreEclipse.css"
+            rel="stylesheet" type="text/css"
+        />
+        <link
+            href="../../../../../../../../../../syntax_highlighter/styles/shThemeWordpress.css"
+            rel="stylesheet" type="text/css"
+        />
+    </head>
+    <body>
+        <pre class="brush: php">&lt;?php
+/**
+ * File containing the EzcDatabase date metadata criterion handler class
+ *
+ * @copyright Copyright (C) 1999-2012 eZ Systems AS. All rights reserved.
+ * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2
+ * @version //autogentag//
+ */
+
+namespace eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler;
+use eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriterionHandler,
+    eZ\Publish\Core\Persistence\Legacy\Content\Search\Gateway\CriteriaConverter,
+    eZ\Publish\SPI\Persistence\Content\Query\Criterion,
+    ezcQuerySelect;
+
+/**
+ * Date metadata criterion handler
+ */
+class DateMetadata extends CriterionHandler
+{
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function accept( Criterion $criterion )
+    {
+        return $criterion instanceof Criterion\DateMetadata;
+    }
+
+    /**
+     * Check if this criterion handler accepts to handle the given criterion.
+     *
+     * @param CriteriaConverter $converter
+     * @param \ezcQuerySelect $query
+     * @param Criterion $criterion
+     * @return \ezcQueryExpression
+     */
+    public function handle( CriteriaConverter $converter, ezcQuerySelect $query, Criterion $criterion )
+    {
+        $column = $this-&gt;dbHandler-&gt;quoteColumn(
+            $criterion-&gt;target === Criterion\DateMetadata::MODIFIED
+                ? 'modified'
+                : 'published',
+            'ezcontentobject'
+        );
+
+        switch ( $criterion-&gt;operator )
+        {
+            case Criterion\Operator::IN:
+                return $query-&gt;expr-&gt;in(
+                    $column,
+                    $criterion-&gt;value
+                );
+
+            case Criterion\Operator::BETWEEN:
+                return $query-&gt;expr-&gt;between(
+                    $column,
+                    $query-&gt;bindValue( $criterion-&gt;value[0] ),
+                    $query-&gt;bindValue( $criterion-&gt;value[1] )
+                );
+
+            case Criterion\Operator::EQ:
+            case Criterion\Operator::GT:
+            case Criterion\Operator::GTE:
+            case Criterion\Operator::LT:
+            case Criterion\Operator::LTE:
+                $operatorFunction = $this-&gt;comparatorMap[$criterion-&gt;operator];
+                return $query-&gt;expr-&gt;$operatorFunction(
+                    $column,
+                    $query-&gt;bindValue( reset( $criterion-&gt;value ) )
+                );
+
+            default:
+                throw new \RuntimeException( 'Unknown operator.' );
+        }
+
+    }
+}
+
+</pre>
+        <script type="text/javascript">
+             SyntaxHighlighter.all()
+             jQuery('.gutter div').each(function(key, data){
+                jQuery(data).prepend('<a name="L'+jQuery(data).text()+'"/>');
+             });
+        </script>
+    </body>
+</html>
