@@ -11,7 +11,7 @@ namespace ezp\Persistence\Storage\InMemory;
 use ezp\Base\Exception\InvalidArgumentValue,
     ezp\Base\Exception\Logic,
     ezp\Base\Exception\NotFound,
-    ezp\Content\FieldType\Factory,
+    eZ\Publish\Core\Repository\FieldType\Factory,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Content\FieldTypeConstraints,
     ezp\Persistence\ValueObject;

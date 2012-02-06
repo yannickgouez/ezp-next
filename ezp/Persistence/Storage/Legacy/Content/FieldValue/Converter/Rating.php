@@ -13,7 +13,7 @@ use ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Content\Type\FieldDefinition,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
-    ezp\Content\FieldType\Rating\Value as RatingValue;
+    eZ\Publish\Core\Repository\FieldType\Rating\Value as RatingValue;
 
 class Rating implements Converter
 {

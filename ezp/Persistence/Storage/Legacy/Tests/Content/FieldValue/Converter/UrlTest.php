@@ -8,7 +8,7 @@
  */
 
 namespace ezp\Persistence\Storage\Legacy\Tests\Content\FieldValue\Converter;
-use ezp\Content\FieldType\Url\Value as UrlValue,
+use eZ\Publish\Core\Repository\FieldType\Url\Value as UrlValue,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
@@ -66,7 +66,7 @@ class UrlTest extends PHPUnit_Framework_TestCase
         $fieldValue = new FieldValue;
 
         $this->converter->toFieldValue( $storageFieldValue, $fieldValue );
-        self::assertInstanceOf( "ezp\\Content\\FieldType\\Url\\Value", $fieldValue->data );
+        self::assertInstanceOf( "eZ\\Publish\\Core\\Repository\\FieldType\\Url\\Value", $fieldValue->data );
         self::assertFalse( $fieldValue->sortKey );
         self::assertSame( $text, $fieldValue->data->text );
         self::assertEquals( $urlId, $fieldValue->data->getState( "urlId" ) );

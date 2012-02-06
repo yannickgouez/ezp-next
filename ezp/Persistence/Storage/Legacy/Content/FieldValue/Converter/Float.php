@@ -13,12 +13,12 @@ use ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Content\Type\FieldDefinition,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
-    ezp\Content\FieldType\Float\Value as FloatValue,
-    ezp\Content\FieldType\FieldSettings;
+    eZ\Publish\Core\Repository\FieldType\Float\Value as FloatValue,
+    eZ\Publish\Core\Repository\FieldType\FieldSettings;
 
 class Float implements Converter
 {
-    const FLOAT_VALIDATOR_FQN = 'ezp\\Content\\FieldType\\Float\\FloatValueValidator';
+    const FLOAT_VALIDATOR_FQN = 'eZ\\Publish\\Core\\Repository\\FieldType\\Float\\FloatValueValidator';
 
     const NO_MIN_MAX_VALUE = 0;
     const HAS_MIN_VALUE = 1;

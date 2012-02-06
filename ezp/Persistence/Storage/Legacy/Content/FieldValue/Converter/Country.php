@@ -14,8 +14,8 @@ use ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Content\Type\FieldDefinition,
-    ezp\Content\FieldType\FieldSettings,
-    ezp\Content\FieldType\Country\Value as CountryValue,
+    eZ\Publish\Core\Repository\FieldType\FieldSettings,
+    eZ\Publish\Core\Repository\FieldType\Country\Value as CountryValue,
     DOMDocument;
 
 class Country implements Converter

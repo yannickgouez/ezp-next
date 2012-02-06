@@ -16,7 +16,7 @@ use ezp\Persistence\Content\Location as LocationValue,
     ezp\Persistence\Content\FieldValue,
     ezp\Base\Exception\NotFound,
     ezp\Content\Location,
-    ezp\Content\FieldType\TextLine\Value as TextLineValue;
+    eZ\Publish\Core\Repository\FieldType\TextLine\Value as TextLineValue;
 
 /**
  * Test case for Location Handler using in memory storage.

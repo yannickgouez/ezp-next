@@ -8,14 +8,14 @@
  */
 
 namespace ezp\Persistence\Storage\Legacy\Tests\Content\FieldValue\Converter;
-use ezp\Content\FieldType\Checkbox\Value as CheckboxValue,
+use eZ\Publish\Core\Repository\FieldType\Checkbox\Value as CheckboxValue,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
     ezp\Persistence\Storage\Legacy\Content\FieldValue\Converter\Checkbox as CheckboxConverter,
     ezp\Persistence\Content\Type\FieldDefinition as PersistenceFieldDefinition,
     ezp\Persistence\Content\FieldTypeConstraints,
-    ezp\Content\FieldType\FieldSettings,
+    eZ\Publish\Core\Repository\FieldType\FieldSettings,
     PHPUnit_Framework_TestCase;
 
 /**
@@ -66,7 +66,7 @@ class CheckboxTest extends PHPUnit_Framework_TestCase
         $fieldValue = new FieldValue;
 
         $this->converter->toFieldValue( $storageFieldValue, $fieldValue );
-        self::assertInstanceOf( 'ezp\\Content\\FieldType\\Checkbox\\Value', $fieldValue->data );
+        self::assertInstanceOf( 'eZ\\Publish\\Core\\Repository\\FieldType\\Checkbox\\Value', $fieldValue->data );
         self::assertSame( (bool)$storageFieldValue->dataInt, $fieldValue->data->bool );
         self::assertSame( $storageFieldValue->sortKeyInt, $fieldValue->sortKey['sort_key_int'] );
     }
@@ -118,9 +118,9 @@ class CheckboxTest extends PHPUnit_Framework_TestCase
         );
 
         $this->converter->toFieldDefinition( $storageDef, $fieldDef );
-        self::assertInstanceOf( 'ezp\\Content\\FieldType\\Checkbox\\Value', $fieldDef->defaultValue->data );
+        self::assertInstanceOf( 'eZ\\Publish\\Core\\Repository\\FieldType\\Checkbox\\Value', $fieldDef->defaultValue->data );
         self::assertSame( $defaultBool, $fieldDef->defaultValue->data->bool );
-        self::assertInstanceOf( 'ezp\\Content\\FieldType\\FieldSettings', $fieldDef->fieldTypeConstraints->fieldSettings );
+        self::assertInstanceOf( 'eZ\\Publish\\Core\\Repository\\FieldType\\FieldSettings', $fieldDef->fieldTypeConstraints->fieldSettings );
         self::assertSame(
             array( 'defaultValue' => $defaultBool ),
             $fieldDef->fieldTypeConstraints->fieldSettings->getArrayCopy()

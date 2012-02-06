@@ -17,7 +17,7 @@ use ezp\Persistence\Content,
     ezp\Persistence\Content\Query\Criterion\ContentId,
     ezp\Base\Exception\NotFound,
     ezp\Content\Relation,
-    ezp\Content\FieldType\TextLine\Value as TextLineValue,
+    eZ\Publish\Core\Repository\FieldType\TextLine\Value as TextLineValue,
     ezp\Persistence\Content\Relation\CreateStruct as RelationCreateStruct;
 
 /**

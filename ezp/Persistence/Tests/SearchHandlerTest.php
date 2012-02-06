@@ -13,7 +13,7 @@ use ezp\Persistence\Content,
     ezp\Persistence\Content\Field,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Content\Query\Criterion\ContentId,
-    ezp\Content\FieldType\TextLine\Value as TextLineValue,
+    eZ\Publish\Core\Repository\FieldType\TextLine\Value as TextLineValue,
     ezp\Base\Exception\NotFound;
 
 /**

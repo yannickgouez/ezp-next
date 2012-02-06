@@ -8,7 +8,7 @@
  */
 
 namespace ezp\Persistence\Storage\Legacy\Tests\Content\FieldValue\Converter;
-use ezp\Content\FieldType\Keyword\Value as KeywordValue,
+use eZ\Publish\Core\Repository\FieldType\Keyword\Value as KeywordValue,
     ezp\Persistence\Content\FieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldValue,
     ezp\Persistence\Storage\Legacy\Content\StorageFieldDefinition,
@@ -63,7 +63,7 @@ class KeywordTest extends PHPUnit_Framework_TestCase
         $fieldValue = new FieldValue;
 
         $this->converter->toFieldValue( $storageFieldValue, $fieldValue );
-        $this->assertInstanceOf( "ezp\\Content\\FieldType\\Keyword\\Value", $fieldValue->data );
+        $this->assertInstanceOf( "eZ\\Publish\\Core\\Repository\\FieldType\\Keyword\\Value", $fieldValue->data );
         $this->assertSame( array(), $fieldValue->data->values );
         $this->assertNull( $fieldValue->fieldSettings );
         $this->assertNull( $fieldValue->sortKey );
