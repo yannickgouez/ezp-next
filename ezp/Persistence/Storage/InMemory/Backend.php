@@ -404,14 +404,17 @@ class Backend
             {
                 if ( $type === "Content\\Field" && $prop === "value" && ! $data["value"] instanceof FieldValue )
                 {
-                    $fieldValueClassName = Factory::getFieldTypeNamespace( $obj->type ) . "\\Value";
+                    $fieldTypeNS = Factory::getFieldTypeNamespace( $obj->type );
+                    $fieldValueClassName =  "$fieldTypeNS\\Value";
                     $fieldTypeValue = new $fieldValueClassName;
                     foreach ( $data["value"] as $fieldValuePropertyName => $fieldValuePropertyValue )
                     {
                         $fieldTypeValue->$fieldValuePropertyName = $fieldValuePropertyValue;
                     }
 
-                    $value = new FieldValue( array( "data" => $fieldTypeValue ) );
+                    $fieldTypeeClassName =  "$fieldTypeNS\\Type";
+                    $fieldType = new $fieldTypeeClassName;
+                    $value = $fieldType->toPersistenceValue( $fieldTypeValue );
                 }
                 else if ( $type === "Content\\Type\\FieldDefinition" && $prop === "fieldTypeConstraints" && !$data["fieldTypeConstraints"] instanceof FieldTypeConstraints )
                 {
