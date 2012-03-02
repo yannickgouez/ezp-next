@@ -17,7 +17,8 @@ use eZ\Publish\Core\Persistence\Legacy\Content\Gateway,
     eZ\Publish\SPI\Persistence\Content\UpdateStruct,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion,
     eZ\Publish\SPI\Persistence\Content\RestrictedVersion,
-    eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as RelationCreateStruct;
+    eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as RelationCreateStruct,
+    eZ\Publish\Core\Base\Exceptions\NotFound;
 
 /**
  * The Content Handler stores Content and ContentType objects.
@@ -333,7 +334,8 @@ class Handler implements BaseContentHandler
      */
     public function updateMetadata( $contentId, MetadataUpdateStruct $content )
     {
-
+        $this->contentGateway->updateContent( $contentId, $content );
+        return $this->loadContentInfo( $contentId );
     }
 
     /**
@@ -346,7 +348,18 @@ class Handler implements BaseContentHandler
      */
     public function updateContent( $contentId, $versionNo, UpdateStruct $content )
     {
+        $this->contentGateway->updateVersion( $contentId, $versionNo, $content );
+        $this->fieldHandler->updateFields( $content );
+        foreach ( $content->name as $language => $name )
+        {
+            $this->contentGateway->setName(
+                $content->id,
+                $content->versionNo,
+                $name, $language
+            );
+        }
 
+        return $this->load( $content->id, $content->versionNo );
     }
 
     /**
