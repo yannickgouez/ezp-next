@@ -264,7 +264,9 @@ class Handler implements BaseContentHandler
      */
     public function loadVersionInfo( $contentId, $versionNo )
     {
-
+        return $this->mapper->extractVersionInfoFromRow(
+            $this->contentGateway->loadVersionInfo( $contentId, $versionNo )
+        );
     }
 
     /**
