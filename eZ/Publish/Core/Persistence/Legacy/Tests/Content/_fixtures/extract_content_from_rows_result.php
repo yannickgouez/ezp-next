@@ -1,34 +1,39 @@
 <?php
 
 use eZ\Publish\SPI\Persistence\Content,
+    eZ\Publish\SPI\Persistence\Content\ContentInfo,
     eZ\Publish\SPI\Persistence\Content\Field,
     eZ\Publish\SPI\Persistence\Content\FieldValue,
     eZ\Publish\SPI\Persistence\Content\Location,
-    eZ\Publish\SPI\Persistence\Content\Version;
+    eZ\Publish\SPI\Persistence\Content\VersionInfo;
 
 $content = new Content();
-$content->id = 226;
-$content->typeId = 16;
-$content->sectionId = 1;
-$content->ownerId = 14;
-$content->remoteId = '95a226fb62c1533f60c16c3769bc7c6c';
+$content->contentInfo = new ContentInfo();
+$content->contentInfo->contentId = 226;
+$content->contentInfo->contentTypeId = 16;
+$content->contentInfo->sectionId = 1;
+$content->contentInfo->ownerId = 14;
+$content->contentInfo->remoteId = '95a226fb62c1533f60c16c3769bc7c6c';
+$content->contentInfo->isAlwaysAvailable = true;
+$content->contentInfo->modificationDate = 1313061404;
+$content->contentInfo->publicationDate = 1313047907;
+$content->contentInfo->currentVersionNo = 2;
+$content->contentInfo->mainLanguageCode = 'eng-US';
+$content->contentInfo->name = 'Something';
 $content->locations = array( new Location() );
-$content->alwaysAvailable = true;
-$content->modified = 1313061404;
-$content->published = 1313047907;
-$content->currentVersionNo = 2;
-$content->initialLanguageId = 2;
+$content->fields = array();
 
-$version = new Version();
-$version->id = 675;
-$version->name = array( 'eng-US' => 'Something' );
-$version->versionNo = 1;
-$version->modified = 1313047907;
-$version->creatorId = 14;
-$version->created = 1313047865;
-$version->status = 3;
-$version->contentId = 226;
-$version->fields = array();
+$versionInfo = new VersionInfo();
+$versionInfo->id = 675;
+$versionInfo->names = array( 'eng-US' => 'Something' );
+$versionInfo->versionNo = 1;
+$versionInfo->modificationDate = 1313047907;
+$versionInfo->creatorId = 14;
+$versionInfo->creationDate = 1313047865;
+$versionInfo->status = 3;
+$versionInfo->contentId = 226;
+$versionInfo->initialLanguageCode = 'eng-US';
+$versionInfo->languageIds = array( 2 );
 
 $field = new Field();
 $field->id = 1332;
@@ -38,7 +43,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1333;
@@ -48,7 +53,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1334;
@@ -58,7 +63,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1335;
@@ -68,7 +73,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1336;
@@ -78,7 +83,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1337;
@@ -88,7 +93,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1338;
@@ -98,7 +103,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1339;
@@ -108,7 +113,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1340;
@@ -118,7 +123,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1341;
@@ -128,7 +133,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1342;
@@ -138,7 +143,7 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
 $field = new Field();
 $field->id = 1343;
@@ -148,8 +153,8 @@ $field->value = new FieldValue();
 $field->language = 'eng-US';
 $field->versionNo = 1;
 
-$version->fields[] = $field;
+$content->fields[] = $field;
 
-$content->version = $version;
+$content->versionInfo = $versionInfo;
 
 return $content;
