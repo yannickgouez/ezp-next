@@ -23,7 +23,7 @@ use eZ\Publish\SPI\Persistence\Content,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion\LogicalAnd,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion\Operator,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion\Subtree,
-    ezp\Base\Exception\NotFound,
+    eZ\Publish\Core\Base\Exceptions\NotFound,
     Exception;
 
 /**
@@ -86,7 +86,7 @@ class SearchHandler extends SearchHandlerInterface
         }
 
         $list = $this->backend->find(
-            'Content',
+            'Content\\ContentInfo',
             $match,
             array(
                 'locations' => array(
@@ -94,7 +94,7 @@ class SearchHandler extends SearchHandlerInterface
                     'match' => array( 'contentId' => 'id' )
                 ),
                 'version' => array(
-                    'type' => 'Content\\Version',
+                    'type' => 'Content\\VersionInfo',
                     'single' => true,
                     'match' => array( 'contentId' => 'id', 'versionNo' => 'currentVersionNo' ),
                     'sub' => array(

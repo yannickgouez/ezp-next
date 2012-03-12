@@ -10,9 +10,10 @@
 namespace eZ\Publish\Core\Persistence\InMemory;
 use ezp\Base\Exception\InvalidArgumentValue,
     ezp\Base\Exception\Logic,
-    ezp\Base\Exception\NotFound,
+    eZ\Publish\Core\Base\Exceptions\NotFound,
     eZ\Publish\SPI\Persistence\Content\FieldValue,
     eZ\Publish\SPI\Persistence\Content\FieldTypeConstraints,
+    eZ\Publish\SPI\Persistence\Content\ContentInfo,
     eZ\Publish\SPI\Persistence\ValueObject;
 
 /**
@@ -423,6 +424,19 @@ class Backend
                 else
                 {
                     $value = $data[$prop];
+                }
+            }
+            // Property doesn't exist in $data, a specific mapping can be needed
+            else
+            {
+                if ( $type === "Content\\ContentInfo" )
+                {
+                    switch ( $prop )
+                    {
+                        case 'contentId':
+                            $value = $data['id'];
+                            break;
+                    }
                 }
             }
         }
