@@ -14,7 +14,7 @@ use eZ\Publish\SPI\Persistence\Content\Location\Trashed as TrashedValue,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion\ContentId,
     eZ\Publish\SPI\Persistence\Content\Field,
     eZ\Publish\SPI\Persistence\Content\FieldValue,
-    ezp\Base\Exception\NotFound,
+    eZ\Publish\Core\Base\Exceptions\NotFound,
     ezp\Content\Location,
     ezp\Content\FieldType\TextLine\Value as TextLineValue;
 
@@ -109,7 +109,7 @@ class TrashHandlerTest extends HandlerTest
                 )
             );
 
-            $this->lastContentId = $content->id;
+            $this->lastContentId = $content->contentInfo->contentId;
 
             $this->locations[] = $location = $this->persistenceHandler->locationHandler()->create(
                 new CreateStruct(
@@ -157,7 +157,7 @@ class TrashHandlerTest extends HandlerTest
         {
             try
             {
-                $contentHandler->delete( $content->id );
+                $contentHandler->delete( $content->contentInfo->contentId );
             }
             catch ( NotFound $e )
             {
@@ -189,7 +189,7 @@ class TrashHandlerTest extends HandlerTest
     }
 
     /**
-     * @expectedException \ezp\Base\Exception\NotFound
+     * @expectedException \eZ\Publish\Core\Base\Exceptions\NotFound
      * @covers \eZ\Publish\Core\Persistence\InMemory\TrashHandler::load
      * @group trashHandler
      */

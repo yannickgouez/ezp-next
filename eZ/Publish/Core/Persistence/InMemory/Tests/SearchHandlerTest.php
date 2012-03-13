@@ -14,7 +14,7 @@ use eZ\Publish\SPI\Persistence\Content,
     eZ\Publish\SPI\Persistence\Content\FieldValue,
     eZ\Publish\SPI\Persistence\Content\Query\Criterion\ContentId,
     ezp\Content\FieldType\TextLine\Value as TextLineValue,
-    ezp\Base\Exception\NotFound;
+    eZ\Publish\Core\Base\Exceptions\NotFound;
 
 /**
  * Test case for SearchHandler using in memory storage.
@@ -46,7 +46,7 @@ class SearchHandlerTest extends HandlerTest
         parent::setUp();
 
         $struct = new CreateStruct();
-        $struct->name = "test";
+        $struct->name = array( 'eng-GB' => "test" );
         $struct->ownerId = 14;
         $struct->sectionId = 1;
         $struct->typeId = 2;
@@ -65,7 +65,7 @@ class SearchHandlerTest extends HandlerTest
 
         $this->content = $this->persistenceHandler->contentHandler()->create( $struct );
         $this->contentToDelete[] = $this->content;
-        $this->contentId = $this->content->id;
+        $this->contentId = $this->content->contentInfo->contentId;
     }
 
     protected function tearDown()
@@ -77,7 +77,7 @@ class SearchHandlerTest extends HandlerTest
             // Removing default objects as well as those created by tests
             foreach ( $this->contentToDelete as $content )
             {
-                $contentHandler->delete( $content->id );
+                $contentHandler->delete( $content->contentInfo->contentId );
             }
         }
         catch ( NotFound $e )
@@ -94,11 +94,11 @@ class SearchHandlerTest extends HandlerTest
      */
     public function testFindSingle()
     {
-        $content = $this->persistenceHandler->searchHandler()->findSingle( new ContentId( $this->content->id ) );
-        $this->assertTrue( $content instanceof Content );
-        $this->assertEquals( $this->contentId, $content->id );
-        $this->assertEquals( 14, $content->ownerId );
-        $this->assertEquals( "test", $content->version->name );
-        $this->assertInstanceOf( "eZ\\Publish\\SPI\\Persistence\\Content\\VersionInfo", $content->version );
+        $content = $this->persistenceHandler->searchHandler()->findSingle( new ContentId( $this->content->contentInfo->contentId ) );
+        $this->assertInstanceOf( 'eZ\Publish\SPI\Persistence\Content', $content );
+        $this->assertEquals( $this->contentId, $content->contentInfo->contentId );
+        $this->assertEquals( 14, $content->contentInfo->ownerId );
+        $this->assertEquals( array( 'eng-GB' => 'test' ), $content->versionInfo->names );
+        $this->assertInstanceOf( "eZ\\Publish\\SPI\\Persistence\\Content\\VersionInfo", $content->versionInfo );
     }
 }

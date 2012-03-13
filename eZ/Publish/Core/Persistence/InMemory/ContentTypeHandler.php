@@ -17,7 +17,7 @@ use eZ\Publish\SPI\Persistence\Content\Type\Handler as ContentTypeHandlerInterfa
     eZ\Publish\SPI\Persistence\Content\Type\Group\CreateStruct as GroupCreateStruct,
     eZ\Publish\SPI\Persistence\Content\Type\Group\UpdateStruct as GroupUpdateStruct,
     eZ\Publish\SPI\Persistence\Content\Type\Group,
-    ezp\Base\Exception\NotFound,
+    eZ\Publish\Core\Base\Exceptions\NotFound,
     ezp\Base\Exception\BadRequest,
     eZ\Publish\Core\Persistence\InMemory\Handler,
     eZ\Publish\Core\Persistence\InMemory\Backend,

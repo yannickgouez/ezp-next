@@ -8,8 +8,8 @@
  */
 
 namespace eZ\Publish\Core\Persistence\InMemory;
-use ezp\Base\Exception\InvalidArgumentValue,
-    ezp\Base\Exception\Logic,
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue,
+    eZ\Publish\Core\Base\Exceptions\Logic,
     eZ\Publish\Core\Base\Exceptions\NotFound,
     eZ\Publish\SPI\Persistence\Content\FieldValue,
     eZ\Publish\SPI\Persistence\Content\FieldTypeConstraints,
@@ -58,28 +58,29 @@ class Backend
      * @param string $type
      * @param array $data
      * @param boolean $autoIncrement
+     * @param string $idColumn By default, id column is 'id', but this can be customized here (e.g. for 'contentId')
      * @return object
      * @throws InvalidArgumentValue On invalid $type
      * @throws Logic If $autoIncrement is false but $data does not include an id
      * @throws Logic If provided id already exists (and if defined, data contain same status property value)
      */
-    public function create( $type, array $data, $autoIncrement = true )
+    public function create( $type, array $data, $autoIncrement = true, $idColumn = 'id' )
     {
         if ( !is_scalar( $type ) || !isset( $this->data[$type] ) )
             throw new InvalidArgumentValue( 'type', $type );
 
         if ( $autoIncrement )
         {
-            $data['id'] = $this->getNextId( $type );
+            $data[$idColumn] = $this->getNextId( $type, $idColumn );
         }
-        else if ( !$data['id'] )
+        else if ( !$data[$idColumn] )
         {
           throw new Logic( 'create', '$autoIncrement is false but no id is provided' );
         }
 
         foreach ( $this->data[$type] as $item )
         {
-            if ( $item['id'] == $data['id'] && ( !isset( $item['status'] ) || $item['status'] == $data['status'] ) )
+            if ( $item[$idColumn] == $data[$idColumn] && ( !isset( $item['status'] ) || $item['status'] == $data['status'] ) )
                 throw new Logic( 'create', 'provided id already exist' );
         }
 
@@ -97,7 +98,7 @@ class Backend
      * @throws \ezp\Base\Exception\NotFound If data does not exist
      * @throws \ezp\Base\Exception\Logic If several items exists with same id
      */
-    public function load( $type, $id )
+    public function load( $type, $id, $idColumn = 'id' )
     {
         if ( !is_scalar( $type ) || !isset( $this->data[$type] ) )
             throw new InvalidArgumentValue( 'type', $type );
@@ -106,7 +107,7 @@ class Backend
         $found = false;
         foreach ( $this->data[$type] as $item )
         {
-            if ( $item['id'] != $id )
+            if ( $item[$idColumn] != $id )
                 continue;
             if ( $return )
                 throw new Logic( $type, "more than one item exist with id: {$id}" );
@@ -164,9 +165,9 @@ class Backend
      * @return boolean False if data does not exist and can not be updated
      * @uses updateByMatch()
      */
-    public function update( $type, $id, array $data, $union = true )
+    public function update( $type, $id, array $data, $union = true, $idColumn = 'id' )
     {
-        return $this->updateByMatch( $type, array( 'id' => $id ), $data, $union );
+        return $this->updateByMatch( $type, array( $idColumn => $id ), $data, $union );
     }
 
     /**
@@ -182,13 +183,13 @@ class Backend
      * @return boolean False if data does not exist and can not be updated
      * @throws InvalidArgumentValue On invalid $type
      */
-    public function updateByMatch( $type, array $match, array $data, $union = true )
+    public function updateByMatch( $type, array $match, array $data, $union = true, $idColumn = 'id' )
     {
         if ( !is_scalar( $type ) || !isset( $this->data[$type] ) )
             throw new InvalidArgumentValue( 'type', $type );
 
         // Make sure id isn't changed
-        unset( $data['id'] );
+        unset( $data[$idColumn] );
 
         $return = false;
         foreach ( $this->data[$type] as $key => $item )
@@ -213,9 +214,9 @@ class Backend
      * @throws \ezp\Base\Exception\NotFound If data does not exist
      * @uses deleteByMatch()
      */
-    public function delete( $type, $id )
+    public function delete( $type, $id, $idColumn = 'id' )
     {
-        $this->deleteByMatch( $type, array( 'id' => $id ) );
+        $this->deleteByMatch( $type, array( $idColumn => $id ) );
     }
 
     /**
@@ -376,12 +377,12 @@ class Backend
      * @param $type
      * @return int
      */
-    private function getNextId( $type )
+    private function getNextId( $type, $idColumn = 'id' )
     {
         $id = 0;
         foreach ( $this->data[$type] as $item )
         {
-            $id = max( $id, $item['id'] );
+            $id = max( $id, $item[$idColumn] );
         }
         return $id + 1;
     }
@@ -426,20 +427,8 @@ class Backend
                     $value = $data[$prop];
                 }
             }
-            // Property doesn't exist in $data, a specific mapping can be needed
-            else
-            {
-                if ( $type === "Content\\ContentInfo" )
-                {
-                    switch ( $prop )
-                    {
-                        case 'contentId':
-                            $value = $data['id'];
-                            break;
-                    }
-                }
-            }
         }
+
         return $this->joinToValue( $obj, $joinInfo );
     }
 
@@ -457,11 +446,18 @@ class Backend
             if ( isset( $info['single'] ) && $info['single'] )
             {
                 $value =& $item->$property;
-                $value = $this->toValue(
-                    $info['type'],
-                    $value[0],
-                    ( isset( $info['sub'] ) ? $info['sub'] : array() )
-                );
+                if ( !empty( $value ) )
+                {
+                    $value = $this->toValue(
+                        $info['type'],
+                        $value[0],
+                        ( isset( $info['sub'] ) ? $info['sub'] : array() )
+                    );
+                }
+                else
+                {
+                    $value = null;
+                }
                 continue;
             }
 
