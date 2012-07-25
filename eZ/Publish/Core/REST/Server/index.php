@@ -78,6 +78,7 @@ $inputDispatcher = new Common\Input\Dispatcher(
         'application/vnd.ez.api.PolicyUpdate'    => new Input\Parser\PolicyUpdate( $urlHandler, $repository->getRoleService() ),
         'application/vnd.ez.api.limitation'      => new Input\Parser\Limitation( $urlHandler ),
         'application/vnd.ez.api.RoleAssignInput' => new Input\Parser\RoleAssignInput( $urlHandler ),
+        'application/vnd.ez.api.LocationCreate'  => new Input\Parser\LocationCreate( $urlHandler, $repository->getLocationService() ),
     ) ),
     $handler
 );
@@ -109,6 +110,13 @@ $roleController = new Controller\Role(
     $repository->getUserService()
 );
 
+$locationController = new Controller\Location(
+    $inputDispatcher,
+    $urlHandler,
+    $repository->getLocationService(),
+    $repository->getContentService()
+);
+
 /*
  * Visitors are used to transform the Value Objects returned by the Public API
  * into the output format requested by the client. In some cases, it is
@@ -127,20 +135,22 @@ $valueObjectVisitors = array(
     '\\eZ\Publish\API\Repository\Exceptions\BadStateException'        => new Output\ValueObjectVisitor\BadStateException( $urlHandler,  true ),
     '\\Exception'                                                     => new Output\ValueObjectVisitor\Exception( $urlHandler,  true ),
 
-    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\SectionList'           => new Output\ValueObjectVisitor\SectionList( $urlHandler ),
-    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\CreatedSection'        => new Output\ValueObjectVisitor\CreatedSection( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\SectionList'          => new Output\ValueObjectVisitor\SectionList( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\CreatedSection'       => new Output\ValueObjectVisitor\CreatedSection( $urlHandler ),
     '\\eZ\\Publish\\API\\Repository\\Values\\Content\\Section'        => new Output\ValueObjectVisitor\Section( $urlHandler ),
 
-    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\ContentList'           => new Output\ValueObjectVisitor\ContentList( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\ContentList'          => new Output\ValueObjectVisitor\ContentList( $urlHandler ),
     '\\eZ\\Publish\\API\\Repository\\Values\\Content\\ContentInfo'    => new Output\ValueObjectVisitor\ContentInfo( $urlHandler ),
 
-    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\RoleList'              => new Output\ValueObjectVisitor\RoleList( $urlHandler ),
-    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\CreatedRole'           => new Output\ValueObjectVisitor\CreatedRole( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\RoleList'             => new Output\ValueObjectVisitor\RoleList( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\CreatedRole'          => new Output\ValueObjectVisitor\CreatedRole( $urlHandler ),
     '\\eZ\\Publish\\API\\Repository\\Values\\User\\Role'              => new Output\ValueObjectVisitor\Role( $urlHandler ),
     '\\eZ\\Publish\\API\\Repository\\Values\\User\\Policy'            => new Output\ValueObjectVisitor\Policy( $urlHandler ),
     '\\eZ\\Publish\\Core\\REST\\Server\\Values\\PolicyList'           => new Output\ValueObjectVisitor\PolicyList( $urlHandler ),
     '\\eZ\\Publish\\API\\Repository\\Values\\User\\Limitation'        => new Output\ValueObjectVisitor\Limitation( $urlHandler ),
     '\\eZ\\Publish\\Core\\REST\\Server\\Values\\RoleAssignmentList'   => new Output\ValueObjectVisitor\RoleAssignmentList( $urlHandler ),
+    '\\eZ\\Publish\\API\\Repository\\Values\\Content\\Location'       => new Output\ValueObjectVisitor\Location( $urlHandler ),
+    '\\eZ\\Publish\\Core\\REST\\Server\\Values\\LocationList'         => new Output\ValueObjectVisitor\LocationList( $urlHandler ),
 );
 
 /*
@@ -178,6 +188,13 @@ $dispatcher = new AuthenticatingDispatcher(
         ),
         '(^/content/objects/[0-9]+$)' => array(
             'PATCH' => array( $contentController, 'updateContentMetadata' ),
+        ),
+        '(^/content/objects/[0-9]+/locations$)' => array(
+            'GET' => array( $locationController, 'loadLocationsForContent' ),
+            'POST' => array( $locationController, 'createLocation' ),
+        ),
+        '(^/content/locations/[0-9/]+$)' => array(
+            'GET'    => array( $locationController, 'loadLocation' ),
         ),
         '(^/user/roles$)' => array(
             'GET' => array( $roleController, 'listRoles' ),
