@@ -44,6 +44,19 @@
 {% endspaceless %}
 {% endblock %}
 
+{% block ezcountry_field %}
+    {{ dump( field ) }}
+    {{ dump( fieldSettings ) }}
+    {% if field.value.countries|length() > 0 %}
+        <ul {{ block( 'field_attributes' ) }}>
+        {% for country in field.value.countries %}
+            <li>{{ country['Name'] }}, IDC: {{ country['IDC'] }}, Alpha2: {{ country['Alpha2'] }}, Alpha3: {{ country['Alpha3'] }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endspaceless %}
+{% endblock %}
+
 {# TODO: add translate filter #}
 {% block ezboolean_field %}
 {% spaceless %}
